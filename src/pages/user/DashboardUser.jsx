@@ -63,8 +63,6 @@ const DashboardUser = () => {
         setLoading(false);
       }
     })();
-
-    console.log(order);
   }, []);
 
   const handleOrderPlaced = (createdOrder) => {

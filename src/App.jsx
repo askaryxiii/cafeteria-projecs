@@ -11,6 +11,8 @@ import DashboardAccountant from "./pages/accountant/DashboardAccountant";
 import DashboardCafeteria from "./pages/cafeteria/DashboardCafeteria";
 import DashboardAdmin from "./pages/admin/DashboardAdmin";
 import PrivateLayout from "./layouts/PrivateLayout";
+import Orders from "./pages/user/Orders";
+import OrdersList from "./pages/user/OrdersList";
 
 const App = () => {
   return (
@@ -45,7 +47,26 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/user/orders"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                <PrivateLayout>
+                  <Orders />
+                </PrivateLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/orders/orderlist/:dates"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                <PrivateLayout>
+                  <OrdersList />
+                </PrivateLayout>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/chef"
             element={

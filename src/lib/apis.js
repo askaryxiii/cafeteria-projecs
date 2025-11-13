@@ -177,8 +177,6 @@ export async function getTotalPrice(selectedItems, token) {
 }
 
 export async function placeOrder(orderData, token) {
-  console.log("Placing order with data:", orderData, token);
-
   try {
     const res = await fetch(`${API_URL}/orders`, {
       method: "POST",

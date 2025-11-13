@@ -73,7 +73,6 @@ const Ordering = ({ onOrderPlaced }) => {
           return;
         }
         toast.success("Order placed successfully");
-        console.log("order result", res);
         if (typeof onOrderPlaced === "function") onOrderPlaced(res);
       } catch (err) {
         console.error(err);

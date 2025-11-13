@@ -127,3 +127,112 @@ body {
     animation: fadeIn 0.3s ease-out forwards;
   }
 }
+
+/* Container */
+.calendar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main Calendar box */
+.custom-calendar {
+  background-color: #e2e2e2 !important;
+  border: 1px solid #e2e2e2;
+  border-radius: 36px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+}
+
+/* Remove default borders */
+.react-calendar__tile,
+.react-calendar__navigation button {
+  border: none;
+  outline: none;
+}
+
+/* Header (month + year) */
+.react-calendar__navigation {
+  display: flex;
+  width: 100%;
+  justify-content: space-between !important;
+  align-items: center;
+  margin-bottom: 5px !important;
+}
+.react-calendar__navigation__label__labelText {
+  word-spacing: 7.5rem;
+}
+.react-calendar__navigation button {
+  background: none;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #000;
+  cursor: default;
+}
+
+/* Weekday names */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+/* Weekday (Mon, Tue...) */
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+  color: #000;
+}
+
+/* Monday blue color */
+.react-calendar__month-view__weekdays__weekday:nth-child(2) abbr {
+  color: #032552;
+}
+
+/* Dates */
+.react-calendar__tile {
+  text-align: center;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  background: none;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.react-calendar__month-view__days__day:disabled {
+  border-radius: 0 !important;
+  background-color: transparent !important;
+}
+
+.react-calendar__tile--now {
+  border: 1px solid #032552 !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+}
+
+/* Monday blue color in dates */
+.react-calendar__month-view__days__day:nth-child(7n + 2) {
+  color: #032552;
+  font-weight: 600;
+}
+
+/* Hover + active styles */
+.react-calendar__tile:hover {
+  background-color: #e8e8e8;
+  cursor: pointer;
+}
+
+.react-calendar__tile--active {
+  border: 1px solid #032552 !important;
+  background-color: #032552 !important;
+  color: #ffff !important;
+  border-radius: 0px;
+}
+
+/* Remove double arrows for months */
+.react-calendar__navigation__label {
+  pointer-events: none;
+}
+.react-calendar__navigation__arrow {
+  display: none;
+}

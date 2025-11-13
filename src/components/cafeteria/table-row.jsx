@@ -2,7 +2,12 @@ import { CheckboxInput } from "./checkbox-input";
 import { FaRegCircleUser } from "react-icons/fa6";
 
 export function TableRow({ item, onCheckChange, mealType }) {
-  const items = item.items;
+  const items = item?.items || [];
+
+  const getNames = (category) => {
+    const group = items.find((i) => i.category?.toLowerCase() === category);
+    return (group?.items || []).map((p) => p.item_name).join(" - ");
+  };
 
   return (
     <tr
@@ -19,10 +24,11 @@ export function TableRow({ item, onCheckChange, mealType }) {
       </td>
       <td className="px-4 py-4">
         <div className="flex items-center gap-2">
-          {/* <span className="text-lg">😊</span> */}
           <FaRegCircleUser className="w-5 h-5" />
           <span
-            className={`${item.checked ? "text-gray-400" : "text-gray-900"}`}>
+            className={`${
+              item.checked ? "text-gray-400 line-through" : "text-gray-900"
+            }`}>
             {item.name}
           </span>
         </div>
@@ -33,37 +39,25 @@ export function TableRow({ item, onCheckChange, mealType }) {
             className={`${
               item.checked ? "text-gray-400" : "text-gray-700"
             } text-center text-xl`}>
-            {items
-              .filter((i) => i.category.toLowerCase() === "protein")[0]
-              .items.map((p) => p.item_name)
-              .join(" - ")}
+            {getNames("protein")}
           </td>
           <td
             className={`${
               item.checked ? "text-gray-400" : "text-gray-700"
             } text-center text-xl`}>
-            {items
-              .filter((i) => i.category.toLowerCase() === "carbs")[0]
-              .items.map((p) => p.item_name)
-              .join(" - ")}
+            {getNames("carbs")}
           </td>
           <td
             className={`${
               item.checked ? "text-gray-400" : "text-gray-700"
             } text-center text-xl`}>
-            {items
-              .filter((i) => i.category.toLowerCase() === "side")[0]
-              .items.map((p) => p.item_name)
-              .join(" - ")}
+            {getNames("side")}
           </td>
           <td
             className={`${
               item.checked ? "text-gray-400" : "text-gray-700"
             } text-center text-xl`}>
-            {items
-              .filter((i) => i.category.toLowerCase() === "salad")[0]
-              .items.map((p) => p.item_name)
-              .join(" - ")}
+            {getNames("salad")}
           </td>
         </>
       ) : (

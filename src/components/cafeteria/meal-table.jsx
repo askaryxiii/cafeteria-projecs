@@ -7,9 +7,18 @@ export function MealTable() {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [items, setItems] = useState([]);
+  const [checkedItems, setCheckedItems] = useState(() => {
+    try {
+      const raw = localStorage.getItem("mealTable.checked") || "[]";
+      const arr = JSON.parse(raw);
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch (e) {
+      return new Set();
+    }
+  });
   const [mealType, setMealType] = useState(null);
 
-  // Fetch orders and determine meal type
+  // Fetch orders and set meal type based on current time
   const fetchOrders = async () => {
     const now = new Date();
     const hour = now.getHours();
@@ -49,42 +58,43 @@ export function MealTable() {
     }
   };
 
-  // Fetch orders on mount and set up 2-minute refresh interval
+  // Fetch orders on mount and set up refresh interval
   useEffect(() => {
-    fetchOrders(); // Fetch immediately on mount
+    fetchOrders();
 
-    // Fetch every 2 minutes (120000 ms)
+    // Fetch every 1 minute (60000 ms)
     const interval = setInterval(() => {
       fetchOrders();
     }, 60000);
 
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  const sortedItems = [...items].sort((a, b) => {
-    // Keep checked items at the bottom
-    if (a.checked !== b.checked) {
-      return a.checked ? 1 : -1;
-    }
+  // Add checked property to items based on checkedItems Set
+  const itemsWithChecked = items.map((item, idx) => ({
+    ...item,
+    checked: checkedItems.has(item.id),
+    originalIndex: idx,
+  }));
 
-    // If a sort column is selected, sort by that column
+  // Checked items appear at the bottom
+  const sortedItems = [...itemsWithChecked].sort((a, b) => {
+    // Unchecked items first
+    if (a.checked !== b.checked) return a.checked ? 1 : -1;
+
+    // If a sort column is selected, sort by that column, with originalIndex tie-breaker
     if (sortColumn) {
-      const aValue = a[sortColumn] || ""; // Default to empty string if undefined
-      const bValue = b[sortColumn] || ""; // Default to empty string if undefined
-
-      if (sortDirection === "asc") {
-        return aValue.localeCompare(bValue, "ar");
-      } else {
-        return bValue.localeCompare(aValue, "ar");
-      }
+      const aValue = a[sortColumn] || "";
+      const bValue = b[sortColumn] || "";
+      if (aValue === bValue) return a.originalIndex - b.originalIndex;
+      return sortDirection === "asc"
+        ? aValue.localeCompare(bValue, "ar")
+        : bValue.localeCompare(aValue, "ar");
     }
 
-    // Otherwise maintain original order
-    return 0;
+    // Otherwise keep original order
+    return a.originalIndex - b.originalIndex;
   });
-
-  // Track checked items locally
-  const [checkedItems, setCheckedItems] = useState(new Set());
 
   const handleCheckChange = (id) => {
     setCheckedItems((prev) => {
@@ -93,6 +103,11 @@ export function MealTable() {
         newSet.delete(id);
       } else {
         newSet.add(id);
+      }
+      try {
+        localStorage.setItem("mealTable.checked", JSON.stringify([...newSet]));
+      } catch (e) {
+        /* ignore storage errors */
       }
       return newSet;
     });
@@ -164,7 +179,12 @@ function MobileTableRow({ item, onCheckChange }) {
         />
         <div className="flex items-center gap-2 flex-1">
           <span className="text-lg">😊</span>
-          <span className="font-medium text-gray-900">{item.name}</span>
+          <span
+            className={`font-medium ${
+              item.checked ? "line-through text-gray-400" : "text-gray-900"
+            }`}>
+            {item.name}
+          </span>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2 text-sm">

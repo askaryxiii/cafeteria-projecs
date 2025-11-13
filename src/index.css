@@ -1,0 +1,129 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+  --navy: #071840;
+  --card-bg: #f0f0f0;
+  --accent: #0b2a56;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  font-family: "Unbounded", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.auth-page {
+  background-image: url("/assets/auth/bg-pattern.png");
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-container {
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 2rem;
+}
+
+.auth-left {
+  flex: 1.1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-right {
+  width: 360px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.auth-title {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+.auth-sub {
+  font-size: 0.85rem;
+  color: #cfe0ff;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.input-field {
+  background: #e6e6e6;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  color: #0b2a56;
+  width: 100%;
+  border: none;
+}
+.input-row {
+  margin-bottom: 0.8rem;
+}
+.input-label {
+  font-size: 0.8rem;
+  color: #cdd9e9;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.btn-primary {
+  background: #9aa8b6;
+  color: #072039;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  border: none;
+}
+.link-muted {
+  color: #cfe0ff;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.small-note {
+  font-size: 0.8rem;
+  color: #cfe0ff;
+}
+
+.your-order {
+  background-image: url("/assets/backgrounds/orderBG.webp"),
+    url("/assets/backgrounds/orderBG.webp");
+  background-position: left center, right center; /* first image left, second right */
+  background-size: 50% 100%, 50% 100%; /* each image takes half width */
+  background-repeat: no-repeat;
+}
+
+@layer utilities {
+  /* Added custom fadeIn animation for staggered item appearance */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+}

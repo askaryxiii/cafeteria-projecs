@@ -30,7 +30,7 @@ const UserAvatar = () => {
           <DropdownMenu.Separator className=" bg-[#B1B1B1] h-px w-3/4" />
           <DropdownMenu.Item className="group relative flex gap-2.5 p-2 select-none items-center leading-none text-[#032552] outline-none ">
             <GoUnlock className="w-5 h-5" />
-            <Link to="/">Change Password</Link>
+            <Link to="/user/change-password">Change Password</Link>
           </DropdownMenu.Item>
 
           <DropdownMenu.Separator className=" bg-[#B1B1B1] h-px w-3/4" />

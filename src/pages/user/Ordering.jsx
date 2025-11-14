@@ -4,21 +4,21 @@ import { toast } from "react-hot-toast";
 import { readToken, getVerifiedUser, placeOrder } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
-const ORDER_WINDOW_BREAKFAST_START = import.meta.env
-  .VITE_ORDER_WINDOW_BREAKFAST_START;
-
-const ORDER_WINDOW_BREAKFAST_END = import.meta.env
-  .VITE_ORDER_WINDOW_BREAKFAST_END;
-
-const ORDER_WINDOW_LUNCH_START = import.meta.env.VITE_ORDER_WINDOW_LUNCH_START;
-const ORDER_WINDOW_LUNCH_END = import.meta.env.VITE_ORDER_WINDOW_LUNCH_END;
-
-const now = new Date();
-const hour = now.getHours();
-const isBreakfastWindow =
-  hour >= ORDER_WINDOW_BREAKFAST_START && hour < ORDER_WINDOW_BREAKFAST_END;
 
 const Ordering = ({ onOrderPlaced }) => {
+  const ORDER_WINDOW_BREAKFAST_START = import.meta.env
+    .VITE_ORDER_WINDOW_BREAKFAST_START;
+  const ORDER_WINDOW_BREAKFAST_END = import.meta.env
+    .VITE_ORDER_WINDOW_BREAKFAST_END;
+  const ORDER_WINDOW_LUNCH_START = import.meta.env
+    .VITE_ORDER_WINDOW_LUNCH_START;
+  const ORDER_WINDOW_LUNCH_END = import.meta.env.VITE_ORDER_WINDOW_LUNCH_END;
+
+  const now = new Date();
+  const hour = now.getHours();
+  const isBreakfastWindow =
+    hour >= ORDER_WINDOW_BREAKFAST_START && hour < ORDER_WINDOW_BREAKFAST_END;
+
   const defaultValues = isBreakfastWindow
     ? { breakfast: [] }
     : { protein: [], carbs: [], side: [], salad: [] };
@@ -28,7 +28,6 @@ const Ordering = ({ onOrderPlaced }) => {
   });
 
   const selectedItems = watch();
-
   const [totalPrice, setTotalPrice] = useState(0);
 
   const onSubmit = () => {
@@ -40,14 +39,9 @@ const Ordering = ({ onOrderPlaced }) => {
           return;
         }
 
-        // lightweight local parse is sufficient to populate user_email for the
-        // order payload. For security-sensitive checks use the async
-        // `parseToken` which verifies with the server.
         const u = await getVerifiedUser(token);
         const user_email = u?.email || null;
-        const user_id = u?.id || null;
 
-        // date = tomorrow
         const today = new Date().toISOString().split("T")[0];
         const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
           .toISOString()
@@ -97,7 +91,6 @@ const Ordering = ({ onOrderPlaced }) => {
       <h2 className="text-2xl font-normal text-[#032552] mb-6 uppercase tracking-wide text-center">
         Select Your Favorite Dishes
       </h2>
-      {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
         {isBreakfastWindow
           ? breakfastCategories.map((category) => (

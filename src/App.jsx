@@ -13,6 +13,9 @@ import DashboardAdmin from "./pages/admin/DashboardAdmin";
 import PrivateLayout from "./layouts/PrivateLayout";
 import Orders from "./pages/user/Orders";
 import OrdersList from "./pages/user/OrdersList";
+import ChangePassword from "./pages/user/ChangePassword";
+import NotFound from "./pages/NotFound";
+import AdminLayout from "./layouts/AdminLayout";
 
 const App = () => {
   return (
@@ -50,7 +53,7 @@ const App = () => {
           <Route
             path="/user/orders"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={["user, admin, accountant"]}>
                 <PrivateLayout>
                   <Orders />
                 </PrivateLayout>
@@ -63,6 +66,16 @@ const App = () => {
               <ProtectedRoute allowedRoles={["user"]}>
                 <PrivateLayout>
                   <OrdersList />
+                </PrivateLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/change-password"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                <PrivateLayout>
+                  <ChangePassword />
                 </PrivateLayout>
               </ProtectedRoute>
             }
@@ -104,14 +117,15 @@ const App = () => {
             path="/admin"
             element={
               <ProtectedRoute allowedRoles={["admin"]} adminAccess>
-                <PrivateLayout>
+                <AdminLayout>
                   <DashboardAdmin />
-                </PrivateLayout>
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

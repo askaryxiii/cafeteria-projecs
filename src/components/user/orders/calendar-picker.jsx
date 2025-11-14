@@ -14,9 +14,9 @@ export default function CalendarPicker({
   }
 
   return (
-    <div className="calendar-container">
+    <div className={`calendar-container ${className || ""}`}>
       <Calendar
-        className={`custom-calendar ${className || ""}`}
+        className={`custom-calendar `}
         onChange={onChange}
         value={date}
         minDate={minDate}

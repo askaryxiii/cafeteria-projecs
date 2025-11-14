@@ -389,3 +389,68 @@ export async function getChefOrders() {
     return { error: err.message || "Something went wrong" };
   }
 }
+
+export async function getUserOrderFromTo(userId, from, to) {
+  try {
+    const token = readToken();
+    if (!token) return { error: "No auth token found" };
+
+    const verifyRes = await fetch(`${API_URL}/auth/verify-token`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!verifyRes.ok) {
+      const errBody = await verifyRes.json().catch(() => ({}));
+      return { error: errBody.message || "Token verification failed" };
+    }
+    const res = await fetch(
+      `${API_URL}/orders/${userId}?from=${from}&to=${to}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return {
+        error: err.message || `Failed to fetch user order by date range`,
+      };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching user order by date range:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function changePassword(currentPassword, newPassword, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/auth/change-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${t}`,
+      },
+      body: JSON.stringify({
+        currentPassword,
+        newPassword,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to change password" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error changing password:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}

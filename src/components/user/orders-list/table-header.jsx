@@ -3,9 +3,9 @@ import TableCell from "./table-cell";
 export default function TableHeader({ columns }) {
   return (
     <thead>
-      <tr className="bg-gray-300">
+      <tr className="bg-[#DDDBDB]">
         {columns.map((column) => (
-          <TableCell key={column.key} isHeader>
+          <TableCell className={"text-center"} key={column.key} isHeader>
             {column.label}
           </TableCell>
         ))}

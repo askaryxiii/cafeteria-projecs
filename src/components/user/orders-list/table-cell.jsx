@@ -1,10 +1,10 @@
 export default function TableCell({ children, isHeader, className, ...props }) {
-  const baseStyles = "px-4 md:px-6 py-3 md:py-4 text-sm md:text-base";
+  const baseStyles = "px-4 md:px-6 py-3 md:py-2 text-sm md:text-lg text-center";
 
   if (isHeader) {
     return (
       <th
-        className={`${baseStyles} font-bold text-gray-900 text-left ${className}`}
+        className={`${baseStyles} font-bold text-[#011844]  ${className}`}
         {...props}>
         {children}
       </th>
@@ -12,7 +12,9 @@ export default function TableCell({ children, isHeader, className, ...props }) {
   }
 
   return (
-    <td className={`${baseStyles} text-gray-700 ${className}`} {...props}>
+    <td
+      className={`${baseStyles} font-medium text-[#011844] ${className}`}
+      {...props}>
       {children}
     </td>
   );

@@ -1,3 +1,7 @@
-export default function TableRow({ children, isEven }) {
-  return <tr className={isEven ? "bg-white" : "bg-gray-50 border-b border-gray-200"}>{children}</tr>
+export default function TableRow({ children }) {
+  return (
+    <tr className={"bg-[#FDF6F633] border-b border-[#A9AFBAB2] "}>
+      {children}
+    </tr>
+  );
 }

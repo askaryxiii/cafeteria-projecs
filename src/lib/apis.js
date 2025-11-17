@@ -454,3 +454,77 @@ export async function changePassword(currentPassword, newPassword, token) {
     return { error: err.message || "Something went wrong" };
   }
 }
+
+export async function getAllUsers(token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+    const res = await fetch(`${API_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${t}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch users" };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function editUser(userId, userData, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/users/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${t}`,
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to edit user" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error editing user:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function deleteUser(userId, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${t}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to delete user" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}

@@ -1,5 +1,5 @@
+import Logo from "../../../components/ui/logos/Logo";
 import React from "react";
-import Logo from "../../../ui/logos/Logo";
 
 const AdminLogoNav = () => {
   return (

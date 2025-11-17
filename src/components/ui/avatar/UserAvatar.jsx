@@ -5,7 +5,7 @@ import { LuPizza } from "react-icons/lu";
 import { GoUnlock } from "react-icons/go";
 import { PiSignOutBold } from "react-icons/pi";
 import { useContext } from "react";
-import AuthContext from "../../context/AuthContext";
+import AuthContext from "../../../context/AuthContext";
 
 const UserAvatar = () => {
   const { logout } = useContext(AuthContext);

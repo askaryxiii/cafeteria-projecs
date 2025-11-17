@@ -1,4 +1,4 @@
-import Logo from "../../ui/logos/Logo";
+import Logo from "../../components/ui/logos/Logo";
 
 const AuthLayout = ({ title, sub, children }) => {
   return (

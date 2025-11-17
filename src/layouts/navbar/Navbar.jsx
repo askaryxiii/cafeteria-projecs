@@ -1,8 +1,8 @@
-import Logo from "../../ui/logos/Logo";
 import { Link } from "react-router-dom";
-import UserAvatar from "../../ui/avatar/UserAvatar";
+import UserAvatar from "../../components/ui/avatar/UserAvatar";
 import { ImHome } from "react-icons/im";
 import { BsFillCupHotFill } from "react-icons/bs";
+import Logo from "../../components/ui/logos/Logo";
 
 const Navbar = () => {
   return (

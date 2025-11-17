@@ -1,8 +1,8 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { FaUserGroup } from "react-icons/fa6";
 import { PiChefHatBold, PiForkKnifeFill, PiBankFill } from "react-icons/pi";
 import { TbMenu3 } from "react-icons/tb";
-import { MdSettings } from "react-icons/md";
+import { MdSettings, MdDashboard } from "react-icons/md";
 
 import { SidebarHeader } from "../../../components/navbar/sidebar-header";
 import { SidebarNav } from "../../../components/navbar/sidebar-nav";
@@ -10,30 +10,40 @@ import { SidebarFooter } from "../../../components/navbar/sidebar-footer";
 import { cn } from "../../../lib/utils";
 import AuthContext from "../../../context/AuthContext";
 
-export function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const { user, logout } = useContext(AuthContext);
+export function Sidebar({
+  isExpanded,
+  setIsExpanded,
+  onSelectMenu,
+  selectedMenuItem,
+}) {
+  const { logout } = useContext(AuthContext);
 
   const menuItems = [
-    { label: "Users", icon: FaUserGroup },
-    { label: "Chef", icon: PiChefHatBold },
-    { label: "Cafeteria", icon: PiForkKnifeFill },
-    { label: "Accounts", icon: PiBankFill },
-    { label: "Menu Items", icon: TbMenu3 },
-    { label: "Settings", icon: MdSettings },
+    { id: "dashboard", label: "Dashboard", icon: MdDashboard },
+    { id: "users", label: "Users", icon: FaUserGroup },
+    { id: "chef", label: "Chef", icon: PiChefHatBold },
+    { id: "cafeteria", label: "Cafeteria", icon: PiForkKnifeFill },
+    { id: "accounts", label: "Accounts", icon: PiBankFill },
+    { id: "menu", label: "Menu Items", icon: TbMenu3 },
+    { id: "settings", label: "Settings", icon: MdSettings },
   ];
 
   return (
     <div
       className={cn(
-        " row-start-2 flex flex-col h-screen bg-gray-100 border-r border-gray-200 transition-all duration-300",
+        " row-start-2 min-h-screen flex flex-col bg-[#EFEFEF] border-r border-[#9C9393] transition-all duration-300",
         isExpanded ? "w-16 md:w-20 lg:w-64" : "w-16 md:w-20"
       )}>
       <SidebarHeader
         isExpanded={isExpanded}
         onToggle={() => setIsExpanded(!isExpanded)}
       />
-      <SidebarNav menuItems={menuItems} isExpanded={isExpanded} />
+      <SidebarNav
+        menuItems={menuItems}
+        isExpanded={isExpanded}
+        onSelectMenu={onSelectMenu}
+        selectedMenuItem={selectedMenuItem}
+      />
       <SidebarFooter isExpanded={isExpanded} />
     </div>
   );

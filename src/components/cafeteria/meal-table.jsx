@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { getAllOrdersForToday } from "../../lib/apis";
+import { getAllOrdersForToday, getAllOrdersForTomorrow } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
 
-export function MealTable() {
+export function MealTable({
+  fetchTomorrow = false,
+  showDelete = false,
+  onDelete = null,
+}) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [items, setItems] = useState([]);
@@ -34,7 +38,11 @@ export function MealTable() {
     );
     const ORDER_WINDOW_LUNCH_END = 23;
 
-    const fetchedOrders = await getAllOrdersForToday();
+    // Fetch orders based on fetchTomorrow prop
+    const fetchedOrders = fetchTomorrow
+      ? await getAllOrdersForTomorrow()
+      : await getAllOrdersForToday();
+
     if (!fetchedOrders?.error) {
       let ordersToShow = [];
       let typeToShow = null;
@@ -68,7 +76,7 @@ export function MealTable() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchTomorrow]);
 
   // Add checked property to items based on checkedItems Set
   const itemsWithChecked = items.map((item, idx) => ({
@@ -134,6 +142,7 @@ export function MealTable() {
             mealType={mealType}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
+            showDelete={showDelete}
           />
           <tbody className="divide-y divide-gray-200">
             {sortedItems.map((item) => (
@@ -142,6 +151,8 @@ export function MealTable() {
                 item={item}
                 mealType={mealType}
                 onCheckChange={handleCheckChange}
+                showDelete={showDelete}
+                onDelete={onDelete}
               />
             ))}
           </tbody>

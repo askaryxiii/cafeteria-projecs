@@ -11,6 +11,7 @@ import { MdDelete } from "react-icons/md";
 import { MdArrowUpward } from "react-icons/md";
 import { getAllUsers, deleteUser } from "../../../lib/apis";
 import toast from "react-hot-toast";
+import DashboardHeader from "../../../layouts/navbar/admin/DashboardHeader";
 
 export default function UsersTable() {
   const [users, setUsers] = useState([]);
@@ -122,13 +123,11 @@ export default function UsersTable() {
   return (
     <div className="w-full bg-[#E2E2E2]">
       {/* Header */}
-      <div className=" px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <FaUserGroup className="w-9 h-9 p-0.5  text-[#02356A] " />
-          <h1 className="text-2xl font-semibold text-[#02356A]">Users</h1>
-        </div>
-        <ImHome className="w-7 h-7 p-0.5  text-[#02356A] " />
-      </div>
+      <DashboardHeader
+        title="Users"
+        dist="/"
+        icon={<FaUserGroup className="w-8 h-8 text-[#02356A]" />}
+      />
 
       {/* Loading State */}
       {isLoading && (
@@ -152,7 +151,7 @@ export default function UsersTable() {
                 placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
+                className="w-full pl-10 pr-4 py-1.5 border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
               />
             </div>
           </div>

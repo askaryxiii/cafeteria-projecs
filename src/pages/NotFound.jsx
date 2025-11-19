@@ -1,6 +1,7 @@
 import React from "react";
 import Logo from "../components/ui/logos/Logo";
 
+
 const NotFound = () => {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">

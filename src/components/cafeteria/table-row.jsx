@@ -1,14 +1,20 @@
 import { CheckboxInput } from "./checkbox-input";
 import { FaRegCircleUser } from "react-icons/fa6";
+import { MdDelete } from "react-icons/md";
 
-export function TableRow({ item, onCheckChange, mealType }) {
+export function TableRow({
+  item,
+  onCheckChange,
+  mealType,
+  showDelete = false,
+  onDelete = null,
+}) {
   const items = item?.items || [];
 
   const getNames = (category) => {
     const group = items.find((i) => i.category?.toLowerCase() === category);
     return (group?.items || []).map((p) => p.item_name).join(" - ");
   };
-
   return (
     <tr
       className={`relative border-b ${
@@ -29,7 +35,7 @@ export function TableRow({ item, onCheckChange, mealType }) {
             className={`${
               item.checked ? "text-gray-400 line-through" : "text-gray-900"
             }`}>
-            {item.name}
+            {item.arabic_name}
           </span>
         </div>
       </td>
@@ -66,6 +72,16 @@ export function TableRow({ item, onCheckChange, mealType }) {
             item.checked ? "text-gray-400" : "text-gray-700"
           } text-center text-xl`}>
           {items.map((p) => p.item_name).join(" - ")}
+        </td>
+      )}
+      {showDelete && (
+        <td className="px-4 py-4 text-center">
+          <button
+            onClick={() => onDelete && onDelete(item.id)}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+            title="Delete order">
+            <MdDelete className="w-5 h-5" />
+          </button>
         </td>
       )}
     </tr>

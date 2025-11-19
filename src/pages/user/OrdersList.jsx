@@ -6,7 +6,11 @@ import TableBody from "../../components/user/orders-list/table-body";
 import TableRow from "../../components/user/orders-list/table-row";
 import TableHeader from "../../components/user/orders-list/table-header";
 import TableCell from "../../components/user/orders-list/table-cell";
-import { getUserOrderFromTo, getVerifiedUser, readToken } from "../../lib/apis";
+import {
+  getUserOrderFromTo,
+  getVerifiedUser,
+  readToken,
+} from "../../lib/apis";
 import { toast } from "react-hot-toast";
 
 const OrdersList = () => {

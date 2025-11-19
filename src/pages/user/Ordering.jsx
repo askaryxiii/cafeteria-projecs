@@ -67,7 +67,10 @@ const Ordering = ({ onOrderPlaced }) => {
           return;
         }
         toast.success("Order placed successfully");
-        if (typeof onOrderPlaced === "function") onOrderPlaced(res);
+        
+        if (typeof onOrderPlaced === "function") {
+          onOrderPlaced(res);
+        }
       } catch (err) {
         console.error(err);
         toast.error(err.message || "Failed to place order");

@@ -29,7 +29,7 @@ const AdminLayout = ({ children }) => {
   };
 
   return (
-    <div className="grid grid-cols-6 min-h-screen">
+    <div className="grid grid-cols-6 min-h-screen bg-[#E2E2E2]">
       {/* Logo Navigation (top bar) */}
       <div className="col-span-6">
         <AdminLogoNav />

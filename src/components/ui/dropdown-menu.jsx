@@ -1,22 +1,20 @@
-"use client";
-
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
 import { cn } from "../../lib/utils";
 
-function DropdownMenu(props) {
+function DropdownMenu({ ...props }) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
-function DropdownMenuPortal(props) {
+function DropdownMenuPortal({ ...props }) {
   return (
     <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
   );
 }
 
-function DropdownMenuTrigger(props) {
+function DropdownMenuTrigger({ ...props }) {
   return (
     <DropdownMenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
@@ -41,7 +39,7 @@ function DropdownMenuContent({ className, sideOffset = 4, ...props }) {
   );
 }
 
-function DropdownMenuGroup(props) {
+function DropdownMenuGroup({ ...props }) {
   return (
     <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
   );
@@ -82,7 +80,7 @@ function DropdownMenuCheckboxItem({ className, children, checked, ...props }) {
   );
 }
 
-function DropdownMenuRadioGroup(props) {
+function DropdownMenuRadioGroup({ ...props }) {
   return (
     <DropdownMenuPrimitive.RadioGroup
       data-slot="dropdown-menu-radio-group"
@@ -147,7 +145,7 @@ function DropdownMenuShortcut({ className, ...props }) {
   );
 }
 
-function DropdownMenuSub(props) {
+function DropdownMenuSub({ ...props }) {
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />;
 }
 

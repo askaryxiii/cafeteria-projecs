@@ -40,7 +40,6 @@ const DashboardUser = () => {
         setLoading(false);
         return;
       }
-
       if (Array.isArray(res) && res.length > 0) {
         setOrder(res[0]);
       } else {
@@ -60,13 +59,20 @@ const DashboardUser = () => {
   }, []);
 
   const handleOrderPlaced = (createdOrder) => {
-    setOrder(createdOrder);
+   
+    // Add a small delay to ensure backend has processed the order
+    setTimeout(async () => {
+      setLoading(true);
+      await fetchOrder();
+    }, 200);
   };
 
   if (loading) return <OrderSkeleton />;
 
+  
+
   return order ? (
-    <YourOrder order={order} />
+    <YourOrder order={order} onOrderUpdated={handleOrderPlaced} />
   ) : (
     <Ordering onOrderPlaced={handleOrderPlaced} />
   );

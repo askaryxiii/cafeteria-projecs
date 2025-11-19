@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
+const API_URL = import.meta.env.VITE_API_BASE;
 
 export function readToken() {
   try {
@@ -365,6 +365,42 @@ export async function getAllOrdersForToday() {
   }
 }
 
+export async function getAllOrdersForTomorrow() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowString = tomorrow
+    .toISOString()
+    .split("T")[0]
+    .split("-")
+    .reverse()
+    .join("-");
+  const token = readToken();
+
+  try {
+    const res = await fetch(`${API_URL}/orders/all/${tomorrowString}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch orders" };
+    }
+
+    const data = await res.json();
+    // Extract breakfast and lunch orders
+    const breakfastOrders = data.breakfastOrders || [];
+    const lunchOrders = data.lunchOrders || [];
+
+    return { breakfastOrders, lunchOrders };
+  } catch (err) {
+    console.error("Error fetching tomorrow's orders:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
 export async function getChefOrders() {
   const token = readToken();
 
@@ -525,6 +561,144 @@ export async function deleteUser(userId, token) {
     return data;
   } catch (err) {
     console.error("Error deleting user:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function getAllMenuItems(token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+    const res = await fetch(`${API_URL}/menu`, {
+      headers: {
+        Authorization: `Bearer ${t}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch users" };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function editMenuItem(itemId, itemData, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+    const res = await fetch(`${API_URL}/menu/${itemId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${t}`,
+      },
+      body: JSON.stringify(itemData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to edit menu item" };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error editing menu item:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function getAllMenuItemById(token, itemId) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+    const res = await fetch(`${API_URL}/menu/${itemId}`, {
+      headers: {
+        Authorization: `Bearer ${t}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch users" };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function deleteMenuItem(itemId, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+    const res = await fetch(`${API_URL}/menu/${itemId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${t}`,
+      },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to delete menu item" };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error deleting menu item:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function deleteOrder(orderId) {
+  // TODO: Replace with real delete route when available
+  const token = readToken();
+
+  try {
+    // Dummy route placeholder
+    const res = await fetch(`${API_URL}/orders/delete/${orderId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to delete order" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error deleting order:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function getStats(token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+    const res = await fetch(`${API_URL}/stats/system`, {
+      headers: {
+        Authorization: `Bearer ${t}`,
+      },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch stats" };
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching stats:", err);
     return { error: err.message || "Something went wrong" };
   }
 }

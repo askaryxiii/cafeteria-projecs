@@ -15,8 +15,8 @@ const ProtectedRoute = ({
   const { user } = useContext(AuthContext);
   // not authenticated -> go to login
   if (!user) return <Navigate to="/login" replace />;
-  const rawRole = user.user?.role || user.role || "user";
-  const role = rawRole === "employee" ? "user" : rawRole;
+  const rawRole = user.user?.role || user.role || "employee";
+  const role = rawRole === "employee" ? "employee" : rawRole;
   // admin can access all pages
   if (role === "admin") return children;
   if (allowedRoles.includes(role)) return children;
@@ -28,7 +28,7 @@ const ProtectedRoute = ({
       return <Navigate to="/accountant" replace />;
     case "cafeteria":
       return <Navigate to="/cafeteria" replace />;
-    case "user":
+    case "employee":
     default:
       return <Navigate to="/user" replace />;
   }

@@ -12,9 +12,15 @@ const hour = now.getHours();
 const isBreakfastWindow =
   hour >= ORDER_WINDOW_BREAKFAST_START && hour < ORDER_WINDOW_BREAKFAST_END;
 
-const YourOrder = ({ order }) => {
+const YourOrder = ({ order, onOrderUpdated }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
 
+  // Update when order prop changes
+  useEffect(() => {
+    setCurrentOrder(order);
+  }, [order]);
+
+  // Fetch order on component mount
   useEffect(() => {
     (async () => {
       const token = readToken();
@@ -23,11 +29,14 @@ const YourOrder = ({ order }) => {
       const filteredOrder = fetchedOrder.find(
         (o) => o.meal_type === (isBreakfastWindow ? "breakfast" : "lunch")
       );
+
       setCurrentOrder(filteredOrder);
     })();
   }, []);
 
-  if (!currentOrder) return <Ordering />;
+  if (!currentOrder) {
+    return <Ordering onOrderPlaced={onOrderUpdated} />;
+  }
 
   return (
     <div className="flex flex-col items-center w-full">

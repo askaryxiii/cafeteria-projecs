@@ -5,8 +5,10 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
 
+// Fallback data for when real data is not available
 const dataByPeriod = {
   "24hours": [
     { name: "01", value: 40 },
@@ -66,8 +68,28 @@ const dataByPeriod = {
   ],
 };
 
-export default function RevenueChart({ timePeriod = "24hours" }) {
-  const data = dataByPeriod[timePeriod] || dataByPeriod["24hours"];
+// Generate chart data from revenue value
+const generateChartData = (revenue, timePeriod) => {
+  const revenueValue = parseFloat(revenue || 0);
+  if (revenueValue === 0) return dataByPeriod[timePeriod];
+
+  // Distribute revenue across 12 intervals
+  const intervals = 12;
+  const avgPerInterval = revenueValue / intervals;
+
+  return Array.from({ length: intervals }, (_, i) => ({
+    name: String(i + 1).padStart(2, "0"),
+    value: Math.round(avgPerInterval * (0.7 + Math.random() * 0.6)), // Add some variance
+  }));
+};
+
+export default function RevenueChart({
+  timePeriod = "24hours",
+  revenue = null,
+}) {
+  const data = revenue
+    ? generateChartData(revenue, timePeriod)
+    : dataByPeriod[timePeriod] || dataByPeriod["24hours"];
 
   return (
     <div className="w-full h-48">
@@ -76,6 +98,14 @@ export default function RevenueChart({ timePeriod = "24hours" }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis dataKey="name" fontSize={12} stroke="#9ca3af" />
           <YAxis hide />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+            }}
+            formatter={(value) => `EGP ${value}`}
+          />
           <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>

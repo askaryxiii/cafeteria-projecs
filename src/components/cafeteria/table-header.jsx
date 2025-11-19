@@ -6,6 +6,7 @@ export function TableHeader({
   sortColumn,
   sortDirection,
   mealType,
+  showDelete = false,
 }) {
   const renderSortIcon = (column) => {
     if (sortColumn === column) {
@@ -57,6 +58,11 @@ export function TableHeader({
             onClick={() => onColumnSort("breakfast")}
             className="px-4 py-3 text-center text-sm font-medium text-gray-900 cursor-pointer transition">
             Breakfast {renderSortIcon("breakfast")}
+          </th>
+        )}
+        {showDelete && (
+          <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">
+            Actions
           </th>
         )}
       </tr>

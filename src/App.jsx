@@ -43,7 +43,7 @@ const App = () => {
           <Route
             path="/user"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={["employee"]}>
                 <PrivateLayout>
                   <DashboardUser />
                 </PrivateLayout>
@@ -53,7 +53,8 @@ const App = () => {
           <Route
             path="/user/orders"
             element={
-              <ProtectedRoute allowedRoles={["user, admin, accountant"]}>
+              <ProtectedRoute
+                allowedRoles={["employee", "admin", "accountant"]}>
                 <PrivateLayout>
                   <Orders />
                 </PrivateLayout>
@@ -63,7 +64,7 @@ const App = () => {
           <Route
             path="/user/orders/orderlist/:dates"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={["employee"]}>
                 <PrivateLayout>
                   <OrdersList />
                 </PrivateLayout>
@@ -73,7 +74,7 @@ const App = () => {
           <Route
             path="/user/change-password"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={["employee"]}>
                 <PrivateLayout>
                   <ChangePassword />
                 </PrivateLayout>

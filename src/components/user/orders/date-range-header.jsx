@@ -2,7 +2,7 @@ import DateButton from "./date-button";
 
 const CalendarIcon = () => (
   <svg
-    className="w-5 h-5"
+    className="w-4 sm:w-5 h-4 sm:h-5 shrink-0"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24">
@@ -22,19 +22,21 @@ export default function DateRangeHeader({
   onToClick,
 }) {
   return (
-    <div className="bg-blue-900 text-white rounded-lg p-4 mb-8 flex items-center justify-between">
+    <div className="bg-[#032552] text-white rounded-lg p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8 flex items-center justify-between gap-2 sm:gap-4">
       <DateButton
         date={fromDate}
-        label="Date selected"
+        label="From"
         onClick={onFromClick}
         icon={<CalendarIcon />}
       />
 
-      <h1 className="text-2xl font-bold text-center flex-1 mx-4">MY ORDERS</h1>
+      <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-center flex-1">
+        MY ORDERS
+      </h1>
 
       <DateButton
         date={toDate}
-        label="Date selected"
+        label="To"
         onClick={onToClick}
         icon={<CalendarIcon />}
       />

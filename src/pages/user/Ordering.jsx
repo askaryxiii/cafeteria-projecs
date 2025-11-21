@@ -67,7 +67,7 @@ const Ordering = ({ onOrderPlaced }) => {
           return;
         }
         toast.success("Order placed successfully");
-        
+
         if (typeof onOrderPlaced === "function") {
           onOrderPlaced(res);
         }
@@ -90,11 +90,13 @@ const Ordering = ({ onOrderPlaced }) => {
   ];
 
   return (
-    <div className="px-44 ">
-      <h2 className="text-2xl font-normal text-[#032552] mb-6 uppercase tracking-wide text-center">
+    <div className="sm:px-6 md:px-12 lg:px-32 xl:px-44 py-4 sm:py-6 md:py-8">
+      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-[#032552] mb-4 sm:mb-6 md:mb-8 uppercase tracking-wide text-center">
         Select Your Favorite Dishes
       </h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 sm:space-y-8 md:space-y-10">
         {isBreakfastWindow
           ? breakfastCategories.map((category) => (
               <DishDropdown

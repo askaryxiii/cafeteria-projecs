@@ -6,7 +6,7 @@ import AuthContext from "../../context/AuthContext";
 export function SidebarFooter({ isExpanded }) {
   const { logout } = useContext(AuthContext);
   return (
-    <div className="p-4 border-t border-gray-200">
+    <div className="p-2 sm:p-3 md:p-4 border-t border-gray-200">
       <SidebarItem
         Icon={TbLogout}
         label="Logout"

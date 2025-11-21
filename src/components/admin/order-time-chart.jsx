@@ -94,7 +94,7 @@ export default function OrderTimeChart({
 
       {/* Legend with custom styling */}
       <div className="ml-8 space-y-3">
-        <div className="flex items-center gap-3 p-3 bg-gray-800 text-white rounded text-sm font-medium min-w-[160px]">
+        <div className="flex items-center gap-3 p-3 bg-gray-800 text-white rounded text-sm font-medium min-w-40">
           <div>
             <div className="text-xs opacity-75">{primaryTimeRange.name}</div>
             <div className="font-bold">{primaryTimeRange.value}%</div>

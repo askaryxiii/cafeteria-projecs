@@ -2,17 +2,35 @@ import Logo from "../../components/ui/logos/Logo";
 
 const AuthLayout = ({ title, sub, children }) => {
   return (
-    <div className="auth-page flex flex-col items-center justify-center min-h-screen gap-10 p-5">
-      <div className="bg-white flex flex-col gap-6 px-10 py-7 rounded-lg  max-h-fit">
-        <Logo src={"/assets/logo/projecs.webp"} alt="art" width="300" />
-        <div className="flex gap-8 items-center">
-          <div className="auth-left">
-            <Logo src={"/assets/auth/main-art.png"} alt="art" width="700" />
+    <div className="auth-page">
+      <div className="w-full max-w-6xl bg-white rounded-lg overflow-hidden">
+        {/* Logo Section */}
+        <div className="p-3 sm:p-4 md:p-6 ">
+          <Logo
+            src={"/assets/logo/projecs.webp"}
+            alt="projecs logo"
+            width="220"
+            className="h-auto w-32 sm:w-40 md:w-56"
+          />
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 items-stretch md:items-center px-5 py-4 gap-0">
+          {/* Left Side - Image (hidden on mobile) */}
+          <div className="hidden md:col-span-2 lg:col-span-2 lg:flex items-center justify-center  ">
+            <Logo
+              src={"/assets/auth/main-art.png"}
+              alt="auth illustration"
+              width="680"
+              className="w-full h-auto "
+            />
           </div>
-          <div className=" bg-[#001743] text-white p-8 rounded-3xl h-fit shadow-xl/20 ">
+
+          {/* Right Side - Form */}
+          <div className="w-full md:col-span-1 bg-[#001743] text-[#F9F9F9] p-5  rounded-4xl">
             {title && <div className="auth-title">{title}</div>}
             {sub && <div className="auth-sub">{sub}</div>}
-            {children}
+            <div className="mt-4 sm:mt-6">{children}</div>
           </div>
         </div>
       </div>

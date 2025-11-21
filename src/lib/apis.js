@@ -661,7 +661,7 @@ export async function deleteOrder(orderId) {
 
   try {
     // Dummy route placeholder
-    const res = await fetch(`${API_URL}/orders/delete/${orderId}`, {
+    const res = await fetch(`${API_URL}/orders/${orderId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -60,18 +60,20 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <div className="flex items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-lg bg-[#032552] px-6 py-10 shadow-xl">
-        <div className="mb-8 text-center">
-          <h1 className="flex items-center justify-center gap-3 text-2xl font-semibold text-white">
-            <IoLockOpen />
+    <div className="flex items-center justify-center p-2 sm:p-3 md:p-4">
+      <div className="w-full max-w-md rounded-lg bg-[#032552] px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12 shadow-xl">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="flex items-center justify-center gap-2 sm:gap-3 text-xl sm:text-2xl md:text-3xl font-semibold text-white">
+            <IoLockOpen className="w-5 sm:w-6 md:w-7 h-5 sm:h-6 md:h-7" />
             Change Password
-            <IoLockOpen />
+            <IoLockOpen className="w-5 sm:w-6 md:w-7 h-5 sm:h-6 md:h-7" />
           </h1>
         </div>
 
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            onSubmit={methods.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-5 md:space-y-6">
             <PasswordInput
               name="currentPassword"
               placeholder="Current Password"
@@ -96,7 +98,7 @@ export function ChangePasswordForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="rounded-xl bg-[#CECECE] px-8 py-2 text-sm font-semibold text-[#032552] transition-all duration-200 hover:bg-gray-400 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                className="rounded-xl bg-[#CECECE] px-6 sm:px-8 md:px-10 py-1.5 sm:py-2 md:py-2.5 text-xs sm:text-sm md:text-base font-semibold text-[#032552] transition-all duration-200 hover:bg-gray-400 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-h-9 sm:min-h-10 md:min-h-11">
                 {isLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>

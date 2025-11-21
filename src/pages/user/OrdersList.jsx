@@ -130,7 +130,7 @@ const OrdersList = () => {
               {tableData.map((row, index) => (
                 <TableRow key={index} isEven={index % 2 === 0}>
                   <TableCell>{row.date}</TableCell>
-                  <TableCell className="" dir="rtl">
+                  <TableCell className="text-xl" dir="rtl">
                     {row.orders}
                   </TableCell>
                   <TableCell>{row.cost}</TableCell>

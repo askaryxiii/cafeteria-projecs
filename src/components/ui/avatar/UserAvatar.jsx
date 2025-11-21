@@ -25,7 +25,7 @@ const UserAvatar = () => {
           sideOffset={5}>
           <DropdownMenu.Item className="group relative flex gap-2.5 p-2 select-none items-center leading-none text-[#032552] outline-none ">
             <LuPizza className="w-5 h-5" />
-            <Link to="/user/orders"> My Orders </Link>
+            <Link to="/user/orders" className="text-[#032552]"> My Orders </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Separator className=" bg-[#B1B1B1] h-px w-3/4" />
           <DropdownMenu.Item className="group relative flex gap-2.5 p-2 select-none items-center leading-none text-[#032552] outline-none ">

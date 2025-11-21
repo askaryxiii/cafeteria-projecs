@@ -1,7 +1,7 @@
 import React from "react";
 
-const Logo = ({ src, alt, width = "100%", height = "100%" }) => (
-  <img src={src} alt={alt} width={width} height={height} className="" />
+const Logo = ({ src, alt, className = "" }) => (
+  <img src={src} alt={alt} className={className} />
 );
 
 export default Logo;

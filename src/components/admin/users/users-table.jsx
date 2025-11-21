@@ -131,43 +131,45 @@ export default function UsersTable() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="p-8 text-center text-gray-500">Loading users...</div>
+        <div className="p-4 sm:p-6 md:p-8 text-center text-gray-500 text-sm sm:text-base">
+          Loading users...
+        </div>
       )}
 
       {!isLoading && (
         <>
           {/* Controls */}
-          <div className="px-4 py-3 border-b  flex gap-4">
+          <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-b flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1 px-3 py-0.5 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57] hover:bg-[#b9b9b9] transition-colors font-normal text-sm">
-              <Plus className="w-4 h-4" />
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57] hover:bg-[#b9b9b9] transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
+              <Plus className="w-3 sm:w-4 md:w-5 h-3 sm:h-4 md:h-5" />
               Create New User
             </button>
             <div className="flex-1 relative shadow-lg">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
+                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] bg-[#D9D9D9] focus:outline-none text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11"
               />
             </div>
           </div>
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-xs sm:text-sm md:text-base">
               <thead>
-                <tr className="bg-[#DDDBDB] ">
-                  <th className="px-6 py-4.5 text-center text-base font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition">
+                <tr className="bg-[#DDDBDB]">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-24 sm:min-w-32">
                     <button
-                      className="flex items-center gap-2 w-full"
+                      className="flex items-center gap-1 sm:gap-2 w-full justify-center"
                       onClick={() => handleSort("name")}>
                       Full Name
                       <MdArrowUpward
-                        className={`w-4 h-4 text-gray-600 transition ${
+                        className={`w-3 sm:w-4 h-3 sm:h-4 text-gray-600 transition ${
                           sortConfig.key === "name" &&
                           sortConfig.direction === "desc"
                             ? "rotate-180"
@@ -176,13 +178,13 @@ export default function UsersTable() {
                       />
                     </button>
                   </th>
-                  <th className="px-6 py-4.5 text-center text-base font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-24 sm:min-w-32">
                     <button
-                      className="flex items-center justify-end gap-2 w-full"
+                      className="flex items-center justify-center gap-1 sm:gap-2 w-full"
                       onClick={() => handleSort("arabic_name")}>
                       الاسم بالعربية
                       <MdArrowUpward
-                        className={`w-4 h-4 text-gray-600 transition ${
+                        className={`w-3 sm:w-4 h-3 sm:h-4 text-gray-600 transition ${
                           sortConfig.key === "arabic_name" &&
                           sortConfig.direction === "desc"
                             ? "rotate-180"
@@ -191,13 +193,13 @@ export default function UsersTable() {
                       />
                     </button>
                   </th>
-                  <th className="px-6 py-4.5 text-center text-base font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-32 sm:min-w-40">
                     <button
-                      className="flex items-center gap-2 w-full"
+                      className="flex items-center gap-1 sm:gap-2 w-full justify-center"
                       onClick={() => handleSort("email")}>
                       E-mail
                       <MdArrowUpward
-                        className={`w-4 h-4 text-gray-600 transition ${
+                        className={`w-3 sm:w-4 h-3 sm:h-4 text-gray-600 transition ${
                           sortConfig.key === "email" &&
                           sortConfig.direction === "desc"
                             ? "rotate-180"
@@ -206,7 +208,7 @@ export default function UsersTable() {
                       />
                     </button>
                   </th>
-                  <th className="px-6 py-4.5 text-center text-base font-medium text-[#072A57]">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57]">
                     Actions
                   </th>
                 </tr>
@@ -217,43 +219,45 @@ export default function UsersTable() {
                     key={user.id}
                     className={`border-b border-[#A9AFBAB2] ${
                       index % 2 === 0 ? "bg-[#E9E7E7]" : "bg-[#E9E7E7]"
-                    } hover:bg-[#dadada] transition-colors`}>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className=" flex items-center justify-center shrink-0">
-                          <FaUserCircle className="w-5 h-5 text-[#072A57] " />
+                    } hover:bg-[#dadada] transition-colors text-xs sm:text-sm md:text-base`}>
+                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4">
+                      <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+                        <div className="flex items-center justify-center shrink-0">
+                          <FaUserCircle className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
                         </div>
-                        <span className="text-[#072A57] font-medium">
+                        <span className="text-[#072A57] font-medium truncate">
                           {user.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <span className="text-[#072A57] font-medium">
+                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-right">
+                      <div className="flex items-center justify-end gap-1 sm:gap-2 md:gap-3">
+                        <span className="text-[#072A57] font-medium truncate">
                           {user.arabic_name}
                         </span>
-                        <div className=" flex items-center justify-center shrink-0">
-                          <FaUserCircle className="w-5 h-5 text-[#072A57] " />
+                        <div className="flex items-center justify-center shrink-0">
+                          <FaUserCircle className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-[#072A57]">{user.email}</span>
+                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4">
+                      <span className="text-[#072A57] truncate block">
+                        {user.email}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-3">
+                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-right">
+                      <div className="flex items-center justify-end gap-1 sm:gap-2 md:gap-3">
                         <button
                           onClick={() => setEditingUser(user)}
-                          className="p-2 hover:scale-110"
+                          className="p-1 sm:p-1.5 md:p-2 hover:scale-110 transition min-h-8 sm:min-h-9 md:min-h-10 flex items-center justify-center"
                           title="Edit user">
-                          <RiPencilFill className="w-5 h-5 text-[#072A57]" />
+                          <RiPencilFill className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
                         </button>
                         <button
                           onClick={() => setDeletingUserId(user.id)}
-                          className="p-2 hover:scale-110"
+                          className="p-1 sm:p-1.5 md:p-2 hover:scale-110 transition min-h-8 sm:min-h-9 md:min-h-10 flex items-center justify-center"
                           title="Delete user">
-                          <MdDelete className="w-5 h-5 text-[#072A57]" />
+                          <MdDelete className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
                         </button>
                       </div>
                     </td>
@@ -265,7 +269,7 @@ export default function UsersTable() {
 
           {/* No results message */}
           {filteredUsers.length === 0 && !isLoading && (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-4 sm:p-6 md:p-8 text-center text-gray-500 text-sm sm:text-base">
               No users found matching your search.
             </div>
           )}

@@ -75,10 +75,12 @@ const MenuDashboard = () => {
   };
 
   return (
-    <main className=" p-1.5">
+    <main className="p-1 sm:p-1.5 md:p-2">
       <DashboardHeader
         title={"Menu Items"}
-        icon={<TbMenu3 className="w-7 h-7 text-[#02356A]" />}
+        icon={
+          <TbMenu3 className="w-6 sm:w-7 md:w-7 h-6 sm:h-7 md:h-7 text-[#02356A]" />
+        }
         dist="/"
       />
       <ItemsTable

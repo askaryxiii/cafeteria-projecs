@@ -8,8 +8,8 @@ export default function DropdownContent({
 }) {
   if (loading) {
     return (
-      <div className="bg-gray-200 border-l-4 border-r-4 border-b-4 border-gray-300 p-4">
-        <div className="text-center text-gray-600 py-4 animate-pulse">
+      <div className="bg-gray-200 border-l-4 border-r-4 border-b-4 border-gray-300 p-3 sm:p-4 md:p-5">
+        <div className="text-center text-gray-600 py-3 sm:py-4 md:py-5 animate-pulse text-sm sm:text-base">
           Loading items...
         </div>
       </div>
@@ -18,14 +18,16 @@ export default function DropdownContent({
 
   if (items?.length === 0) {
     return (
-      <div className="bg-gray-200 border-l-4 border-r-4 border-b-4 border-gray-300 p-4">
-        <div className="text-center text-gray-600 py-4">No items available</div>
+      <div className="bg-gray-200 border-l-4 border-r-4 border-b-4 border-gray-300 p-3 sm:p-4 md:p-5">
+        <div className="text-center text-gray-600 py-3 sm:py-4 md:py-5 text-sm sm:text-base">
+          No items available
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-200 border-2 rounded-2xl border-gray-300 p-4 space-y-3">
+    <div className="bg-gray-200 border-2 rounded-2xl border-gray-300 p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-2.5 md:space-y-3">
       {items.map((item, index) => (
         <div
           key={item.code}

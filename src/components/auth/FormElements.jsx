@@ -5,7 +5,9 @@ import { MdEmail } from "react-icons/md";
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
 export const InputRow = ({ customClass, children }) => (
-  <div className={`input-row ${customClass}`}>{children}</div>
+  <div className={cn("input-row gap-responsive-sm", customClass)}>
+    {children}
+  </div>
 );
 
 // TextInput: if `icon` prop is provided, render IconInput so the icon appears inside the input
@@ -38,7 +40,11 @@ export const TextInput = React.forwardRef(
     }
 
     return (
-      <input ref={ref} className={cn("input-field", className)} {...props} />
+      <input
+        ref={ref}
+        className={cn("input-field text-responsive-sm", className)}
+        {...props}
+      />
     );
   }
 );
@@ -69,7 +75,7 @@ export const PasswordInput = React.forwardRef(
           showIcon={showIcon}
           className={className}
           {...props}
-          type="password" // ✅ move type after spreading props
+          type="password"
         />
       );
     }
@@ -78,7 +84,7 @@ export const PasswordInput = React.forwardRef(
       <input
         {...props}
         type="password"
-        className={`input-field ${className || ""}`}
+        className={cn("input-field text-responsive-sm", className)}
         ref={ref}
       />
     );
@@ -87,8 +93,13 @@ export const PasswordInput = React.forwardRef(
 
 PasswordInput.displayName = "PasswordInput";
 
-export const PrimaryButton = ({ children, ...props }) => (
-  <button className="btn-primary " {...props}>
+export const PrimaryButton = ({ children, className, ...props }) => (
+  <button
+    className={cn(
+      "btn-primary btn-responsive transition-all duration-200",
+      className
+    )}
+    {...props}>
     {children}
   </button>
 );
@@ -97,7 +108,7 @@ export const PrimaryButton = ({ children, ...props }) => (
 const IconInput = React.forwardRef(
   (
     {
-      icon = <MdEmail className="w-5 h-5" />,
+      icon = <MdEmail className="icon-responsive-sm" />,
       iconPosition = "right",
       iconClassName,
       containerClassName,
@@ -111,13 +122,13 @@ const IconInput = React.forwardRef(
       <div
         ref={ref}
         className={cn(
-          "flex items-center rounded-xl overflow-hidden border border-slate-300 bg-slate-50 ring-offset-background focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 transition-all",
+          "flex items-center rounded-lg sm:rounded-xl overflow-hidden border border-slate-300 bg-slate-50 ring-offset-background focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 transition-all",
           containerClassName
         )}>
         {showIcon && iconPosition === "left" && (
           <div
             className={cn(
-              "flex items-center justify-center px-4 bg-slate-100 text-slate-600 border-r border-slate-300",
+              "flex items-center justify-center px-2 sm:px-3 md:px-4 bg-slate-100 text-slate-600 border-r border-slate-300",
               iconClassName
             )}>
             {icon}
@@ -126,7 +137,7 @@ const IconInput = React.forwardRef(
 
         <input
           className={cn(
-            "flex-1 px-4 py-3 bg-transparent text-slate-900 placeholder:text-slate-500 outline-none font-medium",
+            "flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-transparent text-slate-900 placeholder:text-slate-500 outline-none font-medium text-sm sm:text-base",
             className
           )}
           {...props}
@@ -135,7 +146,7 @@ const IconInput = React.forwardRef(
         {showIcon && iconPosition === "right" && (
           <div
             className={cn(
-              "flex items-center justify-center px-4 py-3 text-slate-600 border-l border-slate-300",
+              "flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-slate-600 border-l border-slate-300",
               iconClassName
             )}>
             {icon}

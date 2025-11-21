@@ -2,7 +2,7 @@ import { MealTable } from "../../components/cafeteria/meal-table";
 
 const DashboardCafeteria = () => {
   return (
-    <div className="p-4">
+    <div className="p-0 md:p-4 lg:p-4">
       <MealTable />
     </div>
   );

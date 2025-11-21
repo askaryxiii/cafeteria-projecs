@@ -55,7 +55,7 @@ export default function DateRangePicker() {
   }, [fromDate, toDate]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full sm:px-0 md:px-4 py-2 sm:py-3 md:py-4 max-w-full md:max-w-5xl mx-auto">
       <DateRangeHeader
         fromDate={fromDate}
         toDate={toDate}
@@ -64,9 +64,9 @@ export default function DateRangePicker() {
       />
 
       {/* Calendars Grid */}
-      <div className="grid grid-cols-2 mb-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 md:gap-6 mb-6 w-full">
         <CalendarPicker
-          className={"justify-self-start"}
+          className={"md:justify-self-start"}
           date={fromDate}
           onChange={handleFromDateChange}
           maxDate={toDate || new Date()}
@@ -74,7 +74,7 @@ export default function DateRangePicker() {
         />
 
         <CalendarPicker
-          className={"justify-self-end"}
+          className={"md:justify-self-end md:col-start-2"}
           date={toDate}
           onChange={handleToDateChange}
           minDate={fromDate || new Date()}

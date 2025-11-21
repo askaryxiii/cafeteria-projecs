@@ -92,26 +92,31 @@ export default function RevenueChart({
     : dataByPeriod[timePeriod] || dataByPeriod["24hours"];
 
   return (
-    <div className="w-full h-48">
+    <div className="w-full h-40 sm:h-48 md:h-56">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="name" fontSize={12} stroke="#9ca3af" />
+          <XAxis
+            dataKey="name"
+            fontSize={window.innerWidth < 640 ? 10 : 12}
+            stroke="#9ca3af"
+          />
           <YAxis hide />
           <Tooltip
             contentStyle={{
               backgroundColor: "#fff",
               border: "1px solid #e5e7eb",
               borderRadius: "8px",
+              fontSize: window.innerWidth < 640 ? "11px" : "12px",
             }}
             formatter={(value) => `EGP ${value}`}
           />
           <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-      <div className="flex justify-between mt-4 text-xs text-gray-600">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+      <div className="flex justify-between mt-2 sm:mt-3 md:mt-4 text-xs sm:text-xs md:text-sm text-gray-600 gap-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
+          <div className="w-1.5 sm:w-2 md:w-2.5 h-1.5 sm:h-2 md:h-2.5 bg-blue-600 rounded-full"></div>
           <span>Last 6 days</span>
         </div>
         <span>Last Week</span>

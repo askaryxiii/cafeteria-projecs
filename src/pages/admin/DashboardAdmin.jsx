@@ -97,27 +97,27 @@ const DashboardAdmin = () => {
       />
 
       {/* Time Period Tabs */}
-      <div className=" px-6 py-4 border-b border-gray-400">
+      <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-b border-gray-400 overflow-x-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-max">
-          <TabsList className="bg-transparent p-0 gap-8 h-auto">
+          <TabsList className="bg-transparent p-0 gap-4 sm:gap-6 md:gap-8 h-auto">
             <TabsTrigger
               value="24hours"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2]  rounded-none px-0 py-2 font-base">
+              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Last 24 hours
             </TabsTrigger>
             <TabsTrigger
               value="weeks"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2]  rounded-none px-0 py-2 font-base">
+              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Last Weeks
             </TabsTrigger>
             <TabsTrigger
               value="months"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2]  rounded-none px-0 py-2 font-base">
+              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Last Months
             </TabsTrigger>
             <TabsTrigger
               value="years"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2]  rounded-none px-0 py-2 font-base">
+              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Last Years
             </TabsTrigger>
           </TabsList>
@@ -125,25 +125,29 @@ const DashboardAdmin = () => {
       </div>
 
       {/* Main Content */}
-      <div className="p-6 space-y-6">
+      <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 md:space-y-6">
         {loading ? (
-          <div className="flex items-center justify-center h-96">
-            <p className="text-gray-600">Loading dashboard data...</p>
+          <div className="flex items-center justify-center h-48 sm:h-64 md:h-96">
+            <p className="text-gray-600 text-sm sm:text-base">
+              Loading dashboard data...
+            </p>
           </div>
         ) : (
           <>
             {/* Revenue and Order Time Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               {/* Revenue Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-6 col-span-1 lg:col-span-1">
-                <div className="flex justify-between items-start mb-4">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 col-span-1 lg:col-span-1">
+                <div className="flex justify-between items-start mb-3 sm:mb-4 md:mb-4">
                   <div>
-                    <p className="text-gray-600 text-sm mb-2">Revenue</p>
-                    <h2 className="text-3xl font-bold text-gray-900">
+                    <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">
+                      Revenue
+                    </p>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                       EGP {currentData?.total_revenue || "0.00"}
                     </h2>
 
-                    <p className="text-gray-500 text-xs mt-2">
+                    <p className="text-gray-500 text-xs mt-1 sm:mt-2">
                       {activeTab === "24hours"
                         ? "Last 24 hours"
                         : activeTab === "weeks"
@@ -161,10 +165,12 @@ const DashboardAdmin = () => {
               </Card>
 
               {/* Order Time Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-6 col-span-1 lg:col-span-2">
-                <div className="flex justify-between items-start mb-6">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 col-span-1 lg:col-span-2">
+                <div className="flex justify-between items-start mb-4 sm:mb-5 md:mb-6">
                   <div>
-                    <p className="text-gray-600 text-sm mb-1">Order Time</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mb-0.5 sm:mb-1">
+                      Order Time
+                    </p>
                     <p className="text-gray-500 text-xs">
                       Most common:{" "}
                       <span className="font-semibold">
@@ -180,22 +186,22 @@ const DashboardAdmin = () => {
             </div>
 
             {/* Most and Least Ordered Food Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-[#E2E2E2] rounded-none p-6">
-                <span className="text-gray-900 text-xl font-bold ">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
+                <span className="text-gray-900 text-base sm:text-lg md:text-xl font-bold block">
                   Most Ordered Food
                 </span>
-                <p className="text-gray-500 text-xs ">
+                <p className="text-gray-500 text-xs">
                   Top {mostOrderedItems.length} items by order quantity
                 </p>
                 <FoodList items={mostOrderedItems} />
               </Card>
 
-              <Card className="bg-[#E2E2E2] rounded-none p-6">
-                <span className="text-gray-900 text-xl font-bold">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
+                <span className="text-gray-900 text-base sm:text-lg md:text-xl font-bold block">
                   Least Ordered Food
                 </span>
-                <p className="text-gray-500 text-xs ">
+                <p className="text-gray-500 text-xs">
                   Bottom {leastOrderedItems.length} items by order quantity
                 </p>
                 <FoodList items={leastOrderedItems} />
@@ -203,15 +209,17 @@ const DashboardAdmin = () => {
             </div>
 
             {/* Order Chart Row */}
-            <Card className="bg-[#E2E2E2] rounded-none p-6">
-              <div className="flex justify-between items-start mb-6">
+            <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
+              <div className="flex justify-between items-start mb-4 sm:mb-5 md:mb-6">
                 <div>
-                  <p className="text-gray-600 text-sm mb-2">Total Orders</p>
-                  <h2 className="text-3xl font-bold text-gray-900">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">
+                    Total Orders
+                  </p>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                     {currentData?.total_orders || 0}
                   </h2>
 
-                  <p className="text-gray-500 text-xs mt-2">
+                  <p className="text-gray-500 text-xs mt-1 sm:mt-2">
                     {activeTab === "24hours"
                       ? "Orders from last 24 hours"
                       : activeTab === "weeks"

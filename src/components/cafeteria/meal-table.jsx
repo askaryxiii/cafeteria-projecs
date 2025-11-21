@@ -3,10 +3,18 @@ import { getAllOrdersForToday, getAllOrdersForTomorrow } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
 
+const getCategoryItem = (order, categoryName) => {
+  const category = order.items.find(
+    (cat) => cat.category.toLowerCase() === categoryName.toLowerCase()
+  );
+  return category?.items[0]?.item_name || "-";
+};
+
 export function MealTable({
   fetchTomorrow = false,
   showDelete = false,
   onDelete = null,
+  refreshTrigger = 0,
 }) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -76,7 +84,7 @@ export function MealTable({
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [fetchTomorrow]);
+  }, [fetchTomorrow, refreshTrigger]);
 
   // Add checked property to items based on checkedItems Set
   const itemsWithChecked = items.map((item, idx) => ({
@@ -133,10 +141,10 @@ export function MealTable({
   };
 
   return (
-    <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-3">
+    <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-2 sm:p-3 md:p-4">
       {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full text-sm md:text-base">
           <TableHeader
             onColumnSort={handleColumnSort}
             mealType={mealType}
@@ -161,12 +169,23 @@ export function MealTable({
 
       {/* Mobile View */}
       <div className="md:hidden">
+        <table className="w-full">
+          <TableHeader
+            onColumnSort={handleColumnSort}
+            mealType={mealType}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            showDelete={showDelete}
+          />
+        </table>
         <div className="divide-y divide-gray-200">
           {sortedItems.map((item) => (
             <MobileTableRow
               key={item.id}
               item={item}
               onCheckChange={handleCheckChange}
+              showDelete={showDelete}
+              onDelete={onDelete}
             />
           ))}
         </div>
@@ -175,45 +194,59 @@ export function MealTable({
   );
 }
 
-function MobileTableRow({ item, onCheckChange }) {
+function MobileTableRow({ item, onCheckChange, showDelete, onDelete }) {
   return (
     <div
-      className={`p-4 space-y-2 ${
+      className={`p-3 sm:p-4 space-y-2 sm:space-y-3 ${
         item.checked ? "bg-gray-100 opacity-50" : ""
       }`}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 sm:gap-3">
         <input
           type="checkbox"
           checked={item.checked}
           onChange={() => onCheckChange(item.id)}
-          className="w-5 h-5 accent-blue-600 cursor-pointer disabled:cursor-not-allowed"
+          className="w-4 sm:w-5 h-4 sm:h-5 accent-blue-600 cursor-pointer disabled:cursor-not-allowed shrink-0"
         />
-        <div className="flex items-center gap-2 flex-1">
-          <span className="text-lg">😊</span>
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <span
-            className={`font-medium ${
+            className={`font-medium text-sm sm:text-base truncate ${
               item.checked ? "line-through text-gray-400" : "text-gray-900"
             }`}>
             {item.name}
           </span>
         </div>
+        {showDelete && (
+          <button
+            onClick={() => onDelete && onDelete(item.id)}
+            className="text-red-500 hover:text-red-700 text-xs sm:text-sm md:text-base shrink-0 min-h-9 sm:min-h-10 flex items-center justify-center px-2 sm:px-3">
+            🗑️
+          </button>
+        )}
       </div>
-      <div className="grid grid-cols-2 gap-2 text-sm">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
         <div>
           <span className="text-gray-600">Protein:</span>
-          <p className="font-medium">{item.protein}</p>
+          <p className="font-medium text-gray-900">
+            {getCategoryItem(item, "protein")}
+          </p>
         </div>
         <div>
           <span className="text-gray-600">Carbs:</span>
-          <p className="font-medium">{item.carbs}</p>
+          <p className="font-medium text-gray-900">
+            {getCategoryItem(item, "carbs")}
+          </p>
         </div>
         <div>
           <span className="text-gray-600">Side:</span>
-          <p className="font-medium">{item.side}</p>
+          <p className="font-medium text-gray-900">
+            {getCategoryItem(item, "side")}
+          </p>
         </div>
         <div>
           <span className="text-gray-600">Salad:</span>
-          <p className="font-medium">{item.salad}</p>
+          <p className="font-medium text-gray-900">
+            {getCategoryItem(item, "salad")}
+          </p>
         </div>
       </div>
     </div>

@@ -15,6 +15,7 @@ export default function CreateItemModal({
   onClose,
   onSave,
   isLoading,
+  drinks = false,
 }) {
   const [formData, setFormData] = useState(emptyForm);
 
@@ -109,20 +110,22 @@ export default function CreateItemModal({
               required
             />
           </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-[#072A57] mb-1">
-              Protein Type
-            </label>
-            <input
-              type="text"
-              name="proteinType"
-              placeholder="Enter protein type"
-              value={formData.proteinType}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              required
-            />
-          </div>
+          {!drinks && (
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-[#072A57] mb-1">
+                Protein Type
+              </label>
+              <input
+                type="text"
+                name="proteinType"
+                placeholder="Enter protein type"
+                value={formData.proteinType}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
+                required
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 justify-center pt-4">

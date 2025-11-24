@@ -10,7 +10,7 @@ import {
 
 // Generate chart data from total orders
 const generateChartData = (totalOrders, mostOrderedItems = []) => {
-  if (!totalOrders || totalOrders === 0) return defaultData;
+  
 
   const itemCount = mostOrderedItems.length || 6;
   const ordersPerItem = Math.round(totalOrders / itemCount);

@@ -1,0 +1,46 @@
+import { SidebarHeader } from "../../../components/navbar/sidebar-header";
+import { SidebarNav } from "../../../components/navbar/sidebar-nav";
+import { SidebarFooter } from "../../../components/navbar/sidebar-footer";
+import { MdClose } from "react-icons/md";
+
+export function MobileMenuDrawer({
+  isOpen,
+  onClose,
+  selectedMenuItem,
+  menuItems,
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+        onClick={onClose}
+      />
+
+      {/* Drawer */}
+      <div className="fixed left-0 top-0 bottom-0 w-80 bg-[#EFEFEF] border-r border-[#9C9393] shadow-lg z-50 md:hidden flex flex-col">
+        {/* Close Button */}
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="font-semibold text-gray-800">Admin Menu</h3>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-300 rounded transition"
+            aria-label="Close menu">
+            <MdClose className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
+
+        {/* Menu Content */}
+        <SidebarHeader />
+        <SidebarNav
+          menuItems={menuItems}
+          selectedMenuItem={selectedMenuItem}
+          onItemClick={onClose}
+        />
+        <SidebarFooter onItemClick={onClose} />
+      </div>
+    </>
+  );
+}

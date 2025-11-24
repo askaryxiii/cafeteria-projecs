@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { FaUserGroup } from "react-icons/fa6";
+import { PiChefHatBold, PiForkKnifeFill, PiBankFill } from "react-icons/pi";
+import { TbMenu3 } from "react-icons/tb";
+import { MdSettings, MdDashboard } from "react-icons/md";
 import AdminLogoNav from "./navbar/admin/AdminLogoNav";
 import { Sidebar } from "./navbar/admin/Sidebar";
+import { MobileMenuDrawer } from "./navbar/admin/MobileMenuDrawer";
 import DashboardAdmin from "../pages/admin/DashboardAdmin";
 import UsersDashboard from "../pages/admin/UsersDashboard";
 import ChefDashboard from "../pages/admin/ChefDashboard";
@@ -9,94 +15,106 @@ import AccountsDashboard from "../pages/admin/AccountsDashboard";
 import MenuDashboard from "../pages/admin/MenuDashboard";
 import Settings from "../pages/admin/Settings";
 
-const AdminLayout = ({ children }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const AdminLayout = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
-    try {
-      const saved = localStorage.getItem("adminSelectedMenu");
-      return saved || "dashboard";
-    } catch (e) {
-      return "dashboard";
-    }
-  });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const location = useLocation();
+
+  // Get the current active menu item from the URL path
+  const getActiveMenuItem = () => {
+    const path = location.pathname;
+    const match = path.match(/\/admin\/([a-z-]+)/);
+    return match ? match[1] : "dashboard";
+  };
+
+  const activeMenuItem = getActiveMenuItem();
 
   useEffect(() => {
     const handleResize = () => {
       const nowMobile = window.innerWidth < 768;
       setIsMobile(nowMobile);
-      if (window.innerWidth >= 768) {
-        setIsExpanded(true);
-      } else {
-        setIsExpanded(false);
-      }
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Map menu item IDs to their corresponding components
-  const menuComponentMap = {
-    dashboard: <DashboardAdmin />,
-    users: <UsersDashboard />,
-    chef: <ChefDashboard />,
-    cafeteria: <CafeteriaDashboard />,
-    accounts: <AccountsDashboard />,
-    menu: <MenuDashboard />,
-    settings: <Settings />,
-  };
-
-  // Save selected menu item to localStorage whenever it changes
-  useEffect(() => {
-    try {
-      localStorage.setItem("adminSelectedMenu", selectedMenuItem);
-    } catch (e) {
-      console.error("Failed to save menu selection:", e);
-    }
-  }, [selectedMenuItem]);
-
-  const handleSelectMenu = (menuId) => {
-    setSelectedMenuItem(menuId);
-    if (isMobile) {
-      setIsExpanded(false);
-    }
-  };
+  // Menu items for sidebar
+  const menuItems = [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: MdDashboard,
+      path: "/admin/dashboard",
+    },
+    { id: "users", label: "Users", icon: FaUserGroup, path: "/admin/users" },
+    { id: "chef", label: "Chef", icon: PiChefHatBold, path: "/admin/chef" },
+    {
+      id: "cafeteria",
+      label: "Cafeteria",
+      icon: PiForkKnifeFill,
+      path: "/admin/cafeteria",
+    },
+    {
+      id: "accounts",
+      label: "Accounts",
+      icon: PiBankFill,
+      path: "/admin/accounts",
+    },
+    { id: "menu", label: "Menu Items", icon: TbMenu3, path: "/admin/menu" },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: MdSettings,
+      path: "/admin/settings",
+    },
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-6 min-h-screen bg-[#E2E2E2]">
+    <div className="bg-[#E2E2E2]">
       {/* Logo Navigation (top bar) */}
-      <div className="col-span-1 md:col-span-6">
-        <AdminLogoNav />
+      <div>
+        <AdminLogoNav
+          isMobile={isMobile}
+          onMenuToggle={() => setIsDrawerOpen(!isDrawerOpen)}
+        />
       </div>
 
-      {/* Sidebar - responsive */}
-      {(isExpanded || !isMobile) && (
-        <div className="col-span-1 fixed md:static bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:right-auto z-40 md:z-auto h-auto md:h-auto">
+      {/* Mobile Menu Drawer */}
+      <MobileMenuDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        selectedMenuItem={activeMenuItem}
+        menuItems={menuItems}
+      />
+
+      <div className="flex min-h-screen">
+        {/* Sidebar - always visible, fixed width */}
+        {!isMobile && (
           <Sidebar
-            isExpanded={isExpanded}
-            setIsExpanded={setIsExpanded}
-            onSelectMenu={handleSelectMenu}
-            selectedMenuItem={selectedMenuItem}
+            selectedMenuItem={activeMenuItem}
             isMobile={isMobile}
+            menuItems={menuItems}
           />
-        </div>
-      )}
+        )}
 
-      {/* Main Content */}
-      <main className="col-span-1 md:col-span-5 overflow-y-auto p-2 sm:p-3 md:p-4 lg:p-6">
-        <div className="w-full">
-          {children || menuComponentMap[selectedMenuItem]}
-        </div>
-      </main>
-
-      {/* Mobile Overlay */}
-      {isMobile && isExpanded && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-          onClick={() => setIsExpanded(false)}
-        />
-      )}
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto p-0 lg:p-6">
+          <Routes>
+            <Route path="/dashboard" element={<DashboardAdmin />} />
+            <Route path="/users" element={<UsersDashboard />} />
+            <Route path="/chef" element={<ChefDashboard />} />
+            <Route path="/cafeteria" element={<CafeteriaDashboard />} />
+            <Route path="/accounts" element={<AccountsDashboard />} />
+            <Route path="/menu" element={<MenuDashboard />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route
+              path="/"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 };

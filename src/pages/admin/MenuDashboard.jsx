@@ -1,77 +1,163 @@
 import React, { useState, useEffect } from "react";
 import ItemsTable from "../../components/admin/menu/items-table";
+import DrinksTable from "../../components/admin/menu/drinks-table";
 import DashboardHeader from "../../layouts/navbar/admin/DashboardHeader";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "../../components/ui/tabs";
 import { TbMenu3 } from "react-icons/tb";
 import { getAllMenuItems, editMenuItem, deleteMenuItem } from "../../lib/apis";
 import toast from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_BASE;
+
+function readToken() {
+  try {
+    return (
+      localStorage.getItem("authToken") ||
+      sessionStorage.getItem("authToken") ||
+      null
+    );
+  } catch (e) {
+    return null;
+  }
+}
+
 const MenuDashboard = () => {
   const [items, setItems] = useState([]);
+  const [drinks, setDrinks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch menu items on component mount
+  // Fetch menu items and drinks on component mount
   useEffect(() => {
     const loadItems = async () => {
       setIsLoading(true);
-      const result = await getAllMenuItems();
-      if (result.error) {
-        toast.error(result.error);
+      try {
+        const token = readToken();
+        if (!token) throw new Error("No auth token found");
+
+        // Fetch all menu items
+        const response = await fetch(`${API_URL}/menu`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch menu items");
+
+        const data = await response.json();
+        const foodItems = data.filter((item) => item.category !== "drink");
+        const drinkItems = data.filter((item) => item.category === "drink");
+
+        setItems(Array.isArray(foodItems) ? foodItems : []);
+        setDrinks(Array.isArray(drinkItems) ? drinkItems : []);
+      } catch (error) {
+        console.error("Error loading items:", error);
+        toast.error(error.message || "Failed to load menu items");
         setItems([]);
-      } else {
-        setItems(Array.isArray(result) ? result : []);
+        setDrinks([]);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     loadItems();
   }, []);
 
-  // Edit function using editMenuItem API
+  // Create function
+  const createItem = async (newData) => {
+    try {
+      const token = readToken();
+      if (!token) throw new Error("No auth token found");
+
+      const response = await fetch(`${API_URL}/menu`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newData),
+      });
+
+      if (!response.ok) throw new Error("Failed to create item");
+
+      const createdItem = await response.json();
+
+      // Add to appropriate list based on category
+      if (newData.category === "drink") {
+        setDrinks([...drinks, createdItem]);
+      } else {
+        setItems([...items, createdItem]);
+      }
+
+      toast.success("Item created successfully");
+      return createdItem;
+    } catch (err) {
+      toast.error("Failed to create item");
+      console.error(err);
+      return { error: err.message };
+    }
+  };
+
+  // Update function
   const updateItem = async (id, updatedData) => {
     try {
-      const result = await editMenuItem(id, updatedData);
-      if (result.error) {
-        toast.error(result.error);
-        return { error: result.error };
+      const token = readToken();
+      if (!token) throw new Error("No auth token found");
+
+      const response = await fetch(`${API_URL}/menu/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) throw new Error("Failed to update item");
+
+      const updatedItem = await response.json();
+
+      // Update in appropriate list based on category
+      if (updatedData.category === "drink") {
+        setDrinks(drinks.map((d) => (d.id === id ? updatedItem : d)));
+      } else {
+        setItems(items.map((item) => (item.id === id ? updatedItem : item)));
       }
-      // Refresh the items list after successful edit
-      setItems(
-        items.map((item) =>
-          item.id === id ? { ...item, ...updatedData } : item
-        )
-      );
+
       toast.success("Item updated successfully");
       return { success: true };
     } catch (err) {
       toast.error("Failed to update item");
+      console.error(err);
       return { error: err.message };
     }
   };
 
-  // Delete function using deleteMenuItem API
+  // Delete function
   const deleteItem = async (id) => {
     try {
-      const result = await deleteMenuItem(id);
-      if (result.error) {
-        toast.error(result.error);
-        return { error: result.error };
-      }
-      // Remove item from list after successful delete
+      const token = readToken();
+      if (!token) throw new Error("No auth token found");
+
+      const response = await fetch(`${API_URL}/menu/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("Failed to delete item");
+
+      // Remove from both lists (it will only exist in one)
       setItems(items.filter((item) => item.id !== id));
+      setDrinks(drinks.filter((d) => d.id !== id));
+
       toast.success("Item deleted successfully");
       return { success: true };
     } catch (err) {
       toast.error("Failed to delete item");
+      console.error(err);
       return { error: err.message };
     }
-  };
-
-  // Create function (placeholder for now)
-  const createItem = async (newData) => {
-    // TODO: Implement createMenuItem API call when endpoint is available
-    const newItem = { id: Date.now(), ...newData };
-    setItems([...items, newItem]);
-    toast.success("Item created successfully");
-    return newItem;
   };
 
   return (
@@ -83,12 +169,30 @@ const MenuDashboard = () => {
         }
         dist="/"
       />
-      <ItemsTable
-        items={items}
-        onUpdate={updateItem}
-        onDelete={deleteItem}
-        onCreate={createItem}
-      />
+      <Tabs defaultValue="items" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="items">Food Items</TabsTrigger>
+          <TabsTrigger value="drinks">Drinks</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="items">
+          <ItemsTable
+            items={items}
+            onUpdate={updateItem}
+            onDelete={deleteItem}
+            onCreate={createItem}
+          />
+        </TabsContent>
+
+        <TabsContent value="drinks">
+          <DrinksTable
+            drinks={drinks}
+            onUpdate={updateItem}
+            onDelete={deleteItem}
+            onCreate={createItem}
+          />
+        </TabsContent>
+      </Tabs>
     </main>
   );
 };

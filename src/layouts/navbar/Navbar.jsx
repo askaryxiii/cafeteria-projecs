@@ -6,6 +6,7 @@ import UserAvatar from "../../components/ui/avatar/UserAvatar";
 import Logo from "../../components/ui/logos/Logo";
 import { Link } from "react-router-dom";
 import MobileUserMenu from "./MobileUserMenu";
+import { IoFastFoodSharp } from "react-icons/io5";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -31,8 +32,11 @@ const Navbar = () => {
         />
 
         <div className="hidden md:flex gap-3">
-          <Link to="/" className="nav-btn">
+          <Link to="/user/drinks" className="nav-btn">
             <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+          </Link>
+          <Link to="/user" className="nav-btn">
+            <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
           </Link>
           <Link to="/" className="nav-btn">
             <ImHome className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />

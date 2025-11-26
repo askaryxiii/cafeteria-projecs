@@ -111,14 +111,14 @@ const WeeklyMenu = () => {
 
       const data = await response.json();
 
-      // Autofill the form with fetched data
-      if (data && data.items) {
-        data.items.forEach((dayMenu, dayIndex) => {
+      // Autofill the form with fetched data - API response uses "menu" array
+      if (data && data.menu) {
+        data.menu.forEach((dayMenu, dayIndex) => {
           // Fill each category with the fetched data
           ["protein", "carbs", "salad", "side"].forEach((category) => {
             const items = dayMenu.menu?.[category] || [];
-            // Fill with fetched data
-            items.forEach((item, itemIndex) => {
+            // Fill with fetched data (only first 4 items)
+            items.slice(0, 4).forEach((item, itemIndex) => {
               setValue(
                 `items.${dayIndex}.menu.${category}.${itemIndex}.code`,
                 item.code || ""
@@ -183,10 +183,10 @@ const WeeklyMenu = () => {
       const token = readToken();
       if (!token) throw new Error("No auth token found");
 
-      // Filter out empty codes and construct proper payload
+      // Filter out empty codes and construct payload matching backend format
       const cleanedData = {
         week_start_date: data.week_start_date,
-        items: data.items.map((item) => ({
+        menu: data.items.map((item) => ({
           day: item.day,
           date: item.date,
           menu: {

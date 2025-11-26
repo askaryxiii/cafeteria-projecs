@@ -8,29 +8,34 @@ import Ordering from "./Ordering";
 
 const YourOrder = ({ order, onOrderUpdated }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
-  const [isBreakfastWindow, setIsBreakfastWindow] = useState(false);
+  const [isBreakfastWindow, setIsBreakfastWindow] = useState(null);
+  const [windowsInitialized, setWindowsInitialized] = useState(false);
 
   // Initialize windows on mount
   useEffect(() => {
     (async () => {
-      const windowsResponse = await getOrderWindows();
-      const now = new Date();
-      const hour = now.getHours();
+      try {
+        const windowsResponse = await getOrderWindows();
+        const now = new Date();
+        const hour = now.getHours();
 
-      let ORDER_WINDOW_BREAKFAST_START = 11;
-      let ORDER_WINDOW_BREAKFAST_END = 15;
+        let ORDER_WINDOW_BREAKFAST_START = 11;
+        let ORDER_WINDOW_BREAKFAST_END = 15;
 
-      if (windowsResponse?.windows) {
-        ORDER_WINDOW_BREAKFAST_START =
-          parseInt(windowsResponse.windows.breakfast_start) || 11;
-        ORDER_WINDOW_BREAKFAST_END =
-          parseInt(windowsResponse.windows.breakfast_end) || 15;
+        if (windowsResponse?.windows) {
+          ORDER_WINDOW_BREAKFAST_START =
+            parseInt(windowsResponse.windows.breakfast_start) || 11;
+          ORDER_WINDOW_BREAKFAST_END =
+            parseInt(windowsResponse.windows.breakfast_end) || 15;
+        }
+
+        const isBreakfast =
+          hour >= ORDER_WINDOW_BREAKFAST_START &&
+          hour < ORDER_WINDOW_BREAKFAST_END;
+        setIsBreakfastWindow(isBreakfast);
+      } finally {
+        setWindowsInitialized(true);
       }
-
-      const isBreakfast =
-        hour >= ORDER_WINDOW_BREAKFAST_START &&
-        hour < ORDER_WINDOW_BREAKFAST_END;
-      setIsBreakfastWindow(isBreakfast);
     })();
   }, []);
 
@@ -38,20 +43,6 @@ const YourOrder = ({ order, onOrderUpdated }) => {
   useEffect(() => {
     setCurrentOrder(order);
   }, [order]);
-
-  // Fetch order on component mount
-  useEffect(() => {
-    (async () => {
-      const token = readToken();
-      const today = new Date().toISOString().split("T")[0];
-      const fetchedOrder = await getUserOrdersByDate(today, token);
-      const filteredOrder = fetchedOrder.find(
-        (o) => o.meal_type === (isBreakfastWindow ? "breakfast" : "lunch")
-      );
-
-      setCurrentOrder(filteredOrder);
-    })();
-  }, [isBreakfastWindow]);
 
   if (!currentOrder) {
     return <Ordering onOrderPlaced={onOrderUpdated} />;

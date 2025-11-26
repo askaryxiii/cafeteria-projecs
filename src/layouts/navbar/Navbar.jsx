@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { BsFillCupHotFill } from "react-icons/bs";
 import { ImHome } from "react-icons/im";
@@ -7,9 +7,11 @@ import Logo from "../../components/ui/logos/Logo";
 import { Link } from "react-router-dom";
 import MobileUserMenu from "./MobileUserMenu";
 import { IoFastFoodSharp } from "react-icons/io5";
+import AuthContext from "../../context/AuthContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const { user } = useContext(AuthContext);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -32,15 +34,24 @@ const Navbar = () => {
         />
 
         <div className="hidden md:flex gap-3">
-          <Link to="/user/drinks" className="nav-btn">
-            <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
-          </Link>
-          <Link to="/user" className="nav-btn">
-            <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
-          </Link>
-          <Link to="/" className="nav-btn">
-            <ImHome className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
-          </Link>
+          {user.user.role === "admin" ||
+          user.user.role === "employee" ||
+          user.user.role === "accountant" ? (
+            <div className="flex gap-3">
+              <Link to="/user/drinks" className="nav-btn">
+                <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+              </Link>
+              <Link to="/user" className="nav-btn">
+                <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+              </Link>
+              <Link to="/" className="nav-btn">
+                <ImHome className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+              </Link>
+            </div>
+          ) : (
+            <></>
+          )}
+
           <UserAvatar />
         </div>
 

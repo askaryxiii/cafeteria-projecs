@@ -28,6 +28,7 @@ const DishDropdown = ({
       setItems(breakfastFetch);
     } else {
       const fetchedItems = await getTodayMenuByCategory(categoryName);
+
       setItems(fetchedItems);
     }
     setLoading(false);

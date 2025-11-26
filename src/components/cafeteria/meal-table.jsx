@@ -81,6 +81,10 @@ export function MealTable({
         typeToShow = "lunch";
       }
 
+      // Always add drinks orders alongside breakfast or lunch
+      const drinkOrders = fetchedOrders.drinkOrders || [];
+      ordersToShow = [...ordersToShow, ...drinkOrders];
+
       setItems(ordersToShow);
       setMealType(typeToShow);
     }

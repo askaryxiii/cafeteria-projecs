@@ -41,7 +41,7 @@ const DrinkDropdown = ({ control }) => {
       if (!response.ok) throw new Error("Failed to fetch drinks");
 
       const data = await response.json();
-      const drinkItems = data.filter((item) => item.category === "drink");
+      const drinkItems = data.filter((item) => item.meal_type === "drinks");
       setItems(drinkItems);
     } catch (error) {
       console.error("Error fetching drinks:", error);

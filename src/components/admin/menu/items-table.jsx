@@ -22,6 +22,14 @@ export default function ItemsTable({ items, onUpdate, onDelete, onCreate }) {
   const filteredItems = useMemo(() => {
     let filtered = items;
 
+    // Filter by meal type (lunch or breakfast)
+    filtered = filtered.filter(
+      (item) =>
+        item.meal_type &&
+        (item.meal_type.toLowerCase() === "lunch" ||
+          item.meal_type.toLowerCase() === "breakfast")
+    );
+
     // Apply search filter
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();

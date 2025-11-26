@@ -702,3 +702,55 @@ export async function getStats(token) {
     return { error: err.message || "Something went wrong" };
   }
 }
+
+export async function getOrderWindows() {
+  try {
+    const token = readToken();
+    if (!token) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/order-windows`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch order windows" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching order windows:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function updateOrderWindows(windowsData) {
+  try {
+    const token = readToken();
+    if (!token) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/order-windows`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(windowsData),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to update order windows" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error updating order windows:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}

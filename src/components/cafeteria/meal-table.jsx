@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { getAllOrdersForToday, getAllOrdersForTomorrow } from "../../lib/apis";
+import {
+  getAllOrdersForToday,
+  getAllOrdersForTomorrow,
+  getOrderWindows,
+} from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
 
@@ -35,16 +39,24 @@ export function MealTable({
     const now = new Date();
     const hour = now.getHours();
 
-    const ORDER_WINDOW_BREAKFAST_START = parseInt(
-      import.meta.env.VITE_ORDER_WINDOW_BREAKFAST_START
-    );
-    const ORDER_WINDOW_BREAKFAST_END = parseInt(
-      import.meta.env.VITE_ORDER_WINDOW_BREAKFAST_END
-    );
-    const ORDER_WINDOW_LUNCH_START = parseInt(
-      import.meta.env.VITE_ORDER_WINDOW_LUNCH_START
-    );
-    const ORDER_WINDOW_LUNCH_END = 23;
+    // Get order windows from API
+    const windowsResponse = await getOrderWindows();
+
+    let ORDER_WINDOW_BREAKFAST_START = 11;
+    let ORDER_WINDOW_BREAKFAST_END = 15;
+    let ORDER_WINDOW_LUNCH_START = 15;
+    let ORDER_WINDOW_LUNCH_END = 23;
+
+    if (windowsResponse?.windows) {
+      ORDER_WINDOW_BREAKFAST_START =
+        parseInt(windowsResponse.windows.breakfast_start) || 11;
+      ORDER_WINDOW_BREAKFAST_END =
+        parseInt(windowsResponse.windows.breakfast_end) || 15;
+      ORDER_WINDOW_LUNCH_START =
+        parseInt(windowsResponse.windows.lunch_start) || 15;
+      ORDER_WINDOW_LUNCH_END =
+        parseInt(windowsResponse.windows.lunch_end?.split(":")[0]) || 23;
+    }
 
     // Fetch orders based on fetchTomorrow prop
     const fetchedOrders = fetchTomorrow

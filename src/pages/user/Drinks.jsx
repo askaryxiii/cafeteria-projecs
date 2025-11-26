@@ -8,7 +8,7 @@ import DrinkDropdown from "../../components/user/drink-dropdown";
 const API_URL = import.meta.env.VITE_API_BASE;
 
 const Drinks = ({ onOrderPlaced }) => {
-  const { control, watch, handleSubmit } = useForm({
+  const { control, watch, handleSubmit, reset } = useForm({
     defaultValues: { drinks: [] },
   });
 
@@ -56,6 +56,9 @@ const Drinks = ({ onOrderPlaced }) => {
 
         const result = await response.json();
         toast.success("Drink order placed successfully");
+
+        // Reset form to clear selected drinks
+        reset();
 
         if (typeof onOrderPlaced === "function") {
           onOrderPlaced(result);

@@ -2,15 +2,11 @@ import React, { useState, useEffect } from "react";
 import ItemsTable from "../../components/admin/menu/items-table";
 import DrinksTable from "../../components/admin/menu/drinks-table";
 import DashboardHeader from "../../layouts/navbar/admin/DashboardHeader";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "../../components/ui/tabs";
+import { Tabs, TabsList, TabsContent } from "../../components/ui/tabs";
 import { TbMenu3 } from "react-icons/tb";
 import { getAllMenuItems, editMenuItem, deleteMenuItem } from "../../lib/apis";
 import toast from "react-hot-toast";
+import CustTabList from "../../components/ui/tabs/Tabs_list";
 
 const API_URL = import.meta.env.VITE_API_BASE;
 
@@ -30,6 +26,16 @@ const MenuDashboard = () => {
   const [items, setItems] = useState([]);
   const [drinks, setDrinks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const tabs = [
+    {
+      title: "Food Items",
+      value: "items",
+    },
+    {
+      title: "Drinks",
+      value: "drinks",
+    },
+  ];
 
   // Fetch menu items and drinks on component mount
   useEffect(() => {
@@ -47,8 +53,17 @@ const MenuDashboard = () => {
         if (!response.ok) throw new Error("Failed to fetch menu items");
 
         const data = await response.json();
-        const foodItems = data.filter((item) => item.category !== "drink");
-        const drinkItems = data.filter((item) => item.category === "drink");
+        // Filter food items - exclude drinks and only include lunch/breakfast types
+        const foodItems = data.filter(
+          (item) =>
+            item.category !== "drink" &&
+            item.meal_type &&
+            (item.meal_type.toLowerCase() === "lunch" ||
+              item.meal_type.toLowerCase() === "breakfast")
+        );
+        const drinkItems = data.filter(
+          (item) => item.meal_type === "drinks" || item.meal_type === "drink"
+        );
 
         setItems(Array.isArray(foodItems) ? foodItems : []);
         setDrinks(Array.isArray(drinkItems) ? drinkItems : []);
@@ -66,6 +81,8 @@ const MenuDashboard = () => {
 
   // Create function
   const createItem = async (newData) => {
+    console.log(newData);
+
     try {
       const token = readToken();
       if (!token) throw new Error("No auth token found");
@@ -170,28 +187,31 @@ const MenuDashboard = () => {
         dist="/"
       />
       <Tabs defaultValue="items" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="items">Food Items</TabsTrigger>
-          <TabsTrigger value="drinks">Drinks</TabsTrigger>
+        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-[#ACA4A4] border-t-[#ACA4A4] rounded-none ">
+          {tabs.map((tab) => (
+            <CustTabList tab={tab} />
+          ))}
         </TabsList>
 
-        <TabsContent value="items">
-          <ItemsTable
-            items={items}
-            onUpdate={updateItem}
-            onDelete={deleteItem}
-            onCreate={createItem}
-          />
-        </TabsContent>
-
-        <TabsContent value="drinks">
-          <DrinksTable
-            drinks={drinks}
-            onUpdate={updateItem}
-            onDelete={deleteItem}
-            onCreate={createItem}
-          />
-        </TabsContent>
+        {tabs.map((tab) => (
+          <TabsContent value={tab.value}>
+            {tab.value == "items" ? (
+              <ItemsTable
+                items={items}
+                onUpdate={updateItem}
+                onDelete={deleteItem}
+                onCreate={createItem}
+              />
+            ) : (
+              <DrinksTable
+                drinks={drinks}
+                onUpdate={updateItem}
+                onDelete={deleteItem}
+                onCreate={createItem}
+              />
+            )}
+          </TabsContent>
+        ))}
       </Tabs>
     </main>
   );

@@ -2,12 +2,12 @@ import { useState } from "react";
 import Modal from "./modal-base";
 
 const emptyForm = {
-  itemName: "",
+  item_name: "",
   category: "",
   price: 0,
-  weightGrams: 0,
-  mealType: "",
-  proteinType: "",
+  weight_grams: 0,
+  meal_type: "",
+  protein_type: "",
 };
 
 export default function CreateItemModal({
@@ -46,9 +46,9 @@ export default function CreateItemModal({
             </label>
             <input
               type="text"
-              name="itemName"
+              name="item_name"
               placeholder="Enter item name"
-              value={formData.itemName}
+              value={formData.item_name}
               onChange={handleChange}
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
@@ -88,12 +88,11 @@ export default function CreateItemModal({
             </label>
             <input
               type="number"
-              name="weightGrams"
+              name="weight_grams"
               placeholder="Enter weight in grams"
-              value={formData.weightGrams}
+              value={formData.weight_grams}
               onChange={handleChange}
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              required
             />
           </div>
           <div>
@@ -102,9 +101,9 @@ export default function CreateItemModal({
             </label>
             <input
               type="text"
-              name="mealType"
+              name="meal_type"
               placeholder="Enter meal type"
-              value={formData.mealType}
+              value={formData.meal_type}
               onChange={handleChange}
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
@@ -117,12 +116,11 @@ export default function CreateItemModal({
               </label>
               <input
                 type="text"
-                name="proteinType"
+                name="protein_type"
                 placeholder="Enter protein type"
-                value={formData.proteinType}
+                value={formData.protein_type}
                 onChange={handleChange}
                 className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-                required
               />
             </div>
           )}

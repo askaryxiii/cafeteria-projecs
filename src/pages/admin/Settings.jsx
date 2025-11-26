@@ -7,6 +7,9 @@ import {
   TabsContent,
 } from "../../components/ui/tabs";
 import toast from "react-hot-toast";
+import DashboardHeader from "../../layouts/navbar/admin/DashboardHeader";
+import { IoSettingsSharp } from "react-icons/io5";
+import CustTabList from "../../components/ui/tabs/Tabs_list";
 
 const API_URL = import.meta.env.VITE_API_BASE;
 
@@ -77,6 +80,60 @@ const WeeklyMenu = () => {
     side: [],
   });
   const [loading, setLoading] = useState(false);
+  const [isFetchingWeekly, setIsFetchingWeekly] = useState(false);
+
+  // Function to fetch and autofill existing weekly menu
+  const fetchExistingWeeklyMenu = async (dateString) => {
+    try {
+      setIsFetchingWeekly(true);
+
+      // First, reset all fields to empty
+      WEEKDAYS.forEach((day, dayIndex) => {
+        ["protein", "carbs", "salad", "side"].forEach((category) => {
+          for (let i = 0; i < 4; i++) {
+            setValue(`items.${dayIndex}.menu.${category}.${i}.code`, "");
+          }
+        });
+      });
+
+      const token = readToken();
+      if (!token) throw new Error("No auth token found");
+
+      const response = await fetch(`${API_URL}/weekly-menu/${dateString}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        // If no existing menu, fields are already cleared
+        console.log("No existing weekly menu found for this date");
+        return;
+      }
+
+      const data = await response.json();
+
+      // Autofill the form with fetched data
+      if (data && data.items) {
+        data.items.forEach((dayMenu, dayIndex) => {
+          // Fill each category with the fetched data
+          ["protein", "carbs", "salad", "side"].forEach((category) => {
+            const items = dayMenu.menu?.[category] || [];
+            // Fill with fetched data
+            items.forEach((item, itemIndex) => {
+              setValue(
+                `items.${dayIndex}.menu.${category}.${itemIndex}.code`,
+                item.code || ""
+              );
+            });
+          });
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching existing weekly menu:", error);
+      // Silently fail - user can still create new menu
+    } finally {
+      setIsFetchingWeekly(false);
+    }
+  };
 
   // Watch for changes in week_start_date
   const weekStartDate = watch("week_start_date");
@@ -87,6 +144,9 @@ const WeeklyMenu = () => {
       WEEKDAYS.forEach((day, index) => {
         setValue(`items.${index}.date`, newWeekDates[index]);
       });
+
+      // Fetch existing weekly menu for this date
+      fetchExistingWeeklyMenu(weekStartDate);
     }
   }, [weekStartDate, setValue]);
 
@@ -167,13 +227,13 @@ const WeeklyMenu = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-[#072A57] mb-2">
           Week Start Date
         </label>
         <input
           type="date"
           {...control.register("week_start_date")}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="w-full pl-4 pr-4 py-1.5 rounded-sm border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
         />
       </div>
 
@@ -188,7 +248,7 @@ const WeeklyMenu = () => {
       <button
         type="submit"
         disabled={loading}
-        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
+        className="bg-[#072A57] hover:bg-[#0a3c7e] shadow-lg text-white font-semibold py-1.5 px-4  whitespace-nowrap transition-colors">
         {loading ? "Submitting..." : "Submit Weekly Menu"}
       </button>
     </form>
@@ -222,7 +282,7 @@ const DaySection = ({ itemIndex, control, watch, menuItems, errors }) => {
   const date = watch(`items.${itemIndex}.date`);
 
   return (
-    <div className="p-6 bg-white border border-gray-200 rounded-lg">
+    <div className="p-6  border border-[#ACA4A4] rounded-sm">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 capitalize">
         {day} - {date}
       </h3>
@@ -296,6 +356,11 @@ const MenuItemSelect = ({
   const fieldName = `items.${itemIndex}.menu.${category}.${fieldIndex}.code`;
   const value = watch(fieldName);
 
+  // Find the selected item to display its name
+  const selectedItem = value
+    ? menuItems.find((item) => item.code === value)
+    : null;
+
   return (
     <div>
       <label className="text-xs text-gray-600 mb-1 block">
@@ -307,8 +372,13 @@ const MenuItemSelect = ({
             ? `${category} item ${fieldIndex + 1} is required`
             : false,
         })}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
-        <option value="">Select {category}</option>
+        value={value || ""}
+        className="w-full px-3 py-2 border border-[#ACA4A4] rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+        <option value="">
+          {selectedItem
+            ? `${selectedItem.item_name} (${selectedItem.code})`
+            : `Select ${category}`}
+        </option>
         {menuItems.map((item) => (
           <option key={item.id} value={item.code}>
             {item.item_name} ({item.code})
@@ -334,23 +404,39 @@ const SettingsPanel = () => {
 };
 
 const Settings = () => {
+  const tabs = [
+    {
+      title: "Weekly Menu",
+      value: "weekly-menu",
+    },
+    {
+      title: "Settings",
+      value: "settings",
+    },
+  ];
   return (
-    <div className="w-full">
+    <main className="p-1 sm:p-1.5 md:p-2">
+      <DashboardHeader
+        title={"Settings"}
+        icon={
+          <IoSettingsSharp className="w-6 sm:w-7 md:w-7 h-6 sm:h-7 md:h-7 text-[#02356A]" />
+        }
+        dist="/"
+      />
       <Tabs defaultValue="weekly-menu" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="weekly-menu">Weekly Menu</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-[#ACA4A4] border-t-[#ACA4A4] rounded-none ">
+          {tabs.map((tab) => (
+            <CustTabList tab={tab} />
+          ))}
         </TabsList>
 
-        <TabsContent value="weekly-menu" className="mt-6">
-          <WeeklyMenu />
-        </TabsContent>
-
-        <TabsContent value="settings" className="mt-6">
-          <SettingsPanel />
-        </TabsContent>
+        {tabs.map((tab) => (
+          <TabsContent value={tab.value} className="mt-6">
+            {tab.value == "weekly-menu" ? <WeeklyMenu /> : <SettingsPanel />}
+          </TabsContent>
+        ))}
       </Tabs>
-    </div>
+    </main>
   );
 };
 

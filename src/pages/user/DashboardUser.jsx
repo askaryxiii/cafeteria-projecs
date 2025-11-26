@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { readToken, getUserOrdersByDate } from "../../lib/apis";
+import {
+  readToken,
+  getUserOrdersByDate,
+  getOrderWindows,
+} from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
 import { toast } from "react-hot-toast";
@@ -8,16 +12,31 @@ import OrderSkeleton from "../../components/skeleton/loading/order/OrderSkeleton
 const DashboardUser = () => {
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
+  const [isBreakfastWindow, setIsBreakfastWindow] = useState(false);
 
-  const ORDER_WINDOW_BREAKFAST_START = import.meta.env
-    .VITE_ORDER_WINDOW_BREAKFAST_START;
-  const ORDER_WINDOW_BREAKFAST_END = import.meta.env
-    .VITE_ORDER_WINDOW_BREAKFAST_END;
+  // Initialize windows on mount
+  useEffect(() => {
+    (async () => {
+      const windowsResponse = await getOrderWindows();
+      const now = new Date();
+      const hour = now.getHours();
 
-  const now = new Date();
-  const hour = now.getHours();
-  const isBreakfastWindow =
-    hour >= ORDER_WINDOW_BREAKFAST_START && hour < ORDER_WINDOW_BREAKFAST_END;
+      let ORDER_WINDOW_BREAKFAST_START = 11;
+      let ORDER_WINDOW_BREAKFAST_END = 15;
+
+      if (windowsResponse?.windows) {
+        ORDER_WINDOW_BREAKFAST_START =
+          parseInt(windowsResponse.windows.breakfast_start) || 11;
+        ORDER_WINDOW_BREAKFAST_END =
+          parseInt(windowsResponse.windows.breakfast_end) || 15;
+      }
+
+      const isBreakfast =
+        hour >= ORDER_WINDOW_BREAKFAST_START &&
+        hour < ORDER_WINDOW_BREAKFAST_END;
+      setIsBreakfastWindow(isBreakfast);
+    })();
+  }, []);
 
   const fetchOrder = async () => {
     try {
@@ -56,10 +75,9 @@ const DashboardUser = () => {
   useEffect(() => {
     setLoading(true);
     fetchOrder();
-  }, []);
+  }, [isBreakfastWindow]);
 
   const handleOrderPlaced = (createdOrder) => {
-   
     // Add a small delay to ensure backend has processed the order
     setTimeout(async () => {
       setLoading(true);
@@ -68,8 +86,6 @@ const DashboardUser = () => {
   };
 
   if (loading) return <OrderSkeleton />;
-
-  
 
   return order ? (
     <YourOrder order={order} onOrderUpdated={handleOrderPlaced} />

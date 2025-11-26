@@ -22,6 +22,11 @@ export default function DrinksTable({ drinks, onUpdate, onDelete, onCreate }) {
   const filteredDrinks = useMemo(() => {
     let filtered = drinks;
 
+    // Filter by category (drink)
+    filtered = filtered.filter(
+      (item) => item.meal_type && item.meal_type.toLowerCase() === "drinks"
+    );
+
     // Apply search filter
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();

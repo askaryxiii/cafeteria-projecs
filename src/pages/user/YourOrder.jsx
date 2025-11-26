@@ -1,19 +1,38 @@
 import { useEffect, useState } from "react";
-import { readToken, getUserOrdersByDate } from "../../lib/apis";
+import {
+  readToken,
+  getUserOrdersByDate,
+  getOrderWindows,
+} from "../../lib/apis";
 import Ordering from "./Ordering";
-
-const ORDER_WINDOW_BREAKFAST_START = import.meta.env
-  .VITE_ORDER_WINDOW_BREAKFAST_START;
-const ORDER_WINDOW_BREAKFAST_END = import.meta.env
-  .VITE_ORDER_WINDOW_BREAKFAST_END;
-
-const now = new Date();
-const hour = now.getHours();
-const isBreakfastWindow =
-  hour >= ORDER_WINDOW_BREAKFAST_START && hour < ORDER_WINDOW_BREAKFAST_END;
 
 const YourOrder = ({ order, onOrderUpdated }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
+  const [isBreakfastWindow, setIsBreakfastWindow] = useState(false);
+
+  // Initialize windows on mount
+  useEffect(() => {
+    (async () => {
+      const windowsResponse = await getOrderWindows();
+      const now = new Date();
+      const hour = now.getHours();
+
+      let ORDER_WINDOW_BREAKFAST_START = 11;
+      let ORDER_WINDOW_BREAKFAST_END = 15;
+
+      if (windowsResponse?.windows) {
+        ORDER_WINDOW_BREAKFAST_START =
+          parseInt(windowsResponse.windows.breakfast_start) || 11;
+        ORDER_WINDOW_BREAKFAST_END =
+          parseInt(windowsResponse.windows.breakfast_end) || 15;
+      }
+
+      const isBreakfast =
+        hour >= ORDER_WINDOW_BREAKFAST_START &&
+        hour < ORDER_WINDOW_BREAKFAST_END;
+      setIsBreakfastWindow(isBreakfast);
+    })();
+  }, []);
 
   // Update when order prop changes
   useEffect(() => {
@@ -32,7 +51,7 @@ const YourOrder = ({ order, onOrderUpdated }) => {
 
       setCurrentOrder(filteredOrder);
     })();
-  }, []);
+  }, [isBreakfastWindow]);
 
   if (!currentOrder) {
     return <Ordering onOrderPlaced={onOrderUpdated} />;

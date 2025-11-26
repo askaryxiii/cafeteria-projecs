@@ -1,23 +1,43 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { readToken, getVerifiedUser, placeOrder } from "../../lib/apis";
+import {
+  readToken,
+  getVerifiedUser,
+  placeOrder,
+  getOrderWindows,
+} from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
 
 const Ordering = ({ onOrderPlaced }) => {
-  const ORDER_WINDOW_BREAKFAST_START = import.meta.env
-    .VITE_ORDER_WINDOW_BREAKFAST_START;
-  const ORDER_WINDOW_BREAKFAST_END = import.meta.env
-    .VITE_ORDER_WINDOW_BREAKFAST_END;
-  const ORDER_WINDOW_LUNCH_START = import.meta.env
-    .VITE_ORDER_WINDOW_LUNCH_START;
-  const ORDER_WINDOW_LUNCH_END = import.meta.env.VITE_ORDER_WINDOW_LUNCH_END;
+  const [isBreakfastWindow, setIsBreakfastWindow] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const now = new Date();
-  const hour = now.getHours();
-  const isBreakfastWindow =
-    hour >= ORDER_WINDOW_BREAKFAST_START && hour < ORDER_WINDOW_BREAKFAST_END;
+  // Initialize windows on mount
+  useEffect(() => {
+    (async () => {
+      const windowsResponse = await getOrderWindows();
+      const now = new Date();
+      const hour = now.getHours();
+
+      let ORDER_WINDOW_BREAKFAST_START = 11;
+      let ORDER_WINDOW_BREAKFAST_END = 15;
+
+      if (windowsResponse?.windows) {
+        ORDER_WINDOW_BREAKFAST_START =
+          parseInt(windowsResponse.windows.breakfast_start) || 11;
+        ORDER_WINDOW_BREAKFAST_END =
+          parseInt(windowsResponse.windows.breakfast_end) || 15;
+      }
+
+      const isBreakfast =
+        hour >= ORDER_WINDOW_BREAKFAST_START &&
+        hour < ORDER_WINDOW_BREAKFAST_END;
+      setIsBreakfastWindow(isBreakfast);
+      setLoading(false);
+    })();
+  }, []);
 
   const defaultValues = isBreakfastWindow
     ? { breakfast: [] }
@@ -88,6 +108,10 @@ const Ordering = ({ onOrderPlaced }) => {
   const breakfastCategories = [
     { id: "breakfast", name: "Breakfast", nameAr: "افطار" },
   ];
+
+  if (loading) {
+    return <div className="text-center p-8">Loading...</div>;
+  }
 
   return (
     <div className="sm:px-6 md:px-12 lg:px-32 xl:px-44 py-4 sm:py-6 md:py-8">

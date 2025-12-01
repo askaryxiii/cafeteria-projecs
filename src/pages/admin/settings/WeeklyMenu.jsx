@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "../../components/ui/tabs";
 import toast from "react-hot-toast";
-import DashboardHeader from "../../layouts/navbar/admin/DashboardHeader";
-import { IoSettingsSharp } from "react-icons/io5";
-import CustTabList from "../../components/ui/tabs/Tabs_list";
 
 const API_URL = import.meta.env.VITE_API_BASE;
 
@@ -46,6 +37,145 @@ function getWeekDates(startDate) {
     return date.toISOString().split("T")[0];
   });
 }
+
+const WeeklyMenuItems = ({ control, watch, menuItems, errors }) => {
+  const { fields: itemsFields } = useFieldArray({
+    control,
+    name: "items",
+  });
+
+  return (
+    <div className="space-y-8">
+      {itemsFields.map((itemField, itemIndex) => (
+        <DaySection
+          key={itemField.id}
+          itemIndex={itemIndex}
+          control={control}
+          watch={watch}
+          menuItems={menuItems}
+          errors={errors}
+        />
+      ))}
+    </div>
+  );
+};
+
+const DaySection = ({ itemIndex, control, watch, menuItems, errors }) => {
+  const day = watch(`items.${itemIndex}.day`);
+  const date = watch(`items.${itemIndex}.date`);
+
+  return (
+    <div className="p-6  border border-[#ACA4A4] rounded-sm">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 capitalize">
+        {day} - {date}
+      </h3>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {CATEGORIES.map((category) => (
+          <CategorySection
+            key={category}
+            category={category}
+            itemIndex={itemIndex}
+            control={control}
+            watch={watch}
+            menuItems={menuItems[category] || []}
+            errors={errors}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CategorySection = ({
+  category,
+  itemIndex,
+  control,
+  watch,
+  menuItems,
+  errors,
+}) => {
+  const { fields: categoryFields } = useFieldArray({
+    control,
+    name: `items.${itemIndex}.menu.${category}`,
+  });
+
+  return (
+    <div className="space-y-3">
+      <h4 className="text-sm font-medium text-gray-700 capitalize">
+        {category}
+      </h4>
+
+      {categoryFields.map((field, fieldIndex) => {
+        const isRequired = fieldIndex < 2;
+        return (
+          <MenuItemSelect
+            key={field.id}
+            fieldIndex={fieldIndex}
+            itemIndex={itemIndex}
+            category={category}
+            isRequired={isRequired}
+            control={control}
+            watch={watch}
+            menuItems={menuItems}
+            errors={errors}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+const MenuItemSelect = ({
+  fieldIndex,
+  itemIndex,
+  category,
+  isRequired,
+  control,
+  watch,
+  menuItems,
+  errors,
+}) => {
+  const fieldName = `items.${itemIndex}.menu.${category}.${fieldIndex}.code`;
+  const value = watch(fieldName);
+
+  // Find the selected item to display its name
+  const selectedItem = value
+    ? menuItems.find((item) => item.code === value)
+    : null;
+
+  return (
+    <div>
+      <label className="text-xs text-gray-600 mb-1 block">
+        Item {fieldIndex + 1} {isRequired ? "*" : "(Optional)"}
+      </label>
+      <select
+        {...control.register(fieldName, {
+          required: isRequired
+            ? `${category} item ${fieldIndex + 1} is required`
+            : false,
+        })}
+        value={value || ""}
+        className="w-full px-3 py-2 border border-[#ACA4A4] rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+        <option value="">
+          {selectedItem
+            ? `${selectedItem.item_name} (${selectedItem.code})`
+            : `Select ${category}`}
+        </option>
+        {menuItems.map((item) => (
+          <option key={item.id} value={item.code}>
+            {item.item_name} ({item.code})
+          </option>
+        ))}
+      </select>
+      {errors?.items?.[itemIndex]?.menu?.[category]?.[fieldIndex]?.id && (
+        <p className="text-red-500 text-xs mt-1">
+          {errors.items[itemIndex].menu[category][fieldIndex].id.message}
+        </p>
+      )}
+    </div>
+  );
+};
 
 const WeeklyMenu = () => {
   const mondayOfWeek = getMondayOfCurrentWeek();
@@ -255,189 +385,4 @@ const WeeklyMenu = () => {
   );
 };
 
-const WeeklyMenuItems = ({ control, watch, menuItems, errors }) => {
-  const { fields: itemsFields } = useFieldArray({
-    control,
-    name: "items",
-  });
-
-  return (
-    <div className="space-y-8">
-      {itemsFields.map((itemField, itemIndex) => (
-        <DaySection
-          key={itemField.id}
-          itemIndex={itemIndex}
-          control={control}
-          watch={watch}
-          menuItems={menuItems}
-          errors={errors}
-        />
-      ))}
-    </div>
-  );
-};
-
-const DaySection = ({ itemIndex, control, watch, menuItems, errors }) => {
-  const day = watch(`items.${itemIndex}.day`);
-  const date = watch(`items.${itemIndex}.date`);
-
-  return (
-    <div className="p-6  border border-[#ACA4A4] rounded-sm">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 capitalize">
-        {day} - {date}
-      </h3>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {CATEGORIES.map((category) => (
-          <CategorySection
-            key={category}
-            category={category}
-            itemIndex={itemIndex}
-            control={control}
-            watch={watch}
-            menuItems={menuItems[category] || []}
-            errors={errors}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const CategorySection = ({
-  category,
-  itemIndex,
-  control,
-  watch,
-  menuItems,
-  errors,
-}) => {
-  const { fields: categoryFields } = useFieldArray({
-    control,
-    name: `items.${itemIndex}.menu.${category}`,
-  });
-
-  return (
-    <div className="space-y-3">
-      <h4 className="text-sm font-medium text-gray-700 capitalize">
-        {category}
-      </h4>
-
-      {categoryFields.map((field, fieldIndex) => {
-        const isRequired = fieldIndex < 2;
-        return (
-          <MenuItemSelect
-            key={field.id}
-            fieldIndex={fieldIndex}
-            itemIndex={itemIndex}
-            category={category}
-            isRequired={isRequired}
-            control={control}
-            watch={watch}
-            menuItems={menuItems}
-            errors={errors}
-          />
-        );
-      })}
-    </div>
-  );
-};
-
-const MenuItemSelect = ({
-  fieldIndex,
-  itemIndex,
-  category,
-  isRequired,
-  control,
-  watch,
-  menuItems,
-  errors,
-}) => {
-  const fieldName = `items.${itemIndex}.menu.${category}.${fieldIndex}.code`;
-  const value = watch(fieldName);
-
-  // Find the selected item to display its name
-  const selectedItem = value
-    ? menuItems.find((item) => item.code === value)
-    : null;
-
-  return (
-    <div>
-      <label className="text-xs text-gray-600 mb-1 block">
-        Item {fieldIndex + 1} {isRequired ? "*" : "(Optional)"}
-      </label>
-      <select
-        {...control.register(fieldName, {
-          required: isRequired
-            ? `${category} item ${fieldIndex + 1} is required`
-            : false,
-        })}
-        value={value || ""}
-        className="w-full px-3 py-2 border border-[#ACA4A4] rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
-        <option value="">
-          {selectedItem
-            ? `${selectedItem.item_name} (${selectedItem.code})`
-            : `Select ${category}`}
-        </option>
-        {menuItems.map((item) => (
-          <option key={item.id} value={item.code}>
-            {item.item_name} ({item.code})
-          </option>
-        ))}
-      </select>
-      {errors?.items?.[itemIndex]?.menu?.[category]?.[fieldIndex]?.id && (
-        <p className="text-red-500 text-xs mt-1">
-          {errors.items[itemIndex].menu[category][fieldIndex].id.message}
-        </p>
-      )}
-    </div>
-  );
-};
-
-const SettingsPanel = () => {
-  return (
-    <div className="p-6 bg-white rounded-lg border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Settings</h3>
-      <p className="text-gray-600">Settings content will be added here.</p>
-    </div>
-  );
-};
-
-const Settings = () => {
-  const tabs = [
-    {
-      title: "Weekly Menu",
-      value: "weekly-menu",
-    },
-    {
-      title: "Settings",
-      value: "settings",
-    },
-  ];
-  return (
-    <main className="p-1 sm:p-1.5 md:p-2">
-      <DashboardHeader
-        title={"Settings"}
-        icon={
-          <IoSettingsSharp className="w-6 sm:w-7 md:w-7 h-6 sm:h-7 md:h-7 text-[#02356A]" />
-        }
-        dist="/"
-      />
-      <Tabs defaultValue="weekly-menu" className="w-full">
-        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-[#ACA4A4] border-t-[#ACA4A4] rounded-none ">
-          {tabs.map((tab) => (
-            <CustTabList tab={tab} />
-          ))}
-        </TabsList>
-
-        {tabs.map((tab) => (
-          <TabsContent value={tab.value} className="mt-6">
-            {tab.value == "weekly-menu" ? <WeeklyMenu /> : <SettingsPanel />}
-          </TabsContent>
-        ))}
-      </Tabs>
-    </main>
-  );
-};
-
-export default Settings;
+export default WeeklyMenu;

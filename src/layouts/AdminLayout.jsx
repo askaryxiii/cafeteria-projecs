@@ -13,7 +13,7 @@ import ChefDashboard from "../pages/admin/ChefDashboard";
 import CafeteriaDashboard from "../pages/admin/CafeteriaDashboard";
 import AccountsDashboard from "../pages/admin/AccountsDashboard";
 import MenuDashboard from "../pages/admin/MenuDashboard";
-import Settings from "../pages/admin/Settings";
+import Settings from "../pages/admin/settings/Settings";
 
 const AdminLayout = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);

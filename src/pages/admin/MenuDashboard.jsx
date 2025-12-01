@@ -188,13 +188,13 @@ const MenuDashboard = () => {
       />
       <Tabs defaultValue="items" className="w-full">
         <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-[#ACA4A4] border-t-[#ACA4A4] rounded-none ">
-          {tabs.map((tab) => (
-            <CustTabList tab={tab} />
+          {tabs.map((tab, index) => (
+            <CustTabList key={index} tab={tab} />
           ))}
         </TabsList>
 
-        {tabs.map((tab) => (
-          <TabsContent value={tab.value}>
+        {tabs.map((tab, index) => (
+          <TabsContent key={index} value={tab.value}>
             {tab.value == "items" ? (
               <ItemsTable
                 items={items}

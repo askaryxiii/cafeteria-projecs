@@ -20,9 +20,10 @@ export default function DateRangeHeader({
   toDate,
   onFromClick,
   onToClick,
+  title = "MY ORDERS",
 }) {
   return (
-    <div className="bg-[#032552] text-white rounded-lg p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8 flex items-center justify-between gap-2 sm:gap-4">
+    <div className="bg-[#032552] text-white rounded-lg p-2 sm:p-3 md:p-2 mb-4 sm:mb-6 md:mb-8 flex items-center justify-between gap-2 sm:gap-4">
       <DateButton
         date={fromDate}
         label="From"
@@ -30,8 +31,8 @@ export default function DateRangeHeader({
         icon={<CalendarIcon />}
       />
 
-      <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-center flex-1">
-        MY ORDERS
+      <h1 className="text-lg md:text-xl uppercase font-bold text-center flex-1">
+        {title}
       </h1>
 
       <DateButton

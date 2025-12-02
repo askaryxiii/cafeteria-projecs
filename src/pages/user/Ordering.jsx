@@ -6,49 +6,69 @@ import {
   getVerifiedUser,
   placeOrder,
   getOrderWindows,
+  isTimeInWindow,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
 
 const Ordering = ({ onOrderPlaced }) => {
-  const [isBreakfastWindow, setIsBreakfastWindow] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mealType, setMealType] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   // Initialize windows on mount
   useEffect(() => {
     (async () => {
-      const windowsResponse = await getOrderWindows();
-      const now = new Date();
-      const hour = now.getHours();
+      try {
+        const windows = await getOrderWindows();
 
-      let ORDER_WINDOW_BREAKFAST_START = 11;
-      let ORDER_WINDOW_BREAKFAST_END = 15;
+        if (windows) {
+          const now = new Date();
+          const hour = now.getHours();
+          const minute = now.getMinutes();
 
-      if (windowsResponse?.windows) {
-        ORDER_WINDOW_BREAKFAST_START =
-          parseInt(windowsResponse.windows.breakfast_start) || 11;
-        ORDER_WINDOW_BREAKFAST_END =
-          parseInt(windowsResponse.windows.breakfast_end) || 15;
+          // Determine meal type based on current time
+          if (
+            isTimeInWindow(
+              hour,
+              minute,
+              windows.breakfast_start,
+              windows.breakfast_end
+            )
+          ) {
+            setMealType("breakfast");
+          } else if (
+            isTimeInWindow(hour, minute, windows.lunch_start, windows.lunch_end)
+          ) {
+            setMealType("lunch");
+          } else {
+            setMealType(null); // Outside ordering windows
+          }
+        } else {
+          // Fallback logic
+          const hour = new Date().getHours();
+          setMealType(
+            hour >= 11 && hour < 15 ? "breakfast" : hour >= 15 ? "lunch" : null
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching order windows:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      const isBreakfast =
-        hour >= ORDER_WINDOW_BREAKFAST_START &&
-        hour < ORDER_WINDOW_BREAKFAST_END;
-      setIsBreakfastWindow(isBreakfast);
-      setLoading(false);
     })();
   }, []);
 
-  const defaultValues = isBreakfastWindow
-    ? { breakfast: [] }
-    : { protein: [], carbs: [], side: [], salad: [] };
+  const defaultValues =
+    mealType === "breakfast"
+      ? { breakfast: [] }
+      : { protein: [], carbs: [], side: [], salad: [] };
 
   const { control, watch, handleSubmit } = useForm({
     defaultValues,
   });
 
   const selectedItems = watch();
-  const [totalPrice, setTotalPrice] = useState(0);
 
   const onSubmit = () => {
     (async () => {
@@ -67,8 +87,8 @@ const Ordering = ({ onOrderPlaced }) => {
           .toISOString()
           .split("T")[0];
 
-        const meal_type = isBreakfastWindow ? "breakfast" : "lunch";
-        const selectedDate = isBreakfastWindow ? today : tomorrow;
+        const meal_type = mealType === "breakfast" ? "breakfast" : "lunch";
+        const selectedDate = mealType === "breakfast" ? today : tomorrow;
 
         const codes = Object.values(selectedItems).flat();
         const items = codes.map((c) => ({ code: c }));
@@ -109,7 +129,7 @@ const Ordering = ({ onOrderPlaced }) => {
     { id: "breakfast", name: "Breakfast", nameAr: "افطار" },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return <div className="text-center p-8">Loading...</div>;
   }
 
@@ -121,7 +141,7 @@ const Ordering = ({ onOrderPlaced }) => {
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-6 sm:space-y-8 md:space-y-10">
-        {isBreakfastWindow
+        {mealType === "breakfast"
           ? breakfastCategories.map((category) => (
               <DishDropdown
                 key={category.id}

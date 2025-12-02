@@ -3,6 +3,8 @@ import {
   readToken,
   getUserOrdersByDate,
   getOrderWindows,
+  parseTimeToHours,
+  isTimeInWindow,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
@@ -19,24 +21,30 @@ const DashboardUser = () => {
   useEffect(() => {
     (async () => {
       try {
-        const windowsResponse = await getOrderWindows();
-        const now = new Date();
-        const hour = now.getHours();
+        const windows = await getOrderWindows();
 
-        let ORDER_WINDOW_BREAKFAST_START = 11;
-        let ORDER_WINDOW_BREAKFAST_END = 15;
+        if (windows) {
+          const now = new Date();
+          const hour = now.getHours();
+          const minute = now.getMinutes();
 
-        if (windowsResponse?.windows) {
-          ORDER_WINDOW_BREAKFAST_START =
-            parseInt(windowsResponse.windows.breakfast_start) || 11;
-          ORDER_WINDOW_BREAKFAST_END =
-            parseInt(windowsResponse.windows.breakfast_end) || 15;
+          const isBreakfast = isTimeInWindow(
+            hour,
+            minute,
+            windows.breakfast_start,
+            windows.breakfast_end
+          );
+
+          setIsBreakfastWindow(isBreakfast);
+        } else {
+          // Fallback to default timing if API fails
+          setIsBreakfastWindow(hour >= 11 && hour < 15);
         }
-
-        const isBreakfast =
-          hour >= ORDER_WINDOW_BREAKFAST_START &&
-          hour < ORDER_WINDOW_BREAKFAST_END;
-        setIsBreakfastWindow(isBreakfast);
+      } catch (error) {
+        console.error("Error fetching order windows:", error);
+        // Fallback default
+        const hour = new Date().getHours();
+        setIsBreakfastWindow(hour >= 11 && hour < 15);
       } finally {
         setWindowsInitialized(true);
       }
@@ -90,8 +98,9 @@ const DashboardUser = () => {
   const handleOrderPlaced = (createdOrder) => {
     // Add a small delay to ensure backend has processed the order
     setTimeout(async () => {
-      setLoading(true);
-      await fetchOrder(isBreakfastWindow);
+      if (windowsInitialized && isBreakfastWindow !== null) {
+        await fetchOrder(isBreakfastWindow);
+      }
     }, 200);
   };
 

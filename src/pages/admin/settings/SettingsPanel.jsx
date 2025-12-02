@@ -136,7 +136,7 @@ const SettingsPanel = () => {
   }
 
   return (
-    <div className="w-full px-6 ">
+    <div className="w-full px-6 pb-8 ">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <h2 className="text-lg font-medium text-[#072A57]">Meals Hours</h2>

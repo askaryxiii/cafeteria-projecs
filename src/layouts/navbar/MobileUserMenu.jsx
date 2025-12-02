@@ -6,10 +6,11 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import { HiUser } from "react-icons/hi2";
-import { MdKeyboardArrowRight } from "react-icons/md";
+import { MdAdminPanelSettings, MdKeyboardArrowRight } from "react-icons/md";
 
 const MobileUserMenu = ({ onClose }) => {
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
+  const isAdmin = user?.user?.role === "admin";
 
   return (
     <Dropdown.Root>
@@ -50,6 +51,20 @@ const MobileUserMenu = ({ onClose }) => {
           </Link>
         </Dropdown.Item>
 
+        <Dropdown.Separator className="h-px bg-gray-300 my-1" />
+
+        {isAdmin && (
+          <>
+            <Dropdown.Item asChild>
+              <Link
+                to="/admin/dashboard"
+                className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer">
+                <MdAdminPanelSettings className="w-6 h-6" />
+                <span> Admin Panel</span>
+              </Link>
+            </Dropdown.Item>
+          </>
+        )}
         <Dropdown.Separator className="h-px bg-gray-300 my-1" />
 
         {/* Sign Out */}

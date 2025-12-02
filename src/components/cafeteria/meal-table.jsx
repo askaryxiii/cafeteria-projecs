@@ -3,6 +3,9 @@ import {
   getAllOrdersForToday,
   getAllOrdersForTomorrow,
   getOrderWindows,
+  parseTimeToHours,
+  parseTimeToMinutes,
+  isTimeInWindow,
 } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
@@ -19,6 +22,7 @@ export function MealTable({
   showDelete = false,
   onDelete = null,
   refreshTrigger = 0,
+  mealTypeFilter = null,
 }) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -32,61 +36,112 @@ export function MealTable({
       return new Set();
     }
   });
-  const [mealType, setMealType] = useState(null);
+  const [activeWindows, setActiveWindows] = useState([]);
+  const [orderWindows, setOrderWindows] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch orders and set meal type based on current time
-  const fetchOrders = async () => {
-    const now = new Date();
-    const hour = now.getHours();
+  // Determine which meal type windows are currently active
+  const determineActiveWindows = (hour, minute, windows) => {
+    const active = [];
 
-    // Get order windows from API
-    const windowsResponse = await getOrderWindows();
-
-    let ORDER_WINDOW_BREAKFAST_START = 11;
-    let ORDER_WINDOW_BREAKFAST_END = 15;
-    let ORDER_WINDOW_LUNCH_START = 15;
-    let ORDER_WINDOW_LUNCH_END = 23;
-
-    if (windowsResponse?.windows) {
-      ORDER_WINDOW_BREAKFAST_START =
-        parseInt(windowsResponse.windows.breakfast_start) || 11;
-      ORDER_WINDOW_BREAKFAST_END =
-        parseInt(windowsResponse.windows.breakfast_end) || 15;
-      ORDER_WINDOW_LUNCH_START =
-        parseInt(windowsResponse.windows.lunch_start) || 15;
-      ORDER_WINDOW_LUNCH_END =
-        parseInt(windowsResponse.windows.lunch_end?.split(":")[0]) || 23;
+    if (
+      isTimeInWindow(
+        hour,
+        minute,
+        windows.breakfast_start,
+        windows.breakfast_end
+      )
+    ) {
+      active.push("breakfast");
     }
 
-    // Fetch orders based on fetchTomorrow prop
-    const fetchedOrders = fetchTomorrow
-      ? await getAllOrdersForTomorrow()
-      : await getAllOrdersForToday();
+    if (isTimeInWindow(hour, minute, windows.lunch_start, windows.lunch_end)) {
+      active.push("lunch");
+    }
 
-    if (!fetchedOrders?.error) {
-      let ordersToShow = [];
-      let typeToShow = null;
+    // Drinks are always shown if they overlap with any active window
+    if (
+      isTimeInWindow(hour, minute, windows.drinks_start, windows.drinks_end)
+    ) {
+      active.push("drinks");
+    }
 
-      if (
-        hour >= ORDER_WINDOW_BREAKFAST_START &&
-        hour < ORDER_WINDOW_BREAKFAST_END
-      ) {
-        ordersToShow = fetchedOrders.breakfastOrders || [];
-        typeToShow = "breakfast";
-      } else if (
-        hour >= ORDER_WINDOW_LUNCH_START &&
-        hour < ORDER_WINDOW_LUNCH_END
-      ) {
-        ordersToShow = fetchedOrders.lunchOrders || [];
-        typeToShow = "lunch";
+    return active;
+  };
+
+  // Fetch orders and set active windows
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const now = new Date();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+
+      // Get order windows from API
+      const windows = await getOrderWindows();
+      setOrderWindows(windows);
+
+      console.log(orderWindows);
+
+      if (!windows) {
+        console.warn("Could not fetch order windows, using defaults");
+        // Fallback to defaults if API fails
+        const defaultWindows = {
+          breakfast_start: "11:00",
+          breakfast_end: "15:00",
+          lunch_start: "15:00",
+          lunch_end: "23:59",
+          drinks_start: "11:00",
+          drinks_end: "23:00",
+        };
+        setOrderWindows(defaultWindows);
+
+        // Determine active windows with defaults
+        const active = determineActiveWindows(hour, minute, defaultWindows);
+        setActiveWindows(active);
+        return;
       }
 
-      // Always add drinks orders alongside breakfast or lunch
-      const drinkOrders = fetchedOrders.drinkOrders || [];
-      ordersToShow = [...ordersToShow, ...drinkOrders];
+      // Determine active windows based on current time
+      const active = determineActiveWindows(hour, minute, windows);
+      setActiveWindows(active);
 
-      setItems(ordersToShow);
-      setMealType(typeToShow);
+      // Fetch orders for today or tomorrow
+      let orderData;
+      if (fetchTomorrow) {
+        orderData = await getAllOrdersForTomorrow();
+      } else {
+        orderData = await getAllOrdersForToday();
+      }
+      // console.log(orderData);
+
+      if (orderData.error) {
+        console.error("Error fetching orders:", orderData.error);
+        setItems([]);
+        return;
+      }
+
+      // Combine orders from active windows
+      let combinedOrders = [];
+
+      if (active.includes("breakfast") && orderData.breakfastOrders) {
+        combinedOrders = [...combinedOrders, ...orderData.breakfastOrders];
+      }
+
+      if (active.includes("lunch") && orderData.lunchOrders) {
+        combinedOrders = [...combinedOrders, ...orderData.lunchOrders];
+      }
+
+      if (active.includes("drinks") && orderData.drinkOrders) {
+        combinedOrders = [...combinedOrders, ...orderData.drinkOrders];
+      }
+
+      setItems(combinedOrders);
+    } catch (error) {
+      console.error("Error in fetchOrders:", error);
+      setItems([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,7 +155,7 @@ export function MealTable({
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [fetchTomorrow, refreshTrigger]);
+  }, [fetchTomorrow, refreshTrigger, mealTypeFilter]);
 
   // Add checked property to items based on checkedItems Set
   const itemsWithChecked = items.map((item, idx) => ({
@@ -156,6 +211,14 @@ export function MealTable({
     }
   };
 
+  if (loading) {
+    return (
+      <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-4">
+        <p className="text-gray-600">Loading orders...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-2 sm:p-3 md:p-4">
       {/* Desktop View */}
@@ -163,22 +226,30 @@ export function MealTable({
         <table className="w-full text-sm md:text-base">
           <TableHeader
             onColumnSort={handleColumnSort}
-            mealType={mealType}
+            mealType={activeWindows.join("/")}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             showDelete={showDelete}
           />
           <tbody className="divide-y divide-gray-200">
-            {sortedItems.map((item) => (
-              <TableRow
-                key={item.id}
-                item={item}
-                mealType={mealType}
-                onCheckChange={handleCheckChange}
-                showDelete={showDelete}
-                onDelete={onDelete}
-              />
-            ))}
+            {sortedItems.length > 0 ? (
+              sortedItems.map((item) => (
+                <TableRow
+                  key={item.id}
+                  item={item}
+                  mealType={item.meal_type}
+                  onCheckChange={handleCheckChange}
+                  showDelete={showDelete}
+                  onDelete={onDelete}
+                />
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center py-4 text-gray-500">
+                  No orders for active windows
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -188,22 +259,28 @@ export function MealTable({
         <table className="w-full">
           <TableHeader
             onColumnSort={handleColumnSort}
-            mealType={mealType}
+            mealType={activeWindows.join("/")}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             showDelete={showDelete}
           />
         </table>
         <div className="divide-y divide-gray-200">
-          {sortedItems.map((item) => (
-            <MobileTableRow
-              key={item.id}
-              item={item}
-              onCheckChange={handleCheckChange}
-              showDelete={showDelete}
-              onDelete={onDelete}
-            />
-          ))}
+          {sortedItems.length > 0 ? (
+            sortedItems.map((item) => (
+              <MobileTableRow
+                key={item.id}
+                item={item}
+                onCheckChange={handleCheckChange}
+                showDelete={showDelete}
+                onDelete={onDelete}
+              />
+            ))
+          ) : (
+            <div className="text-center py-4 text-gray-500">
+              No orders for active windows
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -211,24 +288,92 @@ export function MealTable({
 }
 
 function MobileTableRow({ item, onCheckChange, showDelete, onDelete }) {
-  return (
-    <div
-      className={`p-3 sm:p-4 space-y-2 sm:space-y-3 ${
-        item.checked ? "bg-gray-100 opacity-50" : ""
-      }`}>
-      <div className="flex items-center gap-2 sm:gap-3">
+  // Determine if this is a lunch order or other meal type
+  const isLunch = item.meal_type === "lunch";
+
+  if (isLunch) {
+    // Lunch: Show full details (protein, carbs, side, salad)
+    return (
+      <div
+        className={`p-3 sm:p-4 space-y-2 sm:space-y-3 ${
+          item.checked ? "bg-gray-100 opacity-50" : ""
+        }`}>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <input
+            type="checkbox"
+            checked={item.checked}
+            onChange={() => onCheckChange(item.id)}
+            className="w-4 sm:w-5 h-4 sm:h-5 accent-blue-600 cursor-pointer disabled:cursor-not-allowed shrink-0"
+          />
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <span
+              className={`font-medium text-sm sm:text-base truncate ${
+                item.checked ? "line-through text-gray-400" : "text-gray-900"
+              }`}>
+              {item.name}
+            </span>
+          </div>
+          {showDelete && (
+            <button
+              onClick={() => onDelete && onDelete(item.id)}
+              className="text-red-500 hover:text-red-700 text-xs sm:text-sm md:text-base shrink-0 min-h-9 sm:min-h-10 flex items-center justify-center px-2 sm:px-3">
+              🗑️
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+          <div>
+            <span className="text-gray-600">Protein:</span>
+            <p className="font-medium text-gray-900">
+              {getCategoryItem(item, "protein")}
+            </p>
+          </div>
+          <div>
+            <span className="text-gray-600">Carbs:</span>
+            <p className="font-medium text-gray-900">
+              {getCategoryItem(item, "carbs")}
+            </p>
+          </div>
+          <div>
+            <span className="text-gray-600">Side:</span>
+            <p className="font-medium text-gray-900">
+              {getCategoryItem(item, "side")}
+            </p>
+          </div>
+          <div>
+            <span className="text-gray-600">Salad:</span>
+            <p className="font-medium text-gray-900">
+              {getCategoryItem(item, "salad")}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    // Breakfast or Drinks: Show only name and checkbox
+    return (
+      <div
+        className={`p-3 sm:p-4 flex items-center gap-2 sm:gap-3 ${
+          item.checked ? "bg-gray-100 opacity-50" : ""
+        }`}>
         <input
           type="checkbox"
           checked={item.checked}
           onChange={() => onCheckChange(item.id)}
           className="w-4 sm:w-5 h-4 sm:h-5 accent-blue-600 cursor-pointer disabled:cursor-not-allowed shrink-0"
         />
-        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 flex-1 min-w-0">
           <span
-            className={`font-medium text-sm sm:text-base truncate ${
+            className={`font-medium text-lg truncate ${
               item.checked ? "line-through text-gray-400" : "text-gray-900"
             }`}>
             {item.name}
+          </span>
+          <span
+            className={`font-medium text-lg truncate ${
+              item.checked ? "line-through text-gray-400" : "text-gray-900"
+            }`}>
+            {item.items[0].item_name}
           </span>
         </div>
         {showDelete && (
@@ -239,32 +384,6 @@ function MobileTableRow({ item, onCheckChange, showDelete, onDelete }) {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
-        <div>
-          <span className="text-gray-600">Protein:</span>
-          <p className="font-medium text-gray-900">
-            {getCategoryItem(item, "protein")}
-          </p>
-        </div>
-        <div>
-          <span className="text-gray-600">Carbs:</span>
-          <p className="font-medium text-gray-900">
-            {getCategoryItem(item, "carbs")}
-          </p>
-        </div>
-        <div>
-          <span className="text-gray-600">Side:</span>
-          <p className="font-medium text-gray-900">
-            {getCategoryItem(item, "side")}
-          </p>
-        </div>
-        <div>
-          <span className="text-gray-600">Salad:</span>
-          <p className="font-medium text-gray-900">
-            {getCategoryItem(item, "salad")}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  }
 }

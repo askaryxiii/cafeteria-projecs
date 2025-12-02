@@ -395,7 +395,6 @@ export async function getAllOrdersForTomorrow() {
     const breakfastOrders = data.breakfastOrders || [];
     const lunchOrders = data.lunchOrders || [];
     const drinkOrders = data.drinksOrders || [];
-    console.log("data:", data);
 
     return { breakfastOrders, lunchOrders, drinkOrders };
   } catch (err) {
@@ -709,51 +708,84 @@ export async function getStats(token) {
 export async function getOrderWindows() {
   try {
     const token = readToken();
-    if (!token) return { error: "No auth token found" };
-
-    const res = await fetch(`${API_URL}/order-windows`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return { error: err.message || "Failed to fetch order windows" };
+    if (!token) {
+      console.warn("No auth token found for getOrderWindows");
+      return null;
     }
 
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error("Error fetching order windows:", err);
-    return { error: err.message || "Something went wrong" };
+    const response = await fetch(`${API_URL}/order-windows`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to fetch order windows");
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Extract windows object if it exists, otherwise use root level
+    return data?.windows || data;
+  } catch (error) {
+    console.error("Error fetching order windows:", error);
+    return null;
   }
 }
 
-export async function updateOrderWindows(windowsData) {
+export function parseTimeToHours(timeString) {
+  // Converts "11:00" or "11" to 11
+  const parts = timeString.split(":");
+  return parseInt(parts[0]);
+}
+
+export function parseTimeToMinutes(timeString) {
+  // Converts "11:30" to 30, or "11" to 0
+  const parts = timeString.split(":");
+  return parseInt(parts[1] || 0);
+}
+
+export function isTimeInWindow(hour, minute, startTime, endTime) {
+  // Check if current time is within the window
+  const startHour = parseTimeToHours(startTime);
+  const startMinute = parseTimeToMinutes(startTime);
+  const endHour = parseTimeToHours(endTime);
+  const endMinute = parseTimeToMinutes(endTime);
+
+  const currentTotalMinutes = hour * 60 + minute;
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = endHour * 60 + endMinute;
+
+  return (
+    currentTotalMinutes >= startTotalMinutes &&
+    currentTotalMinutes <= endTotalMinutes
+  );
+}
+
+export async function userDetailed(from, to) {
   try {
     const token = readToken();
-    if (!token) return { error: "No auth token found" };
-
-    const res = await fetch(`${API_URL}/order-windows`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(windowsData),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return { error: err.message || "Failed to update order windows" };
+    if (!token) {
+      console.warn("No auth token found for accountant");
+      return null;
     }
 
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error("Error updating order windows:", err);
-    return { error: err.message || "Something went wrong" };
+    const response = await fetch(
+      `${API_URL}/accountant/users-detailed?from_date=${from}&to_date=${to}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) {
+      console.warn("Failed to fetch users detailed");
+      return null;
+    }
+
+    const data = await response.json();
+
+    return { period: data.period, users: data.users };
+  } catch (error) {
+    console.error("Error fetching users detailed:", error);
+    return null;
   }
 }

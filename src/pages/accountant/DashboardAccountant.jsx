@@ -87,7 +87,6 @@ const DashboardAccountant = () => {
             className={"md:justify-self-start"}
             date={fromDate}
             onChange={handleFromDateChange}
-            maxDate={toDate || new Date()}
             isOpen={showFromCalendar}
           />
 
@@ -95,7 +94,6 @@ const DashboardAccountant = () => {
             className={"md:justify-self-end md:col-start-2"}
             date={toDate}
             onChange={handleToDateChange}
-            minDate={fromDate || new Date()}
             isOpen={showToCalendar}
           />
         </div>

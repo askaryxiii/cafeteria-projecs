@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { clearVerifiedUserCache } from "../lib/apis";
 
-const API_BASE = import.meta.env.API_BASE || "http://localhost:4000/api";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export const AuthContext = createContext();
 
@@ -49,20 +49,74 @@ export const AuthProvider = ({ children }) => {
 
   // verify token with backend and refresh local user info
   const verifyToken = async (token) => {
-    const res = await fetch(`${API_BASE}/auth/verify-token`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) {
-      throw new Error("Token verification failed");
+    const apiUrl = `${API_BASE}/auth/verify-token`;
+
+    try {
+      const res = await fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
+      });
+
+      const contentType = res.headers.get("content-type");
+
+      // Read the body ONCE into a variable
+      const responseText = await res.text();
+
+      if (!res.ok) {
+        console.error("❌ Token verification failed - status:", res.status);
+        console.error("Error response:", responseText);
+        throw new Error(
+          `Token verification failed: ${res.status} - ${responseText.substring(
+            0,
+            100
+          )}`
+        );
+      }
+
+      // Check if response is actually JSON (not HTML error page)
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("❌ Expected JSON but got:", contentType);
+        console.error("Response was:", responseText);
+        throw new Error(
+          `Expected JSON response but got ${contentType}. Is the API endpoint correct? Response: ${responseText.substring(
+            0,
+            100
+          )}`
+        );
+      }
+
+      // Try to parse the already-read response as JSON
+      try {
+        const data = JSON.parse(responseText);
+
+        return data;
+      } catch (parseError) {
+        console.error("❌ Failed to parse as JSON:", parseError.message);
+        console.error("Response text was:", responseText.substring(0, 200));
+        throw new Error(
+          `Server response is not valid JSON. Response: ${responseText.substring(
+            0,
+            100
+          )}`
+        );
+      }
+    } catch (fetchError) {
+      console.error("❌ Fetch error:", fetchError);
+      throw fetchError;
     }
-    return res.json();
   };
 
   // login(email,password, remember:boolean)
   const login = async ({ email, password }, remember = false) => {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
       body: JSON.stringify({ email, password }),
     });
     if (!res.ok) {
@@ -90,9 +144,8 @@ export const AuthProvider = ({ children }) => {
       // ignore
     }
 
-    // get user info from server (verifyRes used above when present)
-    const userInfo =
-      verifyRes && verifyRes.user ? verifyRes.user : await verifyToken(token);
+    // get user info from verifyRes (don't call twice)
+    const userInfo = verifyRes && verifyRes.user ? verifyRes.user : verifyRes;
 
     const auth = { token, user: userInfo, expiresAt };
     storage.setItem("auth", JSON.stringify(auth));
@@ -113,7 +166,10 @@ export const AuthProvider = ({ children }) => {
   }) => {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
       body: JSON.stringify({ name, email, password, role, arabic_name }),
     });
     if (!res.ok) {

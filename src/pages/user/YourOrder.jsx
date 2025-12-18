@@ -8,10 +8,11 @@ import {
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 
-const YourOrder = ({ order, onOrderUpdated }) => {
+const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
-  const [isBreakfastWindow, setIsBreakfastWindow] = useState(null);
   const [windowsInitialized, setWindowsInitialized] = useState(false);
+  const [localBreakfastWindow, setLocalBreakfastWindow] =
+    useState(isBreakfastWindow);
 
   // Initialize windows on mount
   useEffect(() => {
@@ -31,18 +32,20 @@ const YourOrder = ({ order, onOrderUpdated }) => {
             windows.breakfast_end
           );
 
-          setIsBreakfastWindow(isBreakfast);
+          setLocalBreakfastWindow(isBreakfast);
         } else {
           // Fallback to default timing
-          setIsBreakfastWindow(
+          setLocalBreakfastWindow(
             new Date().getHours() >= 11 && new Date().getHours() < 15
           );
         }
       } catch (error) {
         console.error("Error fetching order windows:", error);
-        setIsBreakfastWindow(
+        setLocalBreakfastWindow(
           new Date().getHours() >= 11 && new Date().getHours() < 15
         );
+      } finally {
+        setWindowsInitialized(true);
       }
     })();
   }, []);
@@ -52,7 +55,22 @@ const YourOrder = ({ order, onOrderUpdated }) => {
     setCurrentOrder(order);
   }, [order]);
 
-  if (!currentOrder) {
+  // Filter order based on current window
+  // During breakfast window, only show breakfast orders
+  // During lunch window, only show lunch orders
+  const displayOrder =
+    windowsInitialized && currentOrder
+      ? (() => {
+          const mealType = currentOrder.meal_type?.toLowerCase();
+          const isCorrectWindow =
+            (localBreakfastWindow && mealType === "breakfast") ||
+            (!localBreakfastWindow && mealType === "lunch");
+
+          return isCorrectWindow ? currentOrder : null;
+        })()
+      : currentOrder;
+
+  if (!displayOrder) {
     return <Ordering onOrderPlaced={onOrderUpdated} />;
   }
 
@@ -65,8 +83,8 @@ const YourOrder = ({ order, onOrderUpdated }) => {
         <div className="bg-[#032552] text-white py-4 sm:py-6 md:py-8 px-4 sm:px-6 md:px-10 rounded-lg shadow w-full">
           <div className="justify-center flex flex-col items-center">
             <div className="flex flex-col gap-4 sm:gap-5 md:gap-7 pt-6 sm:pt-8 md:pt-10 pb-3 sm:pb-4 md:pb-5 w-full">
-              {currentOrder?.items && currentOrder?.items.length ? (
-                currentOrder?.items.map((it, idx) => (
+              {displayOrder?.items && displayOrder?.items.length ? (
+                displayOrder?.items.map((it, idx) => (
                   <div
                     className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-2 sm:px-3 md:px-4 text-sm sm:text-base md:text-lg lg:text-xl font-medium rounded"
                     key={idx}>
@@ -84,7 +102,7 @@ const YourOrder = ({ order, onOrderUpdated }) => {
               )}
             </div>
             <span className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-6 text-base sm:text-lg md:text-xl lg:text-2xl rounded">
-              {currentOrder.total_cost} LE
+              {displayOrder?.total_cost} LE
             </span>
           </div>
         </div>

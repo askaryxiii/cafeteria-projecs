@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MealTable } from "../../components/cafeteria/meal-table";
+import { CafeteriaOrdersTable } from "../../components/cafeteria/cafeteria-orders-table";
 import { deleteOrder } from "../../lib/apis";
 import DeleteConfirmModal from "../../components/admin/users/delete-confirm-modal";
 
@@ -52,8 +52,7 @@ const CafeteriaDashboard = () => {
           <PiForkKnifeFill className="w-7 sm:w-8 md:w-8 h-7 sm:h-8 md:h-8 text-[#02356A]" />
         }
       />
-      <MealTable
-        fetchTomorrow={true}
+      <CafeteriaOrdersTable
         showDelete={true}
         onDelete={handleDeleteOrder}
         refreshTrigger={refreshTrigger}

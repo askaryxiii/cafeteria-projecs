@@ -36,8 +36,8 @@ export default function OrderChart({ timePeriod = "24hours", data = null }) {
   const chartData = generateChartData(totalOrders, mostOrderedItems);
   return (
     <div className="w-full">
-      <div className="h-40 sm:h-56 md:h-64">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-56 md:h-64 w-full">
+        <ResponsiveContainer width="100%" height={220}>
           <LineChart
             data={chartData}
             margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>

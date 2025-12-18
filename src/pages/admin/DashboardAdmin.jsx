@@ -1,20 +1,16 @@
-import React, { useContext, useState, useEffect } from "react";
-import AuthContext from "../../context/AuthContext";
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { Card } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
 import RevenueChart from "../../components/admin/revenue-chart";
 import OrderTimeChart from "../../components/admin/order-time-chart";
 import FoodList from "../../components/admin/food-list";
 import OrderChart from "../../components/admin/order-chart";
-import { ImHome } from "react-icons/im";
 import { MdOutlineInsertChartOutlined } from "react-icons/md";
 import DashboardHeader from "../../layouts/navbar/admin/DashboardHeader";
 import { getStats, readToken } from "../../lib/apis";
 import { toast } from "react-hot-toast";
 
 const DashboardAdmin = () => {
-  const { user, logout } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("24hours");
   const [statsData, setStatsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -137,7 +133,7 @@ const DashboardAdmin = () => {
             {/* Revenue and Order Time Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               {/* Revenue Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 col-span-1 lg:col-span-1">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 col-span-1 lg:col-span-1 ">
                 <div className="flex justify-between items-start mb-3 sm:mb-4 md:mb-4">
                   <div>
                     <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">

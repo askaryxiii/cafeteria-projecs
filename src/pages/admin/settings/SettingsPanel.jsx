@@ -41,7 +41,10 @@ const SettingsPanel = () => {
         if (!token) throw new Error("No auth token found");
 
         const response = await fetch(`${API_URL}/order-windows`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
         });
 
         if (!response.ok) throw new Error("Failed to fetch order windows");
@@ -88,6 +91,7 @@ const SettingsPanel = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
         },
         body: JSON.stringify(payload),
       });

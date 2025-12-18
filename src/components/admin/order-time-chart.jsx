@@ -62,7 +62,7 @@ export default function OrderTimeChart({
   return (
     <div className="w-full flex items-center justify-between">
       <div className="flex-1 h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={220}>
           <PieChart>
             <Pie
               data={pieData}

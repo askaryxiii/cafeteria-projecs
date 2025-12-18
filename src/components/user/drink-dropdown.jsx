@@ -35,7 +35,10 @@ const DrinkDropdown = ({ control }) => {
       if (!token) throw new Error("No auth token found");
 
       const response = await fetch(`${API_URL}/menu`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
       });
 
       if (!response.ok) throw new Error("Failed to fetch drinks");

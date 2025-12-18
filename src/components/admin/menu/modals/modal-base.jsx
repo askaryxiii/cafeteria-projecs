@@ -1,8 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 
 export default function Modal({ isOpen, onClose, title, children }) {
-  console.log(onClose);
-
   if (!isOpen) return null;
 
   return (

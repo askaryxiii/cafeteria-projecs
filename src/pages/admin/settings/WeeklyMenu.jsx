@@ -230,7 +230,10 @@ const WeeklyMenu = () => {
       if (!token) throw new Error("No auth token found");
 
       const response = await fetch(`${API_URL}/weekly-menu/${dateString}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
       });
 
       if (!response.ok) {
@@ -287,7 +290,10 @@ const WeeklyMenu = () => {
         if (!token) throw new Error("No auth token found");
 
         const response = await fetch(`${API_URL}/menu`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
         });
 
         if (!response.ok) throw new Error("Failed to fetch menu items");
@@ -341,6 +347,7 @@ const WeeklyMenu = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
         },
         body: JSON.stringify(cleanedData),
       });

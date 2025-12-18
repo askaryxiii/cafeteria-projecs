@@ -47,7 +47,10 @@ const MenuDashboard = () => {
 
         // Fetch all menu items
         const response = await fetch(`${API_URL}/menu`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
         });
 
         if (!response.ok) throw new Error("Failed to fetch menu items");

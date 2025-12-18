@@ -543,18 +543,17 @@ body {
 .react-calendar__navigation {
   display: flex;
   width: 100%;
-  justify-content: space-between !important;
   align-items: center;
   margin-bottom: 5px !important;
 }
+/* Text inside month/year */
 .react-calendar__navigation__label__labelText {
-  word-spacing: 7.5rem;
+  font-size: 1.4rem;
+  font-weight: 700;
 }
+/* Remove default button behavior */
 .react-calendar__navigation button {
   background: none;
-  font-weight: 700;
-  font-size: 1.4rem;
-  color: #000;
   cursor: default;
 }
 
@@ -616,12 +615,21 @@ body {
   border-radius: 0px;
 }
 
-/* Remove double arrows for months */
+/* Middle label (Month + Year) */
 .react-calendar__navigation__label {
+  flex-grow: 3 !important; /* Increase this number to make it wider */
+  text-align: center;
   pointer-events: none;
 }
+
+/* Arrows */
 .react-calendar__navigation__arrow {
-  display: none;
+  flex: 0 0 30px !important; /* Smaller arrow width */
+  max-width: 30px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: none;
+  color: #000;
 }
 
 .nav-btn {

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -87,18 +88,27 @@ export default function RevenueChart({
   timePeriod = "24hours",
   revenue = null,
 }) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const data = revenue
     ? generateChartData(revenue, timePeriod)
     : dataByPeriod[timePeriod] || dataByPeriod["24hours"];
-
+  if (!data || data.length === 0) {
+    return <p className="text-gray-400 text-sm text-center">No data</p>;
+  }
   return (
-    <div className="w-full h-40 sm:h-48 md:h-56">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="relative w-full h-[220px] min-h-[220px] md:h-[300px] ">
+      <ResponsiveContainer width="100%" height={220}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="name"
-            fontSize={window.innerWidth < 640 ? 10 : 12}
+            fontSize={isMobile ? 10 : 12}
             stroke="#9ca3af"
           />
           <YAxis hide />
@@ -107,7 +117,7 @@ export default function RevenueChart({
               backgroundColor: "#fff",
               border: "1px solid #e5e7eb",
               borderRadius: "8px",
-              fontSize: window.innerWidth < 640 ? "11px" : "12px",
+              fontSize: isMobile ? "11px" : "12px",
             }}
             formatter={(value) => `EGP ${value}`}
           />

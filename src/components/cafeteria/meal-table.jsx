@@ -3,18 +3,17 @@ import {
   getAllOrdersForToday,
   getAllOrdersForTomorrow,
   getOrderWindows,
-  parseTimeToHours,
-  parseTimeToMinutes,
   isTimeInWindow,
 } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
 
 const getCategoryItem = (order, categoryName) => {
-  const category = order.items.find(
-    (cat) => cat.category.toLowerCase() === categoryName.toLowerCase()
+  // Find the first item in the items array that matches the category
+  const item = order.items.find(
+    (itm) => itm.category.toLowerCase() === categoryName.toLowerCase()
   );
-  return category?.items[0]?.item_name || "-";
+  return item?.item_name || "-";
 };
 
 export function MealTable({
@@ -81,8 +80,6 @@ export function MealTable({
       const windows = await getOrderWindows();
       setOrderWindows(windows);
 
-      console.log(orderWindows);
-
       if (!windows) {
         console.warn("Could not fetch order windows, using defaults");
         // Fallback to defaults if API fails
@@ -113,7 +110,6 @@ export function MealTable({
       } else {
         orderData = await getAllOrdersForToday();
       }
-      // console.log(orderData);
 
       if (orderData.error) {
         console.error("Error fetching orders:", orderData.error);
@@ -121,22 +117,51 @@ export function MealTable({
         return;
       }
 
-      // Combine orders from active windows
+      // Smart combining of orders based on active windows and meal type filter
       let combinedOrders = [];
 
-      if (active.includes("breakfast") && orderData.breakfastOrders) {
-        combinedOrders = [...combinedOrders, ...orderData.breakfastOrders];
+      // Check if breakfast window is active
+      const breakfastActive = active.includes("breakfast");
+      // Check if lunch window is active
+      const lunchActive = active.includes("lunch");
+      // Drinks are always available (no window restriction)
+      const drinksActive = true;
+
+      // Add breakfast orders if window is active AND filter by meal_type
+      if (breakfastActive && orderData.breakfastOrders?.length > 0) {
+        const breakfastFiltered = orderData.breakfastOrders.filter(
+          (order) => order.meal_type.toLowerCase() === "breakfast"
+        );
+        combinedOrders = [...combinedOrders, ...breakfastFiltered];
       }
 
-      if (active.includes("lunch") && orderData.lunchOrders) {
-        combinedOrders = [...combinedOrders, ...orderData.lunchOrders];
+      // Add lunch orders if window is active AND filter by meal_type
+      if (lunchActive && orderData.lunchOrders?.length > 0) {
+        const lunchFiltered = orderData.lunchOrders.filter(
+          (order) => order.meal_type.toLowerCase() === "lunch"
+        );
+        combinedOrders = [...combinedOrders, ...lunchFiltered];
       }
 
-      if (active.includes("drinks") && orderData.drinkOrders) {
-        combinedOrders = [...combinedOrders, ...orderData.drinkOrders];
+      // Add drinks orders ALWAYS (no window restriction) AND filter by meal_type
+      // Drinks can appear with breakfast or lunch, so check independently
+      if (drinksActive && orderData.drinksOrders?.length > 0) {
+        const drinksFiltered = orderData.drinksOrders.filter(
+          (order) => order.meal_type.toLowerCase() === "drinks"
+        );
+        combinedOrders = [...combinedOrders, ...drinksFiltered];
       }
 
-      setItems(combinedOrders);
+      // Apply meal type filter if provided (additional filtering)
+      let filteredOrders = combinedOrders;
+      if (mealTypeFilter) {
+        filteredOrders = combinedOrders.filter(
+          (order) =>
+            order.meal_type.toLowerCase() === mealTypeFilter.toLowerCase()
+        );
+      }
+
+      setItems(filteredOrders);
     } catch (error) {
       console.error("Error in fetchOrders:", error);
       setItems([]);

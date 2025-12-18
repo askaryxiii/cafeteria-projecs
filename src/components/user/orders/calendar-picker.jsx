@@ -1,3 +1,4 @@
+import { formatDate } from "date-fns";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
@@ -20,8 +21,9 @@ export default function CalendarPicker({
         className={`custom-calendar`}
         onChange={onChange}
         value={date}
-        minDate={minDate}
-        maxDate={maxDate}
+        // minDate={minDate}
+        formatMonthYear={(locale, date) => formatDate(date, "MMM yyyy")}
+        // maxDate={maxDate}
       />
     </div>
   );

@@ -1,5 +1,13 @@
 const API_URL = import.meta.env.VITE_API_BASE;
 
+// Helper to add ngrok-skip-browser-warning to all headers
+function getHeaders(baseHeaders = {}) {
+  return {
+    "ngrok-skip-browser-warning": "true",
+    ...baseHeaders,
+  };
+}
+
 export function readToken() {
   try {
     return (
@@ -36,7 +44,7 @@ export async function getWeeklyMeals() {
 
     // verify token
     const verifyRes = await fetch(`${API_URL}/auth/verify-token`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getHeaders({ Authorization: `Bearer ${token}` }),
     });
     if (!verifyRes.ok) {
       const errBody = await verifyRes.json().catch(() => ({}));
@@ -48,10 +56,11 @@ export async function getWeeklyMeals() {
     const dateStr = formatDateYYYYMMDD(nextMonday);
 
     const res = await fetch(`${API_URL}/weekly-menu/${dateStr}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
         "Content-Type": "application/json",
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -75,7 +84,7 @@ export async function getTodayMenuByCategory(categoryName) {
     if (!token) return { error: "No auth token found" };
 
     const verifyRes = await fetch(`${API_URL}/auth/verify-token`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getHeaders({ Authorization: `Bearer ${token}` }),
     });
     if (!verifyRes.ok) {
       const errBody = await verifyRes.json().catch(() => ({}));
@@ -87,10 +96,11 @@ export async function getTodayMenuByCategory(categoryName) {
       .split("T")[0];
 
     const res = await fetch(`${API_URL}/daily-menu/${tomorrow}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
         "Content-Type": "application/json",
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -120,17 +130,18 @@ export async function getBreakfast() {
     if (!token) return { error: "No auth token found" };
 
     const verifyRes = await fetch(`${API_URL}/auth/verify-token`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getHeaders({ Authorization: `Bearer ${token}` }),
     });
     if (!verifyRes.ok) {
       const errBody = await verifyRes.json().catch(() => ({}));
       return { error: errBody.message || "Token verification failed" };
     }
     const res = await fetch(`${API_URL}/menu`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
+    "ngrok-skip-browser-warning": "true",
         "Content-Type": "application/json",
-      },
+      }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -161,9 +172,9 @@ export async function getTotalPrice(selectedItems, token) {
 
   for (const code of codes) {
     const res = await fetch(`${API_URL}/menu/code/${code}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
-      },
+      }),
     });
 
     if (!res.ok) continue;
@@ -180,17 +191,17 @@ export async function placeOrder(orderData, token) {
   try {
     const res = await fetch(`${API_URL}/orders`, {
       method: "POST",
-      headers: {
+      headers: getHeaders({
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-      },
+        "ngrok-skip-browser-warning": "true",
+      }),
       body: JSON.stringify(orderData),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       return { error: err.message || "Order failed" };
     }
-
     const data = await res.json();
     return data;
   } catch (err) {
@@ -204,7 +215,7 @@ export async function parseToken(token) {
     const t = token || readToken();
     if (!t) return null;
     const res = await fetch(`${API_URL}/auth/verify-token`, {
-      headers: { Authorization: `Bearer ${t}` },
+      headers: getHeaders({ Authorization: `Bearer ${t}` }),
     });
     if (!res.ok) return null;
     const data = await res.json().catch(() => null);
@@ -244,10 +255,10 @@ export async function getVerifiedUser(token) {
 export async function getOrdersByDate(dateStr, token) {
   try {
     const res = await fetch(`${API_URL}/orders?date=${dateStr}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-      },
+      }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -286,10 +297,10 @@ export async function getUserOrdersForMonth(userId, month, year, token) {
     const res = await fetch(
       `${API_URL}/orders/${uid}?month=${month}&year=${year}`,
       {
-        headers: {
+        headers: getHeaders({
           Authorization: `Bearer ${t}`,
           "Content-Type": "application/json",
-        },
+        }),
       }
     );
     if (!res.ok) {
@@ -342,10 +353,10 @@ export async function getAllOrdersForToday() {
 
   try {
     const res = await fetch(`${API_URL}/orders/all/${today}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -379,10 +390,10 @@ export async function getAllOrdersForTomorrow() {
 
   try {
     const res = await fetch(`${API_URL}/orders/all/${tomorrowString}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -408,10 +419,10 @@ export async function getChefOrders() {
 
   try {
     const res = await fetch(`${API_URL}/chef/orders/today`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -434,7 +445,7 @@ export async function getUserOrderFromTo(userId, from, to) {
     if (!token) return { error: "No auth token found" };
 
     const verifyRes = await fetch(`${API_URL}/auth/verify-token`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getHeaders({ Authorization: `Bearer ${token}` }),
     });
     if (!verifyRes.ok) {
       const errBody = await verifyRes.json().catch(() => ({}));
@@ -443,10 +454,10 @@ export async function getUserOrderFromTo(userId, from, to) {
     const res = await fetch(
       `${API_URL}/orders/${userId}?from=${from}&to=${to}`,
       {
-        headers: {
+        headers: getHeaders({
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-        },
+        }),
       }
     );
     if (!res.ok) {
@@ -470,10 +481,10 @@ export async function changePassword(currentPassword, newPassword, token) {
 
     const res = await fetch(`${API_URL}/auth/change-password`, {
       method: "POST",
-      headers: {
+      headers: getHeaders({
         "Content-Type": "application/json",
         Authorization: `Bearer ${t}`,
-      },
+      }),
       body: JSON.stringify({
         currentPassword,
         newPassword,
@@ -498,9 +509,9 @@ export async function getAllUsers(token) {
     const t = token || readToken();
     if (!t) return { error: "No auth token found" };
     const res = await fetch(`${API_URL}/users`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${t}`,
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -522,10 +533,10 @@ export async function editUser(userId, userData, token) {
 
     const res = await fetch(`${API_URL}/users/${userId}`, {
       method: "PUT",
-      headers: {
+      headers: getHeaders({
         "Content-Type": "application/json",
         Authorization: `Bearer ${t}`,
-      },
+      }),
       body: JSON.stringify(userData),
     });
 
@@ -549,9 +560,9 @@ export async function deleteUser(userId, token) {
 
     const res = await fetch(`${API_URL}/users/${userId}`, {
       method: "DELETE",
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${t}`,
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -572,9 +583,9 @@ export async function getAllMenuItems(token) {
     const t = token || readToken();
     if (!t) return { error: "No auth token found" };
     const res = await fetch(`${API_URL}/menu`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${t}`,
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -595,10 +606,10 @@ export async function editMenuItem(itemId, itemData, token) {
     if (!t) return { error: "No auth token found" };
     const res = await fetch(`${API_URL}/menu/${itemId}`, {
       method: "PUT",
-      headers: {
+      headers: getHeaders({
         "Content-Type": "application/json",
         Authorization: `Bearer ${t}`,
-      },
+      }),
       body: JSON.stringify(itemData),
     });
     if (!res.ok) {
@@ -618,9 +629,9 @@ export async function getAllMenuItemById(token, itemId) {
     const t = token || readToken();
     if (!t) return { error: "No auth token found" };
     const res = await fetch(`${API_URL}/menu/${itemId}`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${t}`,
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -641,9 +652,9 @@ export async function deleteMenuItem(itemId, token) {
     if (!t) return { error: "No auth token found" };
     const res = await fetch(`${API_URL}/menu/${itemId}`, {
       method: "DELETE",
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${t}`,
-      },
+      }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -665,10 +676,10 @@ export async function deleteOrder(orderId) {
     // Dummy route placeholder
     const res = await fetch(`${API_URL}/orders/${orderId}`, {
       method: "DELETE",
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-      },
+      }),
     });
 
     if (!res.ok) {
@@ -689,9 +700,9 @@ export async function getStats(token) {
     const t = token || readToken();
     if (!t) return { error: "No auth token found" };
     const res = await fetch(`${API_URL}/stats/system`, {
-      headers: {
+      headers: getHeaders({
         Authorization: `Bearer ${t}`,
-      },
+      }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -714,7 +725,7 @@ export async function getOrderWindows() {
     }
 
     const response = await fetch(`${API_URL}/order-windows`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getHeaders({ Authorization: `Bearer ${token}` }),
     });
 
     if (!response.ok) {
@@ -772,7 +783,7 @@ export async function userDetailed(from, to) {
     const response = await fetch(
       `${API_URL}/accountant/users-detailed?from_date=${from}&to_date=${to}`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders({ Authorization: `Bearer ${token}` }),
       }
     );
 
@@ -784,6 +795,39 @@ export async function userDetailed(from, to) {
     const data = await response.json();
 
     return { period: data.period, users: data.users };
+  } catch (error) {
+    console.error("Error fetching users detailed:", error);
+    return null;
+  }
+}
+
+export async function getExcelData(from, to) {
+  try {
+    const token = readToken();
+    if (!token) {
+      console.warn("No auth token found for accountant");
+      return null;
+    }
+
+    const response = await fetch(
+      `${API_URL}/accountant/export-excel?from_date=${from}&to_date=${to}`,
+      {
+        headers: getHeaders({ Authorization: `Bearer ${token}` }),
+      }
+    );
+
+    if (!response.ok) {
+      console.warn("Failed to fetch users detailed");
+      return null;
+    }
+
+    const data = await response.json();
+
+    return {
+      mainData: data.mainData,
+      ordersData: data.ordersData,
+      priceData: data.priceData,
+    };
   } catch (error) {
     console.error("Error fetching users detailed:", error);
     return null;

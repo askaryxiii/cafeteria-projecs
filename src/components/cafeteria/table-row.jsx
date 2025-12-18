@@ -75,7 +75,7 @@ export function TableRow({
         </td>
       )}
       {showDelete && (
-        <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 md:py-4 text-center">
+        <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 md:py-4 text-center flex items-center justify-center">
           <button
             onClick={() => onDelete && onDelete(item.id)}
             className="p-1.5 sm:p-2 md:p-2 text-[#072A57] hover:scale-110 rounded-lg transition min-h-9 sm:min-h-10 flex items-center justify-center"

@@ -107,7 +107,11 @@ const DashboardUser = () => {
   if (loading) return <OrderSkeleton />;
 
   return order ? (
-    <YourOrder order={order} onOrderUpdated={handleOrderPlaced} />
+    <YourOrder
+      order={order}
+      onOrderUpdated={handleOrderPlaced}
+      isBreakfastWindow={isBreakfastWindow}
+    />
   ) : (
     <Ordering onOrderPlaced={handleOrderPlaced} />
   );

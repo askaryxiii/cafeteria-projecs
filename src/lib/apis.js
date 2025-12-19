@@ -21,7 +21,8 @@ export async function getServerTime() {
       serverTimeOffset !== null &&
       now - lastServerTimeUpdate < 5 * 60 * 1000
     ) {
-      return new Date(Date.now() + serverTimeOffset);
+      const serverTimeMs = Date.now() + serverTimeOffset;
+      return new Date(serverTimeMs);
     }
 
     const res = await fetch(`${API_URL}/stats/server-time`, {
@@ -37,11 +38,35 @@ export async function getServerTime() {
     }
 
     const data = await res.json();
-    const serverTime = new Date(data.timestamp || data.time).getTime();
-    serverTimeOffset = serverTime - Date.now();
+    const timestamp = data.serverTime || data.timestamp || data.time;
+
+    // Ensure we have a valid timestamp
+    if (!timestamp) {
+      console.warn("No timestamp in server response:", data);
+      return new Date();
+    }
+
+    // Handle both milliseconds (number) and ISO strings
+    let serverTimeMs;
+    if (typeof timestamp === "number") {
+      serverTimeMs = timestamp;
+    } else {
+      // Parse ISO string or other string formats
+      const parsedDate = new Date(timestamp);
+      serverTimeMs = parsedDate.getTime();
+    }
+
+    // Validate the parsed time
+    if (isNaN(serverTimeMs)) {
+      console.warn("Invalid timestamp from server:", timestamp);
+      return new Date();
+    }
+
+    // Calculate and cache the offset between server time and local browser time
+    serverTimeOffset = serverTimeMs - Date.now();
     lastServerTimeUpdate = Date.now();
 
-    return new Date(serverTime);
+    return new Date(serverTimeMs);
   } catch (error) {
     console.warn("Error fetching server time:", error);
     serverTimeOffset = null;
@@ -394,16 +419,27 @@ export async function getUserOrdersByDate(dateStr, token) {
 }
 
 export async function getAllOrdersForToday() {
-  const serverTime = await getServerTime();
-  const today = serverTime
-    .toISOString()
-    .split("T")[0]
-    .split("-")
-    .reverse()
-    .join("-");
-  const token = readToken();
-
   try {
+    const serverTime = await getServerTime();
+
+    // Validate that serverTime is a valid Date
+    if (
+      !serverTime ||
+      !(serverTime instanceof Date) ||
+      isNaN(serverTime.getTime())
+    ) {
+      console.error("Invalid server time:", serverTime);
+      return { error: "Failed to get valid server time" };
+    }
+
+    const today = serverTime
+      .toISOString()
+      .split("T")[0]
+      .split("-")
+      .reverse()
+      .join("-");
+    const token = readToken();
+
     const res = await fetch(`${API_URL}/orders/all/${today}`, {
       headers: getHeaders({
         Authorization: `Bearer ${token}`,
@@ -430,18 +466,29 @@ export async function getAllOrdersForToday() {
 }
 
 export async function getAllOrdersForTomorrow() {
-  const serverTime = await getServerTime();
-  const tomorrow = new Date(serverTime);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowString = tomorrow
-    .toISOString()
-    .split("T")[0]
-    .split("-")
-    .reverse()
-    .join("-");
-  const token = readToken();
-
   try {
+    const serverTime = await getServerTime();
+
+    // Validate that serverTime is a valid Date
+    if (
+      !serverTime ||
+      !(serverTime instanceof Date) ||
+      isNaN(serverTime.getTime())
+    ) {
+      console.error("Invalid server time:", serverTime);
+      return { error: "Failed to get valid server time" };
+    }
+
+    const tomorrow = new Date(serverTime);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowString = tomorrow
+      .toISOString()
+      .split("T")[0]
+      .split("-")
+      .reverse()
+      .join("-");
+    const token = readToken();
+
     const res = await fetch(`${API_URL}/orders/all/${tomorrowString}`, {
       headers: getHeaders({
         Authorization: `Bearer ${token}`,

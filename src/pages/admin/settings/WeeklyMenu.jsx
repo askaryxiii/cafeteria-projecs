@@ -24,7 +24,9 @@ const CATEGORIES = ["protein", "carbs", "salad", "side"];
 function getMondayOfCurrentWeek(now = new Date()) {
   const day = now.getDay(); // 0 (Sunday) - 6 (Saturday)
   const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  const monday = new Date(now.setDate(diff));
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diff - now.getDate());
+  monday.setHours(0, 0, 0, 0);
   return monday.toISOString().split("T")[0];
 }
 
@@ -34,6 +36,7 @@ function getWeekDates(startDate) {
   return WEEKDAYS.map((day, index) => {
     const date = new Date(start);
     date.setDate(start.getDate() + index);
+    date.setHours(0, 0, 0, 0);
     return date.toISOString().split("T")[0];
   });
 }
@@ -189,6 +192,28 @@ const WeeklyMenu = () => {
     weekDates: [],
   });
 
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      week_start_date: "",
+      items: WEEKDAYS.map((day, index) => ({
+        day,
+        date: "",
+        menu: {
+          protein: [{}, {}, {}, {}],
+          carbs: [{}, {}, {}, {}],
+          salad: [{}, {}, {}, {}],
+          side: [{}, {}, {}, {}],
+        },
+      })),
+    },
+  });
+
   useEffect(() => {
     (async () => {
       try {
@@ -199,39 +224,17 @@ const WeeklyMenu = () => {
           mondayOfWeek: monday,
           weekDates: dates,
         });
+
+        // Update form values with the fetched week data
+        setValue("week_start_date", monday);
+        WEEKDAYS.forEach((day, index) => {
+          setValue(`items.${index}.date`, dates[index]);
+        });
       } catch (error) {
         console.error("Failed to get server time:", error);
-        const monday = getMondayOfCurrentWeek();
-        const dates = getWeekDates(monday);
-        setWeekData({
-          mondayOfWeek: monday,
-          weekDates: dates,
-        });
       }
     })();
-  }, []);
-
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      week_start_date: weekData.mondayOfWeek,
-      items: WEEKDAYS.map((day, index) => ({
-        day,
-        date: weekData.weekDates[index],
-        menu: {
-          protein: [{}, {}, {}, {}],
-          carbs: [{}, {}, {}, {}],
-          salad: [{}, {}, {}, {}],
-          side: [{}, {}, {}, {}],
-        },
-      })),
-    },
-  });
+  }, [setValue]);
   const [loading, setLoading] = useState(false);
   const [isFetchingWeekly, setIsFetchingWeekly] = useState(false);
 

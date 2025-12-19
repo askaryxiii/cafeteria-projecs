@@ -3,7 +3,11 @@ import Modal from "./modal-base";
 import ImportFile from "../import-file";
 import { FiDownload } from "react-icons/fi";
 import toast from "react-hot-toast";
-import { getAllMenuItems, readToken } from "../../../../lib/apis";
+import {
+  getAllMenuItems,
+  readToken,
+  getServerTime,
+} from "../../../../lib/apis";
 
 const ImportModal = ({ isOpen, onClose, isLoading }) => {
   const [isExporting, setIsExporting] = useState(false);
@@ -65,9 +69,10 @@ const ImportModal = ({ isOpen, onClose, isLoading }) => {
       const url = URL.createObjectURL(blob);
 
       link.setAttribute("href", url);
+      const serverTime = await getServerTime();
       link.setAttribute(
         "download",
-        `menu_items_${new Date().toISOString().split("T")[0]}.csv`
+        `menu_items_${serverTime.toISOString().split("T")[0]}.csv`
       );
       link.style.visibility = "hidden";
 

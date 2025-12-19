@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { IoMdClose } from "react-icons/io";
 import AuthContext from "../../../context/AuthContext";
 import toast from "react-hot-toast";
+import { getCurrentTime } from "../../../lib/apis";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +55,7 @@ export default function CreateUserModal({ onClose, onSubmit }) {
         toast.success("User created successfully");
         setIsLoading(false);
         onSubmit({
-          id: Date.now().toString(),
+          id: getCurrentTime().getTime().toString(),
           ...formData,
         });
         onClose();

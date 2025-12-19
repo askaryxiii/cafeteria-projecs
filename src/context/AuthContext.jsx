@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
-import { clearVerifiedUserCache } from "../lib/apis";
+import { clearVerifiedUserCache, getCurrentTime } from "../lib/apis";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }) => {
     // backend may optionally include expiry info; try common locations
     const expiresAt =
       (verifyRes && (verifyRes.expiresAt || verifyRes.user?.exp)) ||
-      Date.now() + 7 * 24 * 3600 * 1000;
+      getCurrentTime().getTime() + 7 * 24 * 3600 * 1000;
 
     // persist token depending on remember flag
     const storage = remember ? localStorage : sessionStorage;

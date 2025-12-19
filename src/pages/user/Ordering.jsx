@@ -7,6 +7,7 @@ import {
   placeOrder,
   getOrderWindows,
   isTimeInWindow,
+  getServerTime,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -23,7 +24,7 @@ const Ordering = ({ onOrderPlaced }) => {
         const windows = await getOrderWindows();
 
         if (windows) {
-          const now = new Date();
+          const now = await getServerTime();
           const hour = now.getHours();
           const minute = now.getMinutes();
 
@@ -46,7 +47,8 @@ const Ordering = ({ onOrderPlaced }) => {
           }
         } else {
           // Fallback logic
-          const hour = new Date().getHours();
+          const now = await getServerTime();
+          const hour = now.getHours();
           setMealType(
             hour >= 11 && hour < 15 ? "breakfast" : hour >= 15 ? "lunch" : null
           );
@@ -82,8 +84,9 @@ const Ordering = ({ onOrderPlaced }) => {
         const u = await getVerifiedUser(token);
         const user_email = u?.email || null;
 
-        const today = new Date().toISOString().split("T")[0];
-        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+        const serverTime = await getServerTime();
+        const today = serverTime.toISOString().split("T")[0];
+        const tomorrow = new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
           .toISOString()
           .split("T")[0];
 

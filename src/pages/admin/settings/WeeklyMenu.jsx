@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
+import { getServerTime } from "../../../lib/apis";
 
 const API_URL = import.meta.env.VITE_API_BASE;
 
@@ -20,8 +21,7 @@ const WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
 const CATEGORIES = ["protein", "carbs", "salad", "side"];
 
 // Get Monday of the current week
-function getMondayOfCurrentWeek() {
-  const now = new Date();
+function getMondayOfCurrentWeek(now = new Date()) {
   const day = now.getDay(); // 0 (Sunday) - 6 (Saturday)
   const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
   const monday = new Date(now.setDate(diff));
@@ -178,8 +178,38 @@ const MenuItemSelect = ({
 };
 
 const WeeklyMenu = () => {
-  const mondayOfWeek = getMondayOfCurrentWeek();
-  const weekDates = getWeekDates(mondayOfWeek);
+  const [menuItems, setMenuItems] = useState({
+    protein: [],
+    carbs: [],
+    salad: [],
+    side: [],
+  });
+  const [weekData, setWeekData] = useState({
+    mondayOfWeek: "",
+    weekDates: [],
+  });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const serverTime = await getServerTime();
+        const monday = getMondayOfCurrentWeek(serverTime);
+        const dates = getWeekDates(monday);
+        setWeekData({
+          mondayOfWeek: monday,
+          weekDates: dates,
+        });
+      } catch (error) {
+        console.error("Failed to get server time:", error);
+        const monday = getMondayOfCurrentWeek();
+        const dates = getWeekDates(monday);
+        setWeekData({
+          mondayOfWeek: monday,
+          weekDates: dates,
+        });
+      }
+    })();
+  }, []);
 
   const {
     control,
@@ -189,10 +219,10 @@ const WeeklyMenu = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      week_start_date: mondayOfWeek,
+      week_start_date: weekData.mondayOfWeek,
       items: WEEKDAYS.map((day, index) => ({
         day,
-        date: weekDates[index],
+        date: weekData.weekDates[index],
         menu: {
           protein: [{}, {}, {}, {}],
           carbs: [{}, {}, {}, {}],
@@ -201,13 +231,6 @@ const WeeklyMenu = () => {
         },
       })),
     },
-  });
-
-  const [menuItems, setMenuItems] = useState({
-    protein: [],
-    carbs: [],
-    salad: [],
-    side: [],
   });
   const [loading, setLoading] = useState(false);
   const [isFetchingWeekly, setIsFetchingWeekly] = useState(false);

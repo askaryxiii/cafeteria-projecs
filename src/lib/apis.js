@@ -8,6 +8,54 @@ function getHeaders(baseHeaders = {}) {
   };
 }
 
+// Cache for server time offset to minimize API calls
+let serverTimeOffset = null;
+let lastServerTimeUpdate = 0;
+
+// Get server time - caches the offset for 5 minutes
+export async function getServerTime() {
+  try {
+    const now = Date.now();
+    // Only fetch from server every 5 minutes
+    if (
+      serverTimeOffset !== null &&
+      now - lastServerTimeUpdate < 5 * 60 * 1000
+    ) {
+      return new Date(Date.now() + serverTimeOffset);
+    }
+
+    const res = await fetch(`${API_URL}/server-time`, {
+      headers: getHeaders({
+        "Content-Type": "application/json",
+      }),
+    });
+
+    if (!res.ok) {
+      console.warn("Failed to fetch server time, using local time");
+      return new Date();
+    }
+
+    const data = await res.json();
+    const serverTime = new Date(data.timestamp || data.time).getTime();
+    serverTimeOffset = serverTime - Date.now();
+    lastServerTimeUpdate = Date.now();
+
+    return new Date(serverTime);
+  } catch (error) {
+    console.warn("Error fetching server time:", error);
+    serverTimeOffset = null;
+    return new Date();
+  }
+}
+
+// Synchronous version - uses cached offset (won't be perfect on first call)
+export function getCurrentTime() {
+  if (serverTimeOffset !== null) {
+    return new Date(Date.now() + serverTimeOffset);
+  }
+  return new Date();
+}
+
 export function readToken() {
   try {
     return (
@@ -28,7 +76,7 @@ function formatDateYYYYMMDD(date) {
 }
 
 // returns next Monday date (if today is Monday returns today)
-function getNextMonday(from = new Date()) {
+function getNextMonday(from = getCurrentTime()) {
   const day = from.getDay(); // 0 (Sun) - 6 (Sat)
   const daysToAdd = (8 - day) % 7; // 0 when Monday
   const next = new Date(from);
@@ -52,7 +100,8 @@ export async function getWeeklyMeals() {
     }
 
     // compute next monday
-    const nextMonday = getNextMonday(new Date());
+    const serverTime = await getServerTime();
+    const nextMonday = getNextMonday(serverTime);
     const dateStr = formatDateYYYYMMDD(nextMonday);
 
     const res = await fetch(`${API_URL}/weekly-menu/${dateStr}`, {
@@ -91,7 +140,8 @@ export async function getTodayMenuByCategory(categoryName) {
       return { error: errBody.message || "Token verification failed" };
     }
 
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    const serverTime = await getServerTime();
+    const tomorrow = new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
       .toISOString()
       .split("T")[0];
 
@@ -343,7 +393,8 @@ export async function getUserOrdersByDate(dateStr, token) {
 }
 
 export async function getAllOrdersForToday() {
-  const today = new Date()
+  const serverTime = await getServerTime();
+  const today = serverTime
     .toISOString()
     .split("T")[0]
     .split("-")
@@ -378,7 +429,8 @@ export async function getAllOrdersForToday() {
 }
 
 export async function getAllOrdersForTomorrow() {
-  const tomorrow = new Date();
+  const serverTime = await getServerTime();
+  const tomorrow = new Date(serverTime);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowString = tomorrow
     .toISOString()

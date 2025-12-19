@@ -9,7 +9,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { RiPencilFill } from "react-icons/ri";
 import { MdDelete } from "react-icons/md";
 import { MdArrowUpward } from "react-icons/md";
-import { getAllUsers, deleteUser } from "../../../lib/apis";
+import { getAllUsers, deleteUser, getCurrentTime } from "../../../lib/apis";
 import toast from "react-hot-toast";
 import DashboardHeader from "../../../layouts/navbar/admin/DashboardHeader";
 
@@ -96,7 +96,7 @@ export default function UsersTable() {
   const handleCreateUser = (userData) => {
     const newUser = {
       ...userData,
-      id: Date.now().toString(),
+      id: getCurrentTime().getTime().toString(),
     };
     setUsers([...users, newUser]);
     setIsCreateModalOpen(false);

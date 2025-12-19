@@ -4,6 +4,7 @@ import {
   getAllOrdersForTomorrow,
   getOrderWindows,
   isTimeInWindow,
+  getServerTime,
 } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
@@ -69,7 +70,7 @@ export function MealTable({
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const now = new Date();
+      const now = await getServerTime();
       const hour = now.getHours();
       const minute = now.getMinutes();
 

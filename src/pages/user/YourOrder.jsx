@@ -5,6 +5,7 @@ import {
   getOrderWindows,
   parseTimeToHours,
   isTimeInWindow,
+  getServerTime,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 
@@ -21,7 +22,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
         const windows = await getOrderWindows();
 
         if (windows) {
-          const now = new Date();
+          const now = await getServerTime();
           const hour = now.getHours();
           const minute = now.getMinutes();
 
@@ -35,15 +36,13 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
           setLocalBreakfastWindow(isBreakfast);
         } else {
           // Fallback to default timing
-          setLocalBreakfastWindow(
-            new Date().getHours() >= 11 && new Date().getHours() < 15
-          );
+          const now = await getServerTime();
+          setLocalBreakfastWindow(now.getHours() >= 11 && now.getHours() < 15);
         }
       } catch (error) {
         console.error("Error fetching order windows:", error);
-        setLocalBreakfastWindow(
-          new Date().getHours() >= 11 && new Date().getHours() < 15
-        );
+        const now = await getServerTime();
+        setLocalBreakfastWindow(now.getHours() >= 11 && now.getHours() < 15);
       } finally {
         setWindowsInitialized(true);
       }

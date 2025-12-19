@@ -5,6 +5,7 @@ import {
   getOrderWindows,
   parseTimeToHours,
   isTimeInWindow,
+  getServerTime,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
@@ -24,7 +25,7 @@ const DashboardUser = () => {
         const windows = await getOrderWindows();
 
         if (windows) {
-          const now = new Date();
+          const now = await getServerTime();
           const hour = now.getHours();
           const minute = now.getMinutes();
 
@@ -38,13 +39,14 @@ const DashboardUser = () => {
           setIsBreakfastWindow(isBreakfast);
         } else {
           // Fallback to default timing if API fails
-          setIsBreakfastWindow(hour >= 11 && hour < 15);
+          const now = await getServerTime();
+          setIsBreakfastWindow(now.getHours() >= 11 && now.getHours() < 15);
         }
       } catch (error) {
         console.error("Error fetching order windows:", error);
         // Fallback default
-        const hour = new Date().getHours();
-        setIsBreakfastWindow(hour >= 11 && hour < 15);
+        const now = await getServerTime();
+        setIsBreakfastWindow(now.getHours() >= 11 && now.getHours() < 15);
       } finally {
         setWindowsInitialized(true);
       }
@@ -59,8 +61,9 @@ const DashboardUser = () => {
         return;
       }
 
-      const today = new Date().toISOString().split("T")[0];
-      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      const serverTime = await getServerTime();
+      const today = serverTime.toISOString().split("T")[0];
+      const tomorrow = new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0];
 

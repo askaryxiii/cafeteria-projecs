@@ -4,11 +4,21 @@ import { format } from "date-fns";
 import DateRangeHeader from "./date-range-header";
 import CalendarPicker from "./calendar-picker";
 import { useNavigate } from "react-router-dom";
+import { getServerTime } from "../../../lib/apis";
 
 export default function DateRangePicker() {
   const [showFromCalendar, setShowFromCalendar] = useState(false);
   const [showToCalendar, setShowToCalendar] = useState(false);
+  const [serverNow, setServerNow] = useState(null);
   const navigate = useNavigate();
+
+  // Initialize server time on mount
+  useEffect(() => {
+    (async () => {
+      const now = await getServerTime();
+      setServerNow(now);
+    })();
+  }, []);
 
   const { watch, setValue } = useForm({
     defaultValues: {
@@ -65,21 +75,25 @@ export default function DateRangePicker() {
 
       {/* Calendars Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 md:gap-6 mb-6 w-full">
-        <CalendarPicker
-          className={"md:justify-self-start"}
-          date={fromDate}
-          onChange={handleFromDateChange}
-          maxDate={toDate || new Date()}
-          isOpen={showFromCalendar}
-        />
+        {serverNow && (
+          <>
+            <CalendarPicker
+              className={"md:justify-self-start"}
+              date={fromDate}
+              onChange={handleFromDateChange}
+              maxDate={toDate || serverNow}
+              isOpen={showFromCalendar}
+            />
 
-        <CalendarPicker
-          className={"md:justify-self-end md:col-start-2"}
-          date={toDate}
-          onChange={handleToDateChange}
-          minDate={fromDate || new Date()}
-          isOpen={showToCalendar}
-        />
+            <CalendarPicker
+              className={"md:justify-self-end md:col-start-2"}
+              date={toDate}
+              onChange={handleToDateChange}
+              minDate={fromDate || serverNow}
+              isOpen={showToCalendar}
+            />
+          </>
+        )}
       </div>
     </div>
   );

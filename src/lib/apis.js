@@ -139,7 +139,7 @@ export async function getBreakfast() {
     const res = await fetch(`${API_URL}/menu`, {
       headers: getHeaders({
         Authorization: `Bearer ${token}`,
-    "ngrok-skip-browser-warning": "true",
+        "ngrok-skip-browser-warning": "true",
         "Content-Type": "application/json",
       }),
     });

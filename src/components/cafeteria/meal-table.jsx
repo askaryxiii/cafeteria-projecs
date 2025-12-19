@@ -107,9 +107,6 @@ export function MealTable({
         orderData = await getAllOrdersForToday();
       }
 
-      
-      
-
       if (orderData.error) {
         console.error("Error fetching orders:", orderData.error);
         setItems([]);

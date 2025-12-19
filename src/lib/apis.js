@@ -24,9 +24,10 @@ export async function getServerTime() {
       return new Date(Date.now() + serverTimeOffset);
     }
 
-    const res = await fetch(`${API_URL}/server-time`, {
+    const res = await fetch(`${API_URL}/stats/server-time`, {
       headers: getHeaders({
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
       }),
     });
 

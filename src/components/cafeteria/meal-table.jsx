@@ -7,6 +7,7 @@ import {
 } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
+import { MdDelete } from "react-icons/md";
 
 const getCategoryItem = (order, categoryName) => {
   // Find the first item in the items array that matches the category
@@ -349,7 +350,7 @@ function MobileTableRow({ item, onCheckChange, showDelete, onDelete }) {
             <button
               onClick={() => onDelete && onDelete(item.id)}
               className="text-red-500 hover:text-red-700 text-xs sm:text-sm md:text-base shrink-0 min-h-9 sm:min-h-10 flex items-center justify-center px-2 sm:px-3">
-              🗑️
+              <MdDelete className="w-6 h-6" />
             </button>
           )}
         </div>
@@ -412,7 +413,7 @@ function MobileTableRow({ item, onCheckChange, showDelete, onDelete }) {
           <button
             onClick={() => onDelete && onDelete(item.id)}
             className="text-red-500 hover:text-red-700 text-xs sm:text-sm md:text-base shrink-0 min-h-9 sm:min-h-10 flex items-center justify-center px-2 sm:px-3">
-            🗑️
+            <MdDelete className="w-6 h-6" />
           </button>
         )}
       </div>

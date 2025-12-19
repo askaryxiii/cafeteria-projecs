@@ -5,6 +5,7 @@ import {
   deleteOrder,
 } from "../../lib/apis";
 import toast from "react-hot-toast";
+import { MdDelete } from "react-icons/md";
 
 /**
  * CafeteriaOrdersTable - Shows all orders for cafeteria staff (no window filtering)
@@ -177,8 +178,8 @@ export function CafeteriaOrdersTable({
                     <td className="px-4 py-2 border text-center">
                       <button
                         onClick={() => onDelete && onDelete(item.id)}
-                        className="text-red-500 hover:text-red-700 text-lg">
-                        🗑️
+                        className="text-[#072A57]  text-lg">
+                        <MdDelete className="w-6 h-6" />
                       </button>
                     </td>
                   )}
@@ -228,8 +229,8 @@ export function CafeteriaOrdersTable({
                 {showDelete && (
                   <button
                     onClick={() => onDelete && onDelete(item.id)}
-                    className="text-red-500 hover:text-red-700 text-lg shrink-0">
-                    🗑️
+                    className="text-[#072A57] text-lg shrink-0">
+                    <MdDelete className="w-6 h-6" />
                   </button>
                 )}
               </div>

@@ -58,12 +58,8 @@ export function MealTable({
       active.push("lunch");
     }
 
-    // Drinks are always shown if they overlap with any active window
-    if (
-      isTimeInWindow(hour, minute, windows.drinks_start, windows.drinks_end)
-    ) {
-      active.push("drinks");
-    }
+    // Drinks are ALWAYS shown (no time window restriction)
+    active.push("drinks");
 
     return active;
   };
@@ -111,11 +107,20 @@ export function MealTable({
         orderData = await getAllOrdersForToday();
       }
 
+      
+      
+
       if (orderData.error) {
         console.error("Error fetching orders:", orderData.error);
         setItems([]);
         return;
       }
+
+      console.log("📊 Order data received:", {
+        breakfast: orderData.breakfastOrders?.length,
+        lunch: orderData.lunchOrders?.length,
+        drinks: orderData.drinksOrders?.length,
+      });
 
       // Smart combining of orders based on active windows and meal type filter
       let combinedOrders = [];
@@ -132,6 +137,7 @@ export function MealTable({
         const breakfastFiltered = orderData.breakfastOrders.filter(
           (order) => order.meal_type.toLowerCase() === "breakfast"
         );
+        console.log("✅ Added breakfast orders:", breakfastFiltered.length);
         combinedOrders = [...combinedOrders, ...breakfastFiltered];
       }
 
@@ -140,6 +146,7 @@ export function MealTable({
         const lunchFiltered = orderData.lunchOrders.filter(
           (order) => order.meal_type.toLowerCase() === "lunch"
         );
+        console.log("✅ Added lunch orders:", lunchFiltered.length);
         combinedOrders = [...combinedOrders, ...lunchFiltered];
       }
 
@@ -149,7 +156,10 @@ export function MealTable({
         const drinksFiltered = orderData.drinksOrders.filter(
           (order) => order.meal_type.toLowerCase() === "drinks"
         );
+        console.log("✅ Added drinks orders:", drinksFiltered.length);
         combinedOrders = [...combinedOrders, ...drinksFiltered];
+      } else {
+        console.log("❌ No drinks orders or drinksActive is false");
       }
 
       // Apply meal type filter if provided (additional filtering)

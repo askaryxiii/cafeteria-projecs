@@ -368,9 +368,9 @@ export async function getAllOrdersForToday() {
     // Extract breakfast, lunch, and drinks orders
     const breakfastOrders = data.breakfastOrders || [];
     const lunchOrders = data.lunchOrders || [];
-    const drinkOrders = data.drinksOrders || [];
+    const drinksOrders = data.drinksOrders || [];
 
-    return { breakfastOrders, lunchOrders, drinkOrders };
+    return { breakfastOrders, lunchOrders, drinksOrders };
   } catch (err) {
     console.error("Error fetching today's orders:", err);
     return { error: err.message || "Something went wrong" };
@@ -405,9 +405,9 @@ export async function getAllOrdersForTomorrow() {
     // Extract breakfast, lunch, and drinks orders
     const breakfastOrders = data.breakfastOrders || [];
     const lunchOrders = data.lunchOrders || [];
-    const drinkOrders = data.drinksOrders || [];
+    const drinksOrders = data.drinksOrders || [];
 
-    return { breakfastOrders, lunchOrders, drinkOrders };
+    return { breakfastOrders, lunchOrders, drinksOrders };
   } catch (err) {
     console.error("Error fetching tomorrow's orders:", err);
     return { error: err.message || "Something went wrong" };

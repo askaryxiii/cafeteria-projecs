@@ -100,7 +100,7 @@ const Ordering = ({ onOrderPlaced }) => {
           total_cost: Number(totalPrice),
           items,
         };
-        console.log(orderBody);
+
         const res = await placeOrder(orderBody, token);
         if (res && res.error) {
           toast.error(res.error);

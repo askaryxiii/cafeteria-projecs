@@ -94,12 +94,11 @@ export function MealTable({
         // Determine active windows with defaults
         const active = determineActiveWindows(hour, minute, defaultWindows);
         setActiveWindows(active);
-        return;
+      } else {
+        // Determine active windows based on current time
+        const active = determineActiveWindows(hour, minute, windows);
+        setActiveWindows(active);
       }
-
-      // Determine active windows based on current time
-      const active = determineActiveWindows(hour, minute, windows);
-      setActiveWindows(active);
 
       // Fetch orders for today or tomorrow
       let orderData;
@@ -121,47 +120,29 @@ export function MealTable({
         drinks: orderData.drinksOrders?.length,
       });
 
-      // Smart combining of orders based on active windows and meal type filter
+      // For viewing orders (not placing), show ALL orders regardless of time window
+      // The time window only applies to ORDER PLACEMENT, not viewing
       let combinedOrders = [];
 
-      // Check if breakfast window is active
-      const breakfastActive = active.includes("breakfast");
-      // Check if lunch window is active
-      const lunchActive = active.includes("lunch");
-      // Drinks are always available (no window restriction)
-      const drinksActive = true;
-
-      console.log("🪟 Active windows:", active, {
-        breakfastActive,
-        lunchActive,
-        drinksActive,
-      });
-
-      // Add breakfast orders if window is active
-      if (breakfastActive && orderData.breakfastOrders?.length > 0) {
-        console.log("✅ Adding breakfast orders:", orderData.breakfastOrders);
-        combinedOrders = [...combinedOrders, ...orderData.breakfastOrders];
-      } else {
+      // Add breakfast orders
+      if (orderData.breakfastOrders?.length > 0) {
         console.log(
-          "❌ Skipping breakfast. breakfastActive:",
-          breakfastActive,
-          "orders:",
-          orderData.breakfastOrders?.length
+          "✅ Adding breakfast orders:",
+          orderData.breakfastOrders.length
         );
+        combinedOrders = [...combinedOrders, ...orderData.breakfastOrders];
       }
 
-      // Add lunch orders if window is active
-      if (lunchActive && orderData.lunchOrders?.length > 0) {
-        console.log("✅ Adding lunch orders:", orderData.lunchOrders);
+      // Add lunch orders
+      if (orderData.lunchOrders?.length > 0) {
+        console.log("✅ Adding lunch orders:", orderData.lunchOrders.length);
         combinedOrders = [...combinedOrders, ...orderData.lunchOrders];
       }
 
-      // Add drinks orders ALWAYS (no window restriction)
-      if (drinksActive && orderData.drinksOrders?.length > 0) {
-        console.log("✅ Adding drinks orders:", orderData.drinksOrders);
+      // Add drinks orders
+      if (orderData.drinksOrders?.length > 0) {
+        console.log("✅ Adding drinks orders:", orderData.drinksOrders.length);
         combinedOrders = [...combinedOrders, ...orderData.drinksOrders];
-      } else {
-        console.log("❌ No drinks orders or drinksActive is false");
       }
 
       console.log("🔗 Combined orders before filter:", combinedOrders.length, {

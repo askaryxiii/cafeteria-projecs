@@ -131,45 +131,55 @@ export function MealTable({
       // Drinks are always available (no window restriction)
       const drinksActive = true;
 
-      // Add breakfast orders if window is active AND filter by meal_type
+      console.log("🪟 Active windows:", active, {
+        breakfastActive,
+        lunchActive,
+        drinksActive,
+      });
+
+      // Add breakfast orders if window is active
       if (breakfastActive && orderData.breakfastOrders?.length > 0) {
-        const breakfastFiltered = orderData.breakfastOrders.filter(
-          (order) => order.meal_type.toLowerCase() === "breakfast"
+        console.log("✅ Adding breakfast orders:", orderData.breakfastOrders);
+        combinedOrders = [...combinedOrders, ...orderData.breakfastOrders];
+      } else {
+        console.log(
+          "❌ Skipping breakfast. breakfastActive:",
+          breakfastActive,
+          "orders:",
+          orderData.breakfastOrders?.length
         );
-        console.log("✅ Added breakfast orders:", breakfastFiltered.length);
-        combinedOrders = [...combinedOrders, ...breakfastFiltered];
       }
 
-      // Add lunch orders if window is active AND filter by meal_type
+      // Add lunch orders if window is active
       if (lunchActive && orderData.lunchOrders?.length > 0) {
-        const lunchFiltered = orderData.lunchOrders.filter(
-          (order) => order.meal_type.toLowerCase() === "lunch"
-        );
-        console.log("✅ Added lunch orders:", lunchFiltered.length);
-        combinedOrders = [...combinedOrders, ...lunchFiltered];
+        console.log("✅ Adding lunch orders:", orderData.lunchOrders);
+        combinedOrders = [...combinedOrders, ...orderData.lunchOrders];
       }
 
-      // Add drinks orders ALWAYS (no window restriction) AND filter by meal_type
-      // Drinks can appear with breakfast or lunch, so check independently
+      // Add drinks orders ALWAYS (no window restriction)
       if (drinksActive && orderData.drinksOrders?.length > 0) {
-        const drinksFiltered = orderData.drinksOrders.filter(
-          (order) => order.meal_type.toLowerCase() === "drinks"
-        );
-        console.log("✅ Added drinks orders:", drinksFiltered.length);
-        combinedOrders = [...combinedOrders, ...drinksFiltered];
+        console.log("✅ Adding drinks orders:", orderData.drinksOrders);
+        combinedOrders = [...combinedOrders, ...orderData.drinksOrders];
       } else {
         console.log("❌ No drinks orders or drinksActive is false");
       }
 
+      console.log("🔗 Combined orders before filter:", combinedOrders.length, {
+        mealTypeFilter,
+      });
+
       // Apply meal type filter if provided (additional filtering)
       let filteredOrders = combinedOrders;
       if (mealTypeFilter) {
+        console.log("🔍 Applying meal type filter:", mealTypeFilter);
         filteredOrders = combinedOrders.filter(
           (order) =>
             order.meal_type.toLowerCase() === mealTypeFilter.toLowerCase()
         );
+        console.log("📋 After filter:", filteredOrders.length, "orders");
       }
 
+      console.log("📝 Final orders to display:", filteredOrders.length);
       setItems(filteredOrders);
     } catch (error) {
       console.error("Error in fetchOrders:", error);

@@ -23,9 +23,10 @@ const CATEGORIES = ["protein", "carbs", "salad", "side"];
 // Get Monday of the current week
 function getMondayOfCurrentWeek(now = new Date()) {
   const day = now.getDay(); // 0 (Sunday) - 6 (Saturday)
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  // Calculate days since Monday (Monday = 1, Sunday = 0)
+  const daysToMonday = day === 0 ? -6 : 1 - day; // If Sunday, go back 6 days; otherwise go back (day - 1) days
   const monday = new Date(now);
-  monday.setDate(now.getDate() + diff - now.getDate());
+  monday.setDate(now.getDate() + daysToMonday);
   monday.setHours(0, 0, 0, 0);
   return monday.toISOString().split("T")[0];
 }

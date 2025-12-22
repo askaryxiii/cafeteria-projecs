@@ -20,6 +20,21 @@ function readToken() {
 const WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
 const CATEGORIES = ["protein", "carbs", "salad", "side"];
 
+// Helper function to parse ISO date string and create a local date (not UTC)
+function parseLocalDate(dateString) {
+  const [year, month, day] = dateString.split("-").map(Number);
+  const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+  return date;
+}
+
+// Helper function to format date as YYYY-MM-DD in local time (not UTC)
+function formatLocalDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 // Get Monday of the current week
 function getMondayOfCurrentWeek(now = new Date()) {
   const day = now.getDay(); // 0 (Sunday) - 6 (Saturday)
@@ -27,18 +42,16 @@ function getMondayOfCurrentWeek(now = new Date()) {
   const daysToMonday = day === 0 ? -6 : 1 - day; // If Sunday, go back 6 days; otherwise go back (day - 1) days
   const monday = new Date(now);
   monday.setDate(now.getDate() + daysToMonday);
-  monday.setHours(0, 0, 0, 0);
-  return monday.toISOString().split("T")[0];
+  return formatLocalDate(monday);
 }
 
 // Calculate dates for the week starting from a given date
 function getWeekDates(startDate) {
-  const start = new Date(startDate);
+  const start = parseLocalDate(startDate);
   return WEEKDAYS.map((day, index) => {
     const date = new Date(start);
     date.setDate(start.getDate() + index);
-    date.setHours(0, 0, 0, 0);
-    return date.toISOString().split("T")[0];
+    return formatLocalDate(date);
   });
 }
 

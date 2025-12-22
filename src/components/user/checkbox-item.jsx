@@ -8,7 +8,7 @@ export default function CheckboxItem({ item, isChecked, onChange }) {
         className="w-4 sm:w-5 md:w-5 h-4 sm:h-5 md:h-5 cursor-pointer accent-blue-950 shrink-0"
       />
       <span className="text-[#02356A] flex-1 text-sm sm:text-base md:text-lg lg:text-xl font-semibold">
-        {item.item_name} {item.weight_grams && `- ${item.weight_grams} جرام`}
+        {item?.item_name} {item.weight_grams && `- ${item.weight_grams} جرام`}
       </span>
       <span className="text-[#02356A] text-xs sm:text-sm md:text-base font-semibold whitespace-nowrap">
         {item.price} LE

@@ -46,7 +46,6 @@ const Login = () => {
       const res = await login(data, remember);
       redirectByRole(res);
     } catch (e) {
-      console.log(e.error);
       setError(e.message);
       toast.error(e.message || "Login failed");
     }

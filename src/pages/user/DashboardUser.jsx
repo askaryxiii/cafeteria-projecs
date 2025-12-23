@@ -3,9 +3,8 @@ import {
   readToken,
   getUserOrdersByDate,
   getOrderWindows,
-  parseTimeToHours,
   isTimeInWindow,
-  getServerTime,
+  getServerTimeComponents,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
@@ -22,16 +21,13 @@ const DashboardUser = () => {
   useEffect(() => {
     (async () => {
       try {
+        const components = await getServerTimeComponents();
         const windows = await getOrderWindows();
 
         if (windows) {
-          const now = await getServerTime();
-          const hour = now.getHours();
-          const minute = now.getMinutes();
-
           const isBreakfast = isTimeInWindow(
-            hour,
-            minute,
+            components.hour,
+            components.minute,
             windows.breakfast_start,
             windows.breakfast_end
           );
@@ -39,14 +35,16 @@ const DashboardUser = () => {
           setIsBreakfastWindow(isBreakfast);
         } else {
           // Fallback to default timing if API fails
-          const now = await getServerTime();
-          setIsBreakfastWindow(now.getHours() >= 11 && now.getHours() < 15);
+          // Breakfast: 11:00-15:00, Lunch: 15:00-23:59
+          const isBreakfast = components.hour >= 11 && components.hour < 15;
+          setIsBreakfastWindow(isBreakfast);
         }
       } catch (error) {
-        console.error("Error fetching order windows:", error);
+        console.error("Error in window initialization:", error);
         // Fallback default
-        const now = await getServerTime();
-        setIsBreakfastWindow(now.getHours() >= 11 && now.getHours() < 15);
+        const components = await getServerTimeComponents();
+        const isBreakfast = components.hour >= 11 && components.hour < 15;
+        setIsBreakfastWindow(isBreakfast);
       } finally {
         setWindowsInitialized(true);
       }
@@ -61,13 +59,10 @@ const DashboardUser = () => {
         return;
       }
 
-      const serverTime = await getServerTime();
-      const today = serverTime.toISOString().split("T")[0];
-      const tomorrow = new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0];
-
-      const dateToCheck = isBreakfast ? today : tomorrow;
+      const components = await getServerTimeComponents();
+      const dateToCheck = isBreakfast
+        ? components.dateString
+        : components.tomorrowString;
 
       const res = await getUserOrdersByDate(dateToCheck, token);
       if (res && res.error) {

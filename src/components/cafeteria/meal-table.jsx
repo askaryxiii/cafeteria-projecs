@@ -4,7 +4,7 @@ import {
   getAllOrdersForTomorrow,
   getOrderWindows,
   isTimeInWindow,
-  getServerTime,
+  getServerTimeComponents,
 } from "../../lib/apis";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
@@ -70,9 +70,7 @@ export function MealTable({
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const now = await getServerTime();
-      const hour = now.getHours();
-      const minute = now.getMinutes();
+      const components = await getServerTimeComponents();
 
       // Get order windows from API
       const windows = await getOrderWindows();
@@ -92,11 +90,19 @@ export function MealTable({
         setOrderWindows(defaultWindows);
 
         // Determine active windows with defaults
-        const active = determineActiveWindows(hour, minute, defaultWindows);
+        const active = determineActiveWindows(
+          components.hour,
+          components.minute,
+          defaultWindows
+        );
         setActiveWindows(active);
       } else {
         // Determine active windows based on current time
-        const active = determineActiveWindows(hour, minute, windows);
+        const active = determineActiveWindows(
+          components.hour,
+          components.minute,
+          windows
+        );
         setActiveWindows(active);
       }
 
@@ -114,53 +120,34 @@ export function MealTable({
         return;
       }
 
-      console.log("📊 Order data received:", {
-        breakfast: orderData.breakfastOrders?.length,
-        lunch: orderData.lunchOrders?.length,
-        drinks: orderData.drinksOrders?.length,
-      });
-
       // For viewing orders (not placing), show ALL orders regardless of time window
       // The time window only applies to ORDER PLACEMENT, not viewing
       let combinedOrders = [];
 
       // Add breakfast orders
       if (orderData.breakfastOrders?.length > 0) {
-        console.log(
-          "✅ Adding breakfast orders:",
-          orderData.breakfastOrders.length
-        );
         combinedOrders = [...combinedOrders, ...orderData.breakfastOrders];
       }
 
       // Add lunch orders
       if (orderData.lunchOrders?.length > 0) {
-        console.log("✅ Adding lunch orders:", orderData.lunchOrders.length);
         combinedOrders = [...combinedOrders, ...orderData.lunchOrders];
       }
 
       // Add drinks orders
       if (orderData.drinksOrders?.length > 0) {
-        console.log("✅ Adding drinks orders:", orderData.drinksOrders.length);
         combinedOrders = [...combinedOrders, ...orderData.drinksOrders];
       }
-
-      console.log("🔗 Combined orders before filter:", combinedOrders.length, {
-        mealTypeFilter,
-      });
 
       // Apply meal type filter if provided (additional filtering)
       let filteredOrders = combinedOrders;
       if (mealTypeFilter) {
-        console.log("🔍 Applying meal type filter:", mealTypeFilter);
         filteredOrders = combinedOrders.filter(
           (order) =>
             order.meal_type.toLowerCase() === mealTypeFilter.toLowerCase()
         );
-        console.log("📋 After filter:", filteredOrders.length, "orders");
       }
 
-      console.log("📝 Final orders to display:", filteredOrders.length);
       setItems(filteredOrders);
     } catch (error) {
       console.error("Error in fetchOrders:", error);

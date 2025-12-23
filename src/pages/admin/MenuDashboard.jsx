@@ -84,8 +84,6 @@ const MenuDashboard = () => {
 
   // Create function
   const createItem = async (newData) => {
-    console.log(newData);
-
     try {
       const token = readToken();
       if (!token) throw new Error("No auth token found");

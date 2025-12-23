@@ -12,19 +12,9 @@ function getHeaders(baseHeaders = {}) {
 let serverTimeOffset = null;
 let lastServerTimeUpdate = 0;
 
-// Get server time - caches the offset for 5 minutes
+// Get server time - fetches fresh from server each time (no caching offset)
 export async function getServerTime() {
   try {
-    const now = Date.now();
-    // Only fetch from server every 5 minutes
-    if (
-      serverTimeOffset !== null &&
-      now - lastServerTimeUpdate < 5 * 60 * 1000
-    ) {
-      const serverTimeMs = Date.now() + serverTimeOffset;
-      return new Date(serverTimeMs);
-    }
-
     const res = await fetch(`${API_URL}/stats/server-time`, {
       headers: getHeaders({
         "Content-Type": "application/json",
@@ -38,7 +28,7 @@ export async function getServerTime() {
     }
 
     const data = await res.json();
-    const timestamp = data.serverTime || data.timestamp || data.time;
+    const timestamp = data.serverTime;
 
     // Ensure we have a valid timestamp
     if (!timestamp) {
@@ -62,14 +52,13 @@ export async function getServerTime() {
       return new Date();
     }
 
-    // Calculate and cache the offset between server time and local browser time
+    // Update cache with fresh server time for use in getCurrentTime()
     serverTimeOffset = serverTimeMs - Date.now();
     lastServerTimeUpdate = Date.now();
 
     return new Date(serverTimeMs);
   } catch (error) {
     console.warn("Error fetching server time:", error);
-    serverTimeOffset = null;
     return new Date();
   }
 }
@@ -80,6 +69,33 @@ export function getCurrentTime() {
     return new Date(Date.now() + serverTimeOffset);
   }
   return new Date();
+}
+
+// Helper function to format date as YYYY-MM-DD using server time (local timezone)
+export function formatServerDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Helper function to get tomorrow's date based on server time
+export function getTomorrowDate(serverTime) {
+  const tomorrow = new Date(serverTime);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow;
+}
+
+// Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
+export async function getServerTimeComponents() {
+  const serverTime = await getServerTime();
+  return {
+    date: serverTime,
+    hour: serverTime.getUTCHours(), // Use UTC hours, not local
+    minute: serverTime.getUTCMinutes(), // Use UTC minutes, not local
+    dateString: formatServerDate(serverTime),
+    tomorrowString: formatServerDate(getTomorrowDate(serverTime)),
+  };
 }
 
 export function readToken() {

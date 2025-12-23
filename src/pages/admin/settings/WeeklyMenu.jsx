@@ -278,7 +278,6 @@ const WeeklyMenu = () => {
 
       if (!response.ok) {
         // If no existing menu, fields are already cleared
-        console.log("No existing weekly menu found for this date");
         return;
       }
 

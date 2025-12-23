@@ -1,7 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { readToken, getVerifiedUser, getServerTime } from "../../lib/apis";
+import {
+  readToken,
+  getVerifiedUser,
+  getServerTimeComponents,
+} from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DrinkDropdown from "../../components/user/drink-dropdown";
 
@@ -27,14 +31,13 @@ const Drinks = ({ onOrderPlaced }) => {
         const u = await getVerifiedUser(token);
         const user_email = u?.email || null;
 
-        const serverTime = await getServerTime();
-        const today = serverTime.toISOString().split("T")[0];
+        const components = await getServerTimeComponents();
 
         const codes = selectedDrinks.drinks || [];
         const items = codes.map((c) => ({ code: c }));
 
         const orderBody = {
-          date: today,
+          date: components.dateString,
           meal_type: "drinks",
           user_email,
           total_cost: Number(totalPrice),

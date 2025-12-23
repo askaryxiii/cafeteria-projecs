@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import DateRangeHeader from "./date-range-header";
 import CalendarPicker from "./calendar-picker";
 import { useNavigate } from "react-router-dom";
-import { getServerTime } from "../../../lib/apis";
+import { getServerTimeComponents } from "../../../lib/apis";
 
 export default function DateRangePicker() {
   const [showFromCalendar, setShowFromCalendar] = useState(false);
@@ -15,8 +15,8 @@ export default function DateRangePicker() {
   // Initialize server time on mount
   useEffect(() => {
     (async () => {
-      const now = await getServerTime();
-      setServerNow(now);
+      const components = await getServerTimeComponents();
+      setServerNow(components.date);
     })();
   }, []);
 

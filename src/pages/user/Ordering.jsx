@@ -7,7 +7,7 @@ import {
   placeOrder,
   getOrderWindows,
   isTimeInWindow,
-  getServerTime,
+  getServerTimeComponents,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -22,24 +22,26 @@ const Ordering = ({ onOrderPlaced }) => {
     (async () => {
       try {
         const windows = await getOrderWindows();
+        const components = await getServerTimeComponents();
 
         if (windows) {
-          const now = await getServerTime();
-          const hour = now.getHours();
-          const minute = now.getMinutes();
-
           // Determine meal type based on current time
           if (
             isTimeInWindow(
-              hour,
-              minute,
+              components.hour,
+              components.minute,
               windows.breakfast_start,
               windows.breakfast_end
             )
           ) {
             setMealType("breakfast");
           } else if (
-            isTimeInWindow(hour, minute, windows.lunch_start, windows.lunch_end)
+            isTimeInWindow(
+              components.hour,
+              components.minute,
+              windows.lunch_start,
+              windows.lunch_end
+            )
           ) {
             setMealType("lunch");
           } else {
@@ -47,10 +49,12 @@ const Ordering = ({ onOrderPlaced }) => {
           }
         } else {
           // Fallback logic
-          const now = await getServerTime();
-          const hour = now.getHours();
           setMealType(
-            hour >= 11 && hour < 15 ? "breakfast" : hour >= 15 ? "lunch" : null
+            components.hour >= 11 && components.hour < 15
+              ? "breakfast"
+              : components.hour >= 15
+              ? "lunch"
+              : null
           );
         }
       } catch (error) {
@@ -84,14 +88,12 @@ const Ordering = ({ onOrderPlaced }) => {
         const u = await getVerifiedUser(token);
         const user_email = u?.email || null;
 
-        const serverTime = await getServerTime();
-        const today = serverTime.toISOString().split("T")[0];
-        const tomorrow = new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0];
-
+        const components = await getServerTimeComponents();
         const meal_type = mealType === "breakfast" ? "breakfast" : "lunch";
-        const selectedDate = mealType === "breakfast" ? today : tomorrow;
+        const selectedDate =
+          mealType === "breakfast"
+            ? components.dateString
+            : components.tomorrowString;
 
         const codes = Object.values(selectedItems).flat();
         const items = codes.map((c) => ({ code: c }));

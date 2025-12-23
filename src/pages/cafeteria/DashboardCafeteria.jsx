@@ -159,12 +159,9 @@ const DashboardCafeteria = () => {
                         className="w-5 h-5 accent-blue-600 cursor-pointer"
                       />
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {order.name}
+                    <td className="px-4 py-3 text-xl font-medium text-gray-900">
+                      {order.arabic_name}
                       <br />
-                      <span className="text-xs text-gray-600">
-                        {order.arabic_name}
-                      </span>
                     </td>
                     <td className="px-4 py-3 text-gray-700">
                       {formatOrderItems(order.items)}

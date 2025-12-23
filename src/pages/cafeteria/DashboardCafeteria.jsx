@@ -6,11 +6,53 @@ import {
 } from "../../lib/apis";
 import { MdDelete } from "react-icons/md";
 
+// Add CSS for smooth line animation
+const lineAnimationStyle = `
+  @keyframes drawLine {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  .line-through-animated::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 2px;
+    background-color: #999;
+    animation: drawLine 0.6s ease-in-out forwards;
+  }
+`;
+
+// Inject styles
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = lineAnimationStyle;
+  document.head.appendChild(style);
+}
+
 const DashboardCafeteria = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [currentWindow, setCurrentWindow] = useState("");
+
+  // Load checked items from localStorage on mount
+  useEffect(() => {
+    const savedCheckedItems = localStorage.getItem("cafeteriaCheckedItems");
+    if (savedCheckedItems) {
+      try {
+        const parsed = JSON.parse(savedCheckedItems);
+        setCheckedItems(new Set(parsed));
+      } catch (error) {
+        console.error("Error loading checked items from localStorage:", error);
+      }
+    }
+  }, []);
 
   // Fetch all today's orders on mount
   useEffect(() => {
@@ -95,6 +137,11 @@ const DashboardCafeteria = () => {
       } else {
         newSet.add(id);
       }
+      // Save to localStorage
+      localStorage.setItem(
+        "cafeteriaCheckedItems",
+        JSON.stringify(Array.from(newSet))
+      );
       return newSet;
     });
   };
@@ -131,9 +178,18 @@ const DashboardCafeteria = () => {
                     }
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setCheckedItems(new Set(orders.map((o) => o.id)));
+                        const newSet = new Set(orders.map((o) => o.id));
+                        setCheckedItems(newSet);
+                        localStorage.setItem(
+                          "cafeteriaCheckedItems",
+                          JSON.stringify(Array.from(newSet))
+                        );
                       } else {
                         setCheckedItems(new Set());
+                        localStorage.setItem(
+                          "cafeteriaCheckedItems",
+                          JSON.stringify([])
+                        );
                       }
                     }}
                   />
@@ -148,8 +204,8 @@ const DashboardCafeteria = () => {
                 orders.map((order) => (
                   <tr
                     key={order.id}
-                    className={`hover:bg-gray-50 ${
-                      checkedItems.has(order.id) ? "bg-gray-100" : ""
+                    className={`hover:bg-gray-50 relative ${
+                      checkedItems.has(order.id) ? "line-through-animated" : ""
                     }`}>
                     <td className="px-4 py-3">
                       <input
@@ -198,10 +254,12 @@ const DashboardCafeteria = () => {
             orders.map((order) => (
               <div
                 key={order.id}
-                className={`p-4 border rounded-lg ${
+                className={`p-4 border rounded-lg relative overflow-hidden ${
                   checkedItems.has(order.id)
                     ? "bg-gray-100 border-gray-300"
                     : "bg-white border-gray-200"
+                } ${
+                  checkedItems.has(order.id) ? "line-through-animated" : ""
                 }`}>
                 <div className="flex items-start gap-3 mb-2">
                   <input

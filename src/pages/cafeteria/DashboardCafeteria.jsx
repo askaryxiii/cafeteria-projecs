@@ -28,19 +28,6 @@ const DashboardCafeteria = () => {
       const inLunch = isTimeInWindow(hour, minute, "15:00", "23:59");
       // drinks are always available
 
-      let mealTypeFilter = "drinks"; // default to drinks if outside windows
-
-      if (inBreakfast) {
-        mealTypeFilter = "breakfast";
-        setCurrentWindow("Breakfast");
-      } else if (inLunch) {
-        mealTypeFilter = "lunch";
-        setCurrentWindow("Lunch");
-      } else {
-        mealTypeFilter = "drinks";
-        setCurrentWindow("Drinks");
-      }
-
       const orderData = await getAllOrdersForToday();
 
       if (orderData.error) {
@@ -49,15 +36,25 @@ const DashboardCafeteria = () => {
         return;
       }
 
-      // Get orders only for the current meal type
+      // Get orders for current meal type + drinks (drinks always shown)
       let filteredOrders = [];
 
-      if (mealTypeFilter === "breakfast") {
-        filteredOrders = orderData.breakfastOrders || [];
-      } else if (mealTypeFilter === "lunch") {
-        filteredOrders = orderData.lunchOrders || [];
+      if (inBreakfast) {
+        filteredOrders = [
+          ...(orderData.breakfastOrders || []),
+          ...(orderData.drinksOrders || []),
+        ];
+        setCurrentWindow("Breakfast & Drinks");
+      } else if (inLunch) {
+        filteredOrders = [
+          ...(orderData.lunchOrders || []),
+          ...(orderData.drinksOrders || []),
+        ];
+        setCurrentWindow("Lunch & Drinks");
       } else {
+        // Outside meal windows, show drinks only
         filteredOrders = orderData.drinksOrders || [];
+        setCurrentWindow("Drinks");
       }
 
       // Sort by created_at descending (newest first)

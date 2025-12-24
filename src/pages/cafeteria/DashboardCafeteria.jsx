@@ -57,6 +57,12 @@ const DashboardCafeteria = () => {
   // Fetch all today's orders on mount
   useEffect(() => {
     fetchOrders();
+    // Fetch every 1 minute (60000 ms)
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchOrders = async () => {

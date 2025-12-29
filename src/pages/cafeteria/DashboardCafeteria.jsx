@@ -259,30 +259,35 @@ const DashboardCafeteria = () => {
           {orders.length > 0 ? (
             orders.map((order) => (
               <div
-                key={order.id}
-                className={`p-4 border rounded-lg relative overflow-hidden ${
+                className={`p-4 border rounded-lg flex justify-between items-center overflow-hidden ${
                   checkedItems.has(order.id)
                     ? "bg-gray-100 border-gray-300"
                     : "bg-white border-gray-200"
                 } ${
                   checkedItems.has(order.id) ? "line-through-animated" : ""
                 }`}>
-                <div className="flex items-start gap-3 mb-2">
-                  <input
-                    type="checkbox"
-                    checked={checkedItems.has(order.id)}
-                    onChange={() => handleCheckChange(order.id)}
-                    className="w-5 h-5 accent-blue-600 cursor-pointer mt-0.5"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900">{order.name}</p>
-                    <p className="text-xs text-gray-600">{order.arabic_name}</p>
-                  </div>
-                  <button
+                <div key={order.id}>
+                  <div className="flex items-start gap-3 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={checkedItems.has(order.id)}
+                      onChange={() => handleCheckChange(order.id)}
+                      className="w-5 h-5 accent-blue-600 cursor-pointer mt-0.5"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900">
+                        {order.name}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {order.arabic_name}
+                      </p>
+                    </div>
+                    {/* <button
                     onClick={() => handleDeleteOrder(order.id)}
                     className="text-red-500 hover:text-red-700 text-lg">
                     <MdDelete />
-                  </button>
+                  </button> */}
+                  </div>
                 </div>
                 <div className="ml-8 space-y-1 text-sm">
                   <p className="text-gray-700">
@@ -301,9 +306,6 @@ const DashboardCafeteria = () => {
                       {order.meal_type.charAt(0).toUpperCase() +
                         order.meal_type.slice(1)}
                     </span>
-                  </p>
-                  <p className="text-gray-900 font-semibold">
-                    Cost: {order.total_cost}
                   </p>
                 </div>
               </div>

@@ -67,7 +67,7 @@ const Navbar = () => {
           ref={menuRef}
           className="absolute right-3 top-full bg-[#dfe1e9] rounded shadow-lg p-4 z-50 flex flex-col gap-1">
           <Link
-            to="/"
+            to="/user/drinks"
             className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded"
             onClick={() => setOpen(false)}>
             <BsFillCupHotFill /> Drinks

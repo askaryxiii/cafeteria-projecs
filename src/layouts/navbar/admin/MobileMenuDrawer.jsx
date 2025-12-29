@@ -28,7 +28,7 @@ export function MobileMenuDrawer({
     <>
       {/* Overlay */}
       <div
-        className="fixed top-0 left-0 w-screen h-[100dvh] bg-black/50 z-40 md:hidden"
+        className="fixed top-0 left-0 w-screen h-dvh bg-black/50 z-40 md:hidden"
         onClick={onClose}
       />
 
@@ -38,7 +38,7 @@ export function MobileMenuDrawer({
   top-0
   left-0
   w-80
-  h-[100dvh]
+  h-dvh
   bg-[#EFEFEF]
   border-r border-[#9C9393]
   shadow-lg

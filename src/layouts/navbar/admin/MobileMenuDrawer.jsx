@@ -20,7 +20,7 @@ export function MobileMenuDrawer({
       />
 
       {/* Drawer */}
-      <div className="fixed left-0 top-0 bottom-0 w-80 bg-[#EFEFEF] border-r border-[#9C9393] shadow-lg z-50 md:hidden flex flex-col min-h-screen">
+      <div className="fixed left-0 top-0 bottom-0 w-80 bg-[#EFEFEF] border-r border-[#9C9393] shadow-lg z-50 md:hidden flex flex-col min-h-dvh">
         {/* Close Button */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           <h3 className="font-semibold text-gray-800">Admin Menu</h3>

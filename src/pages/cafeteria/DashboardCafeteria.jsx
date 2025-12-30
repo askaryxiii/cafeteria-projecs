@@ -9,23 +9,26 @@ import { MdDelete } from "react-icons/md";
 // Add CSS for smooth line animation
 const lineAnimationStyle = `
   @keyframes drawLine {
-    from {
-      width: 0;
-    }
-    to {
-      width: 100%;
-    }
+  from {
+    width: 0;
   }
+  to {
+    width: 100%;
+  }
+}
 
-  .line-through-animated::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    height: 2px;
-    background-color: #999;
-    animation: drawLine 0.6s ease-in-out forwards;
-  }
+.line-through-animated::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  width: 0;
+  background-color: #999;
+  animation: drawLine 0.6s ease-in-out forwards;
+  pointer-events: none;
+}
 `;
 
 // Inject styles
@@ -259,14 +262,15 @@ const DashboardCafeteria = () => {
           {orders.length > 0 ? (
             orders.map((order) => (
               <div
-                className={`p-4 border rounded-lg flex justify-between items-center overflow-hidden ${
+                key={order.id}
+                className={`relative p-4 border rounded-lg flex justify-between items-center overflow-hidden ${
                   checkedItems.has(order.id)
                     ? "bg-gray-100 border-gray-300"
                     : "bg-white border-gray-200"
                 } ${
                   checkedItems.has(order.id) ? "line-through-animated" : ""
                 }`}>
-                <div key={order.id}>
+                <div>
                   <div className="flex items-start gap-3 mb-2">
                     <input
                       type="checkbox"

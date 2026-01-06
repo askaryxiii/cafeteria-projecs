@@ -181,7 +181,8 @@ const MenuItemSelect = ({
         </option>
         {menuItems.map((item) => (
           <option key={item.id} value={item.code}>
-            {item.item_name} ({item.code})
+            {item.item_name}{" "}
+            {item.weight_grams && `(${item.weight_grams} جرام)`} {item.code}
           </option>
         ))}
       </select>

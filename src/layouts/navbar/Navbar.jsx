@@ -38,9 +38,27 @@ const Navbar = () => {
           user.user.role === "employee" ||
           user.user.role === "accountant" ? (
             <div className="flex gap-3">
-              <Link to="/user/drinks" className="nav-btn">
+              {/* <Link to="/user/drinks" className="nav-btn">
                 <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
-              </Link>
+              </Link> */}
+              <div className="relative group inline-block">
+                <button
+                  disabled
+                  className="nav-btn opacity-50 cursor-not-allowed">
+                  <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+                </button>
+
+                {/* Tooltip */}
+                <div
+                  className="
+      absolute bottom-full mb-2 left-1/2 -translate-x-1/2
+      whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white
+      opacity-0 group-hover:opacity-100 transition-opacity
+      pointer-events-none
+    ">
+                  Drinks are currently unavailable
+                </div>
+              </div>
               <Link to="/user" className="nav-btn">
                 <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
               </Link>

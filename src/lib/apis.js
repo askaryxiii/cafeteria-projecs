@@ -8,7 +8,29 @@ function getHeaders(baseHeaders = {}) {
   };
 }
 
+// export function getNextOrderDate(serverDate) {
+//   const date = new Date(serverDate);
+//   const day = date.getDay(); // 0=Sun, 5=Fri, 6=Sat
+
+//   if (day === 5) {
+//     // Friday → Monday
+//     date.setDate(date.getDate() + 3);
+//   } else if (day === 6) {
+//     // Saturday → Monday
+//     date.setDate(date.getDate() + 2);
+//   } else if (day === 0) {
+//     // Sunday → Monday
+//     date.setDate(date.getDate() + 1);
+//   } else {
+//     // Normal day
+//     date.setDate(date.getDate() + 1);
+//   }
+
+//   return date;
+// }
+
 // Cache for server time offset to minimize API calls
+
 let serverTimeOffset = null;
 let lastServerTimeUpdate = 0;
 
@@ -94,6 +116,7 @@ export async function getServerTimeComponents() {
     hour: serverTime.getUTCHours(), // Use UTC hours, not local
     minute: serverTime.getUTCMinutes(), // Use UTC minutes, not local
     dateString: formatServerDate(serverTime),
+    // tomorrowString: formatServerDate(getNextOrderDate(serverTime)),
     tomorrowString: formatServerDate(getTomorrowDate(serverTime)),
   };
 }

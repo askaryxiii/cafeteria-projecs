@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   getAllOrdersForToday,
   getAllOrdersForTomorrow,
@@ -16,6 +16,8 @@ export function CafeteriaOrdersTable({
   showDelete = false,
   onDelete = null,
   refreshTrigger = 0,
+  onCountsChange,
+  orderCounts,
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +30,10 @@ export function CafeteriaOrdersTable({
       return new Set();
     }
   });
+  const totalUsers = useMemo(() => items.length, [items]);
+  const checkedUsers = useMemo(() => {
+    return items.filter((item) => checkedItems.has(item.id)).length;
+  }, [items, checkedItems]);
 
   // Fetch all orders without window filtering
   const fetchOrders = async () => {
@@ -74,6 +80,15 @@ export function CafeteriaOrdersTable({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (showDelete && onCountsChange) {
+      onCountsChange({
+        total: totalUsers,
+        checked: checkedUsers,
+      });
+    }
+  }, [showDelete, totalUsers, checkedUsers, onCountsChange]);
 
   // Fetch orders on mount and when refresh is triggered
   useEffect(() => {
@@ -139,6 +154,12 @@ export function CafeteriaOrdersTable({
 
   return (
     <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-2 sm:p-3 md:p-4">
+      {true && (
+        <div className="px-4 py-4 flex justify-between text-sm font-semibold text-gray-700">
+          <span>Total Orders Today: {orderCounts.total}</span>
+          <span>Checked Orders: {orderCounts.checked}</span>
+        </div>
+      )}
       {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm md:text-base">

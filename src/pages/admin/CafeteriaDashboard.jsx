@@ -11,6 +11,10 @@ const CafeteriaDashboard = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletingOrderId, setDeletingOrderId] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [orderCounts, setOrderCounts] = useState({
+    total: 0,
+    checked: 0,
+  });
 
   const handleDeleteOrder = (orderId) => {
     if (!orderId) return;
@@ -56,6 +60,8 @@ const CafeteriaDashboard = () => {
         showDelete={true}
         onDelete={handleDeleteOrder}
         refreshTrigger={refreshTrigger}
+        onCountsChange={setOrderCounts}
+        orderCounts={orderCounts}
       />
       {deletingOrderId && (
         <DeleteConfirmModal

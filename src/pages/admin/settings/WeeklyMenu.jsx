@@ -124,14 +124,12 @@ const CategorySection = ({
       </h4>
 
       {categoryFields.map((field, fieldIndex) => {
-        const isRequired = fieldIndex < 2;
         return (
           <MenuItemSelect
             key={field.id}
             fieldIndex={fieldIndex}
             itemIndex={itemIndex}
             category={category}
-            isRequired={isRequired}
             control={control}
             watch={watch}
             menuItems={menuItems}
@@ -164,33 +162,22 @@ const MenuItemSelect = ({
   return (
     <div>
       <label className="text-xs text-gray-600 mb-1 block">
-        Item {fieldIndex + 1} {isRequired ? "*" : "(Optional)"}
+        Menu Item {fieldIndex + 1}
       </label>
       <select
-        {...control.register(fieldName, {
-          required: isRequired
-            ? `${category} item ${fieldIndex + 1} is required`
-            : false,
-        })}
+        {...control.register(fieldName)}
         value={value || ""}
-        className="w-full px-3 py-2 border border-[#ACA4A4] rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
-        <option value="">
-          {selectedItem
-            ? `${selectedItem.item_name} (${selectedItem.code})`
-            : `Select ${category}`}
-        </option>
+        className="w-full px-3 py-2 border border-[#ACA4A4] rounded-md text-sm">
+        {/* ✅ BLANK OPTION */}
+        <option value="">-- None --</option>
+
         {menuItems.map((item) => (
           <option key={item.id} value={item.code}>
-            {item.item_name}{" "}
-            {item.weight_grams && `(${item.weight_grams} جرام)`} {item.code}
+            {item.item_name}
+            {item.weight_grams && ` (${item.weight_grams} جرام)`} – {item.code}
           </option>
         ))}
       </select>
-      {errors?.items?.[itemIndex]?.menu?.[category]?.[fieldIndex]?.id && (
-        <p className="text-red-500 text-xs mt-1">
-          {errors.items[itemIndex].menu[category][fieldIndex].id.message}
-        </p>
-      )}
     </div>
   );
 };

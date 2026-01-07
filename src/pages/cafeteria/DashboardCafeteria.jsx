@@ -4,7 +4,6 @@ import {
   getServerTimeComponents,
   isTimeInWindow,
 } from "../../lib/apis";
-import { MdDelete } from "react-icons/md";
 
 // Add CSS for smooth line animation
 const lineAnimationStyle = `

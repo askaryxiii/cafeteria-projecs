@@ -9,7 +9,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { RiPencilFill } from "react-icons/ri";
 import { MdDelete } from "react-icons/md";
 import { MdArrowUpward } from "react-icons/md";
-import { getAllUsers, deleteUser, getCurrentTime } from "../../../lib/apis";
+import { getAllUsers, deleteUser } from "../../../lib/apis";
 import toast from "react-hot-toast";
 import DashboardHeader from "../../../layouts/navbar/admin/DashboardHeader";
 
@@ -85,6 +85,8 @@ export default function UsersTable() {
     return filtered;
   }, [users, searchTerm, sortConfig]);
 
+  const usersCount = useMemo(() => filteredUsers.length, [filteredUsers]);
+
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -96,7 +98,7 @@ export default function UsersTable() {
   const handleCreateUser = (userData) => {
     const newUser = {
       ...userData,
-      id: getCurrentTime().getTime().toString(),
+      id: Date.now().toString(),
     };
     setUsers([...users, newUser]);
     setIsCreateModalOpen(false);
@@ -155,6 +157,9 @@ export default function UsersTable() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] bg-[#D9D9D9] focus:outline-none text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11"
               />
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
+              Showing <span className="font-semibold">{usersCount}</span> users
             </div>
           </div>
 

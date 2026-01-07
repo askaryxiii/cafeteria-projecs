@@ -70,57 +70,60 @@ const Ordering = ({ onOrderPlaced }) => {
       ? { breakfast: [] }
       : { protein: [], carbs: [], side: [], salad: [] };
 
-  const { control, watch, handleSubmit } = useForm({
+  const {
+    control,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({
     defaultValues,
   });
 
   const selectedItems = watch();
 
-  const onSubmit = () => {
-    (async () => {
-      try {
-        const token = readToken();
-        if (!token) {
-          toast.error("Sign out and sign in again to place order");
-          return;
-        }
-
-        const u = await getVerifiedUser(token);
-        const user_email = u?.email || null;
-
-        const components = await getServerTimeComponents();
-        const meal_type = mealType === "breakfast" ? "breakfast" : "lunch";
-        const selectedDate =
-          mealType === "breakfast"
-            ? components.dateString
-            : components.tomorrowString;
-
-        const codes = Object.values(selectedItems).flat();
-        const items = codes.map((c) => ({ code: c }));
-
-        const orderBody = {
-          date: selectedDate,
-          meal_type,
-          user_email,
-          total_cost: Number(totalPrice),
-          items,
-        };
-
-        const res = await placeOrder(orderBody, token);
-        if (res && res.error) {
-          toast.error(res.error);
-          return;
-        }
-        toast.success("Order placed successfully");
-
-        if (typeof onOrderPlaced === "function") {
-          onOrderPlaced(res);
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error(err.message || "Failed to place order");
+  const onSubmit = async () => {
+    try {
+      const token = readToken();
+      if (!token) {
+        toast.error("Sign out and sign in again to place order");
+        return;
       }
-    })();
+
+      const u = await getVerifiedUser(token);
+      const user_email = u?.email || null;
+
+      const components = await getServerTimeComponents();
+      const meal_type = mealType === "breakfast" ? "breakfast" : "lunch";
+      const selectedDate =
+        mealType === "breakfast"
+          ? components.dateString
+          : components.tomorrowString;
+
+      const codes = Object.values(selectedItems).flat();
+      const items = codes.map((c) => ({ code: c }));
+
+      const orderBody = {
+        date: selectedDate,
+        meal_type,
+        user_email,
+        total_cost: Number(totalPrice),
+        items,
+      };
+
+      const res = await placeOrder(orderBody, token);
+      if (res && res.error) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("Order placed successfully");
+
+      if (typeof onOrderPlaced === "function") {
+        onOrderPlaced(res);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to place order");
+    }
   };
 
   const categories = [
@@ -143,6 +146,7 @@ const Ordering = ({ onOrderPlaced }) => {
       <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-[#032552] mb-4 sm:mb-6 md:mb-8 uppercase tracking-wide text-center">
         Select Your Favorite Dishes
       </h2>
+
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-6 sm:space-y-8 md:space-y-10">
@@ -165,9 +169,11 @@ const Ordering = ({ onOrderPlaced }) => {
                 control={control}
               />
             ))}
+
         <FormFooter
           selectedItems={selectedItems}
           onTotalChange={setTotalPrice}
+          isSubmitting={isSubmitting}
         />
       </form>
     </div>

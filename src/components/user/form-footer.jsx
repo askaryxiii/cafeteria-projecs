@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import { getTotalPrice } from "../../lib/apis";
 import { readToken } from "../../lib/apis";
 import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
+import { PulseLoader } from "react-spinners";
 
-export default function FormFooter({ selectedItems, onTotalChange }) {
+export default function FormFooter({
+  selectedItems,
+  onTotalChange,
+  isSubmitting,
+}) {
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
@@ -22,10 +27,12 @@ export default function FormFooter({ selectedItems, onTotalChange }) {
         <LiaMoneyBillWaveAltSolid className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 text-[#02356A]" />
         <span className="whitespace-nowrap">{totalPrice.toFixed(2)} LE</span>
       </div>
+
       <button
         type="submit"
-        className="px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border-2 border-gray-400 rounded font-normal text-sm sm:text-base md:text-lg text-gray-800 hover:bg-gray-200 transition w-full sm:w-auto min-h-11 sm:min-h-10 md:min-h-11 flex items-center justify-center">
-        Submit
+        disabled={isSubmitting}
+        className="px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border-2 border-gray-400 rounded font-normal text-sm sm:text-base md:text-lg text-gray-800 hover:bg-gray-200 transition w-full sm:w-auto min-h-11 sm:min-h-10 md:min-h-11 flex items-center justify-center disabled:opacity-50">
+        {isSubmitting ? <PulseLoader color="#02356A" size={8} /> : "Submit"}
       </button>
     </div>
   );

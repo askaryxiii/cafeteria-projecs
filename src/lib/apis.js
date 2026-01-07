@@ -825,6 +825,7 @@ export async function getStats(token) {
       return { error: err.message || "Failed to fetch stats" };
     }
     const data = await res.json();
+
     return data;
   } catch (err) {
     console.error("Error fetching stats:", err);

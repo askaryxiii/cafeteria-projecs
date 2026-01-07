@@ -68,8 +68,12 @@ const DashboardAdmin = () => {
     if (!items) return [];
     return items.map((item) => ({
       name: item.item_name,
-      orders: parseInt(item.total_quantity),
-      icon: "�️",
+      orders: Number(item.total_quantity) || 0,
+      weight_grams:
+        item.weight_grams !== null && item.weight_grams !== undefined
+          ? Number(item.weight_grams)
+          : null,
+      icon: "🍽️",
     }));
   };
 

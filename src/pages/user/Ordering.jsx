@@ -23,8 +23,6 @@ const Ordering = ({ onOrderPlaced }) => {
       try {
         const windows = await getOrderWindows();
         const components = await getServerTimeComponents();
-        console.log(components);
-
         if (windows) {
           // Determine meal type based on current time
           if (

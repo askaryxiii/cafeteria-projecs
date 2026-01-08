@@ -3,7 +3,6 @@ import CreateUserModal from "./create-user-modal";
 import EditUserModal from "./edit-user-modal";
 import DeleteConfirmModal from "./delete-confirm-modal";
 import { Search, Plus } from "lucide-react";
-import { ImHome } from "react-icons/im";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
 import { RiPencilFill } from "react-icons/ri";

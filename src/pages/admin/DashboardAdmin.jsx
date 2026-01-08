@@ -209,7 +209,7 @@ const DashboardAdmin = () => {
             </div>
 
             {/* Order Chart Row */}
-            <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
+            {/* <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
               <div className="flex justify-between items-start mb-4 sm:mb-5 md:mb-6">
                 <div>
                   <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">
@@ -231,7 +231,7 @@ const DashboardAdmin = () => {
                 </div>
               </div>
               <OrderChart timePeriod={activeTab} data={currentData} />
-            </Card>
+            </Card> */}
           </>
         )}
       </div>

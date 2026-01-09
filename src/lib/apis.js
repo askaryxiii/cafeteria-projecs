@@ -108,6 +108,46 @@ export function getTomorrowDate(serverTime) {
   return tomorrow;
 }
 
+// Helper function to get next Monday based on server time
+// If today is Monday, returns today; if Friday/Saturday/Sunday, returns next Monday
+export function getNextMondayDate(serverTime) {
+  const date = new Date(serverTime);
+  const day = date.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday
+
+  let daysToAdd = 0;
+  if (day === 0) {
+    // Sunday -> Monday (1 day)
+    daysToAdd = 1;
+  } else if (day === 5) {
+    // Friday -> Monday (3 days)
+    daysToAdd = 3;
+  } else if (day === 6) {
+    // Saturday -> Monday (2 days)
+    daysToAdd = 2;
+  } else if (day === 1) {
+    // Monday -> Monday (0 days, today)
+    daysToAdd = 0;
+  }
+
+  date.setDate(date.getDate() + daysToAdd);
+  return date;
+}
+
+// Get the lunch order date based on current day and time
+// Returns tomorrow for regular days, or Monday for Friday/Saturday/Sunday
+export async function getLunchOrderDate() {
+  const serverTime = await getServerTime();
+  const day = serverTime.getDay();
+
+  // If today is Friday (5), Saturday (6), or Sunday (0), order for Monday
+  if (day === 5 || day === 6 || day === 0) {
+    return formatServerDate(getNextMondayDate(serverTime));
+  }
+
+  // Otherwise, order for tomorrow
+  return formatServerDate(getTomorrowDate(serverTime));
+}
+
 // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
   const serverTime = await getServerTime();
@@ -218,11 +258,28 @@ export async function getTodayMenuByCategory(categoryName) {
     }
 
     const serverTime = await getServerTime();
-    const tomorrow = new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split("T")[0];
+    const day = serverTime.getDay();
 
-    const res = await fetch(`${API_URL}/daily-menu/${tomorrow}`, {
+    // For lunch category, use special logic: Mon if Fri/Sat/Sun, else tomorrow
+    let menuDate;
+    if (
+      categoryName.toLowerCase() === "salad" ||
+      categoryName.toLowerCase() === "carbs" ||
+      categoryName.toLowerCase() === "protein" ||
+      categoryName.toLowerCase() === "side"
+    ) {
+      // These are lunch categories - use getLunchOrderDate logic
+      if (day === 5 || day === 6 || day === 0) {
+        menuDate = formatServerDate(getNextMondayDate(serverTime));
+      } else {
+        menuDate = formatServerDate(getTomorrowDate(serverTime));
+      }
+    } else {
+      // Breakfast or other categories - use regular tomorrow
+      menuDate = formatServerDate(getTomorrowDate(serverTime));
+    }
+
+    const res = await fetch(`${API_URL}/daily-menu/${menuDate}`, {
       headers: getHeaders({
         Authorization: `Bearer ${token}`,
         "ngrok-skip-browser-warning": "true",

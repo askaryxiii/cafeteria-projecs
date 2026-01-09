@@ -9,6 +9,7 @@ import {
   isTimeInWindow,
   getServerTimeComponents,
   isFriday,
+  getLunchOrderDate,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -98,10 +99,15 @@ const Ordering = ({ onOrderPlaced }) => {
 
       const components = await getServerTimeComponents();
       const meal_type = mealType === "breakfast" ? "breakfast" : "lunch";
-      const selectedDate =
-        mealType === "breakfast"
-          ? components.dateString
-          : components.tomorrowString;
+
+      let selectedDate;
+      if (mealType === "breakfast") {
+        selectedDate = components.dateString;
+      } else {
+        // For lunch, use the special lunch order date function
+        // which returns Monday if today is Fri/Sat/Sun, otherwise tomorrow
+        selectedDate = await getLunchOrderDate();
+      }
 
       const codes = Object.values(selectedItems).flat();
       const items = codes.map((c) => ({ code: c }));

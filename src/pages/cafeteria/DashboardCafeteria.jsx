@@ -4,6 +4,7 @@ import {
   getServerTimeComponents,
   isTimeInWindow,
 } from "../../lib/apis";
+import { unlockAudio, playNewOrderSound } from "../../lib/sound";
 
 // Add CSS for smooth line animation
 const lineAnimationStyle = `
@@ -42,6 +43,7 @@ const DashboardCafeteria = () => {
   const [loading, setLoading] = useState(true);
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [currentWindow, setCurrentWindow] = useState("");
+  const previousOrderIdsRef = useRef(new Set());
 
   // Load checked items from localStorage on mount
   useEffect(() => {
@@ -65,6 +67,19 @@ const DashboardCafeteria = () => {
     }, 60000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // notification sound for new orders
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+
+    window.addEventListener("click", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+
+    return () => {
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
   }, []);
 
   const fetchOrders = async () => {
@@ -112,6 +127,21 @@ const DashboardCafeteria = () => {
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
+
+      const newIds = new Set(filteredOrders.map((o) => o.id));
+      const oldIds = previousOrderIdsRef.current;
+
+      // Only play sound if this is NOT the first load
+      if (oldIds.size > 0) {
+        const hasNewOrder = [...newIds].some((id) => !oldIds.has(id));
+
+        if (hasNewOrder) {
+          playNewOrderSound();
+        }
+      }
+
+      // Update ref AFTER comparison
+      previousOrderIdsRef.current = newIds;
 
       setOrders(filteredOrders);
     } catch (error) {

@@ -121,6 +121,18 @@ export async function getServerTimeComponents() {
   };
 }
 
+// Get the current day of the week (0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday)
+export async function getCurrentDayOfWeek() {
+  const serverTime = await getServerTime();
+  return serverTime.getDay();
+}
+
+// Check if today is Friday (day 5)
+export async function isFriday() {
+  const day = await getCurrentDayOfWeek();
+  return day === 5;
+}
+
 export function readToken() {
   try {
     return (

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import DropdownButton from "../user/dropdown-button";
 import DropdownContent from "../user/dropdown-content";
-import { getBreakfast, getTodayMenuByCategory } from "../../lib/apis";
+import { getBreakfast, getTodayMenuByCategory, isFriday } from "../../lib/apis";
 
 const DishDropdown = ({
   categoryId,
@@ -13,6 +13,15 @@ const DishDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isFridayToday, setIsFridayToday] = useState(false);
+
+  useEffect(() => {
+    const checkFriday = async () => {
+      const fridayCheck = await isFriday();
+      setIsFridayToday(fridayCheck);
+    };
+    checkFriday();
+  }, []);
 
   useEffect(() => {
     if (isOpen && items.length === 0) {
@@ -34,6 +43,10 @@ const DishDropdown = ({
     setLoading(false);
   };
 
+  // Disable breakfast dropdown on Friday
+  const isDisabled =
+    isFridayToday && categoryName.toLowerCase() === "breakfast";
+
   return (
     <Controller
       name={categoryId}
@@ -44,7 +57,8 @@ const DishDropdown = ({
             categoryName={categoryName}
             categoryNameAr={categoryNameAr}
             isOpen={isOpen}
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => !isDisabled && setIsOpen(!isOpen)}
+            disabled={isDisabled}
           />
 
           <div

@@ -8,6 +8,8 @@ export default function FormFooter({
   selectedItems,
   onTotalChange,
   isSubmitting,
+  disabled = false,
+  mealType,
 }) {
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -30,9 +32,19 @@ export default function FormFooter({
 
       <button
         type="submit"
-        disabled={isSubmitting}
-        className="px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border-2 border-gray-400 rounded font-normal text-sm sm:text-base md:text-lg text-gray-800 hover:bg-gray-200 transition w-full sm:w-auto min-h-11 sm:min-h-10 md:min-h-11 flex items-center justify-center disabled:opacity-50">
-        {isSubmitting ? <PulseLoader color="#02356A" size={8} /> : "Submit"}
+        disabled={isSubmitting || disabled}
+        className={`px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border-2 border-gray-400 rounded font-normal text-sm sm:text-base md:text-lg ${
+          disabled
+            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+            : "text-gray-800 hover:bg-gray-200"
+        } transition w-full sm:w-auto min-h-11 sm:min-h-10 md:min-h-11 flex items-center justify-center disabled:opacity-50`}>
+        {isSubmitting ? (
+          <PulseLoader color="#02356A" size={8} />
+        ) : disabled ? (
+          "Submit"
+        ) : (
+          "Submit"
+        )}
       </button>
     </div>
   );

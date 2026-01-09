@@ -8,6 +8,7 @@ import {
   getOrderWindows,
   isTimeInWindow,
   getServerTimeComponents,
+  isFriday,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -16,6 +17,7 @@ const Ordering = ({ onOrderPlaced }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [mealType, setMealType] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [isFridayToday, setIsFridayToday] = useState(false);
 
   // Initialize windows on mount
   useEffect(() => {
@@ -23,6 +25,9 @@ const Ordering = ({ onOrderPlaced }) => {
       try {
         const windows = await getOrderWindows();
         const components = await getServerTimeComponents();
+        const fridayCheck = await isFriday();
+        setIsFridayToday(fridayCheck);
+
         if (windows) {
           // Determine meal type based on current time
           if (
@@ -173,6 +178,8 @@ const Ordering = ({ onOrderPlaced }) => {
           selectedItems={selectedItems}
           onTotalChange={setTotalPrice}
           isSubmitting={isSubmitting}
+          disabled={isFridayToday && mealType === "breakfast"}
+          mealType={mealType}
         />
       </form>
     </div>

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   getAllOrdersForToday,
-  getAllOrdersForTomorrow,
+  getAllOrdersForDate,
+  getCafeteriaLunchDate,
   deleteOrder,
 } from "../../lib/apis";
 import toast from "react-hot-toast";
@@ -42,8 +43,10 @@ export function CafeteriaOrdersTable({
 
       // Fetch today's orders (breakfast + drinks)
       const todayData = await getAllOrdersForToday();
-      // Fetch tomorrow's orders (lunch)
-      const tomorrowData = await getAllOrdersForTomorrow();
+
+      // Get the correct lunch date (Monday if Fri/Sat/Sun, otherwise tomorrow)
+      const lunchDate = await getCafeteriaLunchDate();
+      const tomorrowData = await getAllOrdersForDate(lunchDate);
 
       if (todayData.error || tomorrowData.error) {
         console.error(
@@ -67,7 +70,7 @@ export function CafeteriaOrdersTable({
         combinedOrders = [...combinedOrders, ...todayData.drinksOrders];
       }
 
-      // Add tomorrow's lunch orders
+      // Add lunch orders (from tomorrow or Monday if Fri/Sat/Sun)
       if (tomorrowData.lunchOrders?.length > 0) {
         combinedOrders = [...combinedOrders, ...tomorrowData.lunchOrders];
       }

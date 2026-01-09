@@ -133,6 +133,20 @@ export function getNextMondayDate(serverTime) {
   return date;
 }
 
+// Get tomorrow's date or Monday if today is Fri/Sat/Sun (for cafeteria lunch display)
+export async function getCafeteriaLunchDate() {
+  const serverTime = await getServerTime();
+  const day = serverTime.getDay();
+
+  // If today is Friday (5), Saturday (6), or Sunday (0), show Monday
+  if (day === 5 || day === 6 || day === 0) {
+    return formatServerDate(getNextMondayDate(serverTime));
+  }
+
+  // Otherwise, show tomorrow
+  return formatServerDate(getTomorrowDate(serverTime));
+}
+
 // Get the lunch order date based on current day and time
 // Returns tomorrow for regular days, or Monday for Friday/Saturday/Sunday
 export async function getLunchOrderDate() {
@@ -161,7 +175,9 @@ export async function getLunchCheckDate() {
 
   // Otherwise, check for tomorrow
   return formatServerDate(getTomorrowDate(serverTime));
-} // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
+}
+
+// Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
   const serverTime = await getServerTime();
   return {
@@ -631,6 +647,36 @@ export async function getAllOrdersForTomorrow() {
     return { breakfastOrders, lunchOrders, drinksOrders };
   } catch (err) {
     console.error("Error fetching tomorrow's orders:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+// Get orders for a specific date (YYYY-MM-DD format)
+export async function getAllOrdersForDate(dateString) {
+  try {
+    const token = readToken();
+
+    const res = await fetch(`${API_URL}/orders/all/${dateString}`, {
+      headers: getHeaders({
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch orders" };
+    }
+
+    const data = await res.json();
+    // Extract breakfast, lunch, and drinks orders
+    const breakfastOrders = data.breakfastOrders || [];
+    const lunchOrders = data.lunchOrders || [];
+    const drinksOrders = data.drinksOrders || [];
+
+    return { breakfastOrders, lunchOrders, drinksOrders };
+  } catch (err) {
+    console.error("Error fetching orders for date:", err);
     return { error: err.message || "Something went wrong" };
   }
 }

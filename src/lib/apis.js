@@ -148,7 +148,20 @@ export async function getLunchOrderDate() {
   return formatServerDate(getTomorrowDate(serverTime));
 }
 
-// Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
+// Get the date to check for existing lunch orders
+// Returns Monday for Friday/Saturday/Sunday, otherwise tomorrow
+export async function getLunchCheckDate() {
+  const serverTime = await getServerTime();
+  const day = serverTime.getDay();
+
+  // If today is Friday (5), Saturday (6), or Sunday (0), check for Monday
+  if (day === 5 || day === 6 || day === 0) {
+    return formatServerDate(getNextMondayDate(serverTime));
+  }
+
+  // Otherwise, check for tomorrow
+  return formatServerDate(getTomorrowDate(serverTime));
+} // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
   const serverTime = await getServerTime();
   return {

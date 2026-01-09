@@ -5,6 +5,7 @@ import {
   getOrderWindows,
   isTimeInWindow,
   getServerTimeComponents,
+  getLunchCheckDate,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
@@ -60,9 +61,16 @@ const DashboardUser = () => {
       }
 
       const components = await getServerTimeComponents();
-      const dateToCheck = isBreakfast
-        ? components.dateString
-        : components.tomorrowString;
+      let dateToCheck;
+
+      if (isBreakfast) {
+        // For breakfast, always check today
+        dateToCheck = components.dateString;
+      } else {
+        // For lunch, use the special lunch check date function
+        // which returns Monday if today is Fri/Sat/Sun, otherwise tomorrow
+        dateToCheck = await getLunchCheckDate();
+      }
 
       const res = await getUserOrdersByDate(dateToCheck, token);
       if (res && res.error) {

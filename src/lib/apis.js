@@ -93,18 +93,18 @@ export function getCurrentTime() {
   return new Date();
 }
 
-// Helper function to format date as YYYY-MM-DD using server time (local timezone)
+// Helper function to format date as YYYY-MM-DD using server time (UTC timezone)
 export function formatServerDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
-// Helper function to get tomorrow's date based on server time
+// Helper function to get tomorrow's date based on server time (UTC)
 export function getTomorrowDate(serverTime) {
   const tomorrow = new Date(serverTime);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
   return tomorrow;
 }
 
@@ -112,7 +112,8 @@ export function getTomorrowDate(serverTime) {
 // If today is Monday, returns today; if Friday/Saturday/Sunday, returns next Monday
 export function getNextMondayDate(serverTime) {
   const date = new Date(serverTime);
-  const day = date.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday
+  // Use getUTCDay() to get the day in UTC, not local timezone
+  const day = date.getUTCDay(); // 0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday
 
   let daysToAdd = 0;
   if (day === 0) {
@@ -129,14 +130,14 @@ export function getNextMondayDate(serverTime) {
     daysToAdd = 0;
   }
 
-  date.setDate(date.getDate() + daysToAdd);
+  date.setUTCDate(date.getUTCDate() + daysToAdd);
   return date;
 }
 
 // Get tomorrow's date or Monday if today is Fri/Sat/Sun (for cafeteria lunch display)
 export async function getCafeteriaLunchDate() {
   const serverTime = await getServerTime();
-  const day = serverTime.getDay();
+  const day = serverTime.getUTCDay();
 
   // If today is Friday (5), Saturday (6), or Sunday (0), show Monday
   if (day === 5 || day === 6 || day === 0) {
@@ -151,7 +152,7 @@ export async function getCafeteriaLunchDate() {
 // Returns tomorrow for regular days, or Monday for Friday/Saturday/Sunday
 export async function getLunchOrderDate() {
   const serverTime = await getServerTime();
-  const day = serverTime.getDay();
+  const day = serverTime.getUTCDay();
 
   // If today is Friday (5), Saturday (6), or Sunday (0), order for Monday
   if (day === 5 || day === 6 || day === 0) {
@@ -166,7 +167,7 @@ export async function getLunchOrderDate() {
 // Returns Monday for Friday/Saturday/Sunday, otherwise tomorrow
 export async function getLunchCheckDate() {
   const serverTime = await getServerTime();
-  const day = serverTime.getDay();
+  const day = serverTime.getUTCDay();
 
   // If today is Friday (5), Saturday (6), or Sunday (0), check for Monday
   if (day === 5 || day === 6 || day === 0) {
@@ -193,7 +194,7 @@ export async function getServerTimeComponents() {
 // Get the current day of the week (0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday)
 export async function getCurrentDayOfWeek() {
   const serverTime = await getServerTime();
-  return serverTime.getDay();
+  return serverTime.getUTCDay();
 }
 
 // Check if today is Friday (day 5)
@@ -287,7 +288,8 @@ export async function getTodayMenuByCategory(categoryName) {
     }
 
     const serverTime = await getServerTime();
-    const day = serverTime.getDay();
+    // Use getUTCDay() instead of getDay() to get the correct day in UTC
+    const day = serverTime.getUTCDay();
 
     // For lunch category, use special logic: Mon if Fri/Sat/Sun, else tomorrow
     let menuDate;
@@ -569,12 +571,7 @@ export async function getAllOrdersForToday() {
       return { error: "Failed to get valid server time" };
     }
 
-    const today = serverTime
-      .toISOString()
-      .split("T")[0]
-      .split("-")
-      .reverse()
-      .join("-");
+    const today = formatServerDate(serverTime);
     const token = readToken();
 
     const res = await fetch(`${API_URL}/orders/all/${today}`, {
@@ -616,14 +613,8 @@ export async function getAllOrdersForTomorrow() {
       return { error: "Failed to get valid server time" };
     }
 
-    const tomorrow = new Date(serverTime);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowString = tomorrow
-      .toISOString()
-      .split("T")[0]
-      .split("-")
-      .reverse()
-      .join("-");
+    const tomorrow = getTomorrowDate(serverTime);
+    const tomorrowString = formatServerDate(tomorrow);
     const token = readToken();
 
     const res = await fetch(`${API_URL}/orders/all/${tomorrowString}`, {

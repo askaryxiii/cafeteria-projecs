@@ -10,6 +10,7 @@ import {
   getServerTimeComponents,
   isFriday,
   getLunchOrderDate,
+  getTodayWeekday,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -19,6 +20,7 @@ const Ordering = ({ onOrderPlaced }) => {
   const [mealType, setMealType] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [isFridayToday, setIsFridayToday] = useState(false);
+  const [todayWeekday, setTodayWeekday] = useState("");
 
   // Initialize windows on mount
   useEffect(() => {
@@ -27,7 +29,9 @@ const Ordering = ({ onOrderPlaced }) => {
         const windows = await getOrderWindows();
         const components = await getServerTimeComponents();
         const fridayCheck = await isFriday();
+        const weekday = await getTodayWeekday();
         setIsFridayToday(fridayCheck);
+        setTodayWeekday(weekday);
 
         if (windows) {
           // Determine meal type based on current time
@@ -154,7 +158,8 @@ const Ordering = ({ onOrderPlaced }) => {
   return (
     <div className="sm:px-6 md:px-12 lg:px-32 xl:px-44 py-4 sm:py-6 md:py-8">
       <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-[#032552] mb-4 sm:mb-6 md:mb-8 uppercase tracking-wide text-center">
-        Select Your Favorite Dishes
+        Select Your Favorite Dishes For{" "}
+        <span className="font-bold">{todayWeekday}</span>
       </h2>
 
       <form

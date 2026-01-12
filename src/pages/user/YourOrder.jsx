@@ -5,6 +5,7 @@ import {
   getOrderWindows,
   isTimeInWindow,
   getServerTimeComponents,
+  getTodayWeekday,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 
@@ -13,6 +14,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   const [windowsInitialized, setWindowsInitialized] = useState(false);
   const [localBreakfastWindow, setLocalBreakfastWindow] =
     useState(isBreakfastWindow);
+  const [todayWeekday, setTodayWeekday] = useState("");
 
   // Initialize windows on mount
   useEffect(() => {
@@ -20,6 +22,8 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
       try {
         const windows = await getOrderWindows();
         const components = await getServerTimeComponents();
+        const weekday = await getTodayWeekday();
+        setTodayWeekday(weekday);
 
         if (windows) {
           const isBreakfast = isTimeInWindow(
@@ -73,7 +77,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   return (
     <div className="flex flex-col items-center w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
       <h2 className="text-2xl sm:text-3xl md:text-4xl text-center font-semibold text-[#032552] drop-shadow-[0_3px_2px_rgba(0,0,0,0.3)] mb-4 sm:mb-6 md:mb-8">
-        Your Order
+        Your Order For <span className="font-bold">{todayWeekday}</span>
       </h2>
       <div className="px-3 sm:px-6 md:px-8 lg:px-32 py-4 sm:py-6 md:py-8 your-order w-full sm:w-11/12 md:w-10/12 lg:w-9/12">
         <div className="bg-[#032552] text-white py-4 sm:py-6 md:py-8 px-4 sm:px-6 md:px-10 rounded-lg shadow w-full">

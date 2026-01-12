@@ -28,12 +28,12 @@ export function SidebarHeader() {
           <div className="w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center shrink-0">
             <FaUserGroup size={20} className="text-gray-600" />
           </div>
-          <span className="hidden lg:block font-semibold text-gray-800 truncate text-sm">
-            {user?.user?.name}
+          <span className="block md:hidden lg:block font-semibold text-gray-800 truncate text-sm">
+            {user.user.name}
           </span>
         </div>
         <MdArrowDropDown
-          className={`hidden lg:block text-gray-600 transition-transform ${
+          className={`block md:hidden lg:block text-gray-600 transition-transform ${
             isDropdownOpen ? "rotate-180" : ""
           }`}
         />

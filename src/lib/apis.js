@@ -197,6 +197,21 @@ export async function getCurrentDayOfWeek() {
   return serverTime.getUTCDay();
 }
 
+// Get the name of today's weekday
+export async function getTodayWeekday() {
+  const day = await getCurrentDayOfWeek();
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  return days[day];
+}
+
 // Check if today is Friday (day 5)
 export async function isFriday() {
   const day = await getCurrentDayOfWeek();

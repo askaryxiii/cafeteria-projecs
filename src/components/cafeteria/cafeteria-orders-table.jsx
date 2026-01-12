@@ -102,24 +102,34 @@ export function CafeteriaOrdersTable({
   const formatOrderDetails = (order) => {
     const mealType = order.meal_type?.toLowerCase();
 
+    // helper to format name + weight
+    const formatItemName = (item) => {
+      if (!item) return "-";
+      return item.weight_grams
+        ? `${item.item_name} (${item.weight_grams}g)`
+        : item.item_name;
+    };
+
     if (mealType === "breakfast" || mealType === "drinks") {
-      // For breakfast/drinks, show the single item name
-      return order.items?.[0]?.item_name || "-";
-    } else if (mealType === "lunch") {
-      // For lunch, combine items by category
+      return formatItemName(order.items?.[0]);
+    }
+
+    if (mealType === "lunch") {
       const categories = ["protein", "carbs", "side", "salad"];
+
       const categoryItems = categories
         .map((cat) => {
           const items = order.items.filter(
-            (item) => item.category?.toLowerCase() === cat.toLowerCase()
+            (item) => item.category?.toLowerCase() === cat
           );
+
           if (items.length > 0) {
-            const itemNames = items.map((i) => i.item_name).join(", ");
-            return itemNames;
+            return items.map(formatItemName).join(", ");
           }
+
           return null;
         })
-        .filter((item) => item !== null);
+        .filter(Boolean);
 
       return categoryItems.join(" | ");
     }

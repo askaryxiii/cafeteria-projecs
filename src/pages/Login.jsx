@@ -10,8 +10,8 @@ import {
   PasswordInput,
   PrimaryButton,
 } from "../components/auth/FormElements";
-import { IoMailOutline } from "react-icons/io5";
-import { GoUnlock } from "react-icons/go";
+import { MdEmail } from "react-icons/md";
+import { PulseLoader } from "react-spinners";
 
 const Login = () => {
   const { register: formRegister, handleSubmit } = useForm();
@@ -19,6 +19,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [remember, setRemember] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const redirectByRole = (res) => {
     const role = res.user?.role || res.role || "user";
@@ -42,12 +43,15 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setError(null);
+    setIsSubmitting(true);
     try {
       const res = await login(data, remember);
       redirectByRole(res);
     } catch (e) {
       setError(e.message);
       toast.error(e.message || "Login failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -57,7 +61,7 @@ const Login = () => {
         <InputRow>
           <TextInput
             placeholder="Email Address"
-            icon={<IoMailOutline className="w-5 h-5" />}
+            icon={<MdEmail className="w-5 h-5" />}
             {...formRegister("email", { required: true })}
           />
         </InputRow>
@@ -65,7 +69,6 @@ const Login = () => {
         <InputRow label="Password">
           <PasswordInput
             placeholder="Password"
-            icon={<GoUnlock className="w-5 h-5" />}
             {...formRegister("password", { required: true })}
           />
         </InputRow>
@@ -83,7 +86,9 @@ const Login = () => {
         </InputRow>
 
         <InputRow customClass={"flex justify-center"}>
-          <PrimaryButton type="submit">LOGIN</PrimaryButton>
+          <PrimaryButton type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <PulseLoader color="#FFFAEE" size={8} /> : "LOGIN"}
+          </PrimaryButton>
         </InputRow>
       </form>
 

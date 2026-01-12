@@ -5,6 +5,8 @@ import {
   isTimeInWindow,
 } from "../../lib/apis";
 import { unlockAudio, playNewOrderSound } from "../../lib/sound";
+import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
+import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 
 // Add CSS for smooth line animation
 const lineAnimationStyle = `
@@ -43,6 +45,10 @@ const DashboardCafeteria = () => {
   const [loading, setLoading] = useState(true);
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [currentWindow, setCurrentWindow] = useState("");
+  const [sortConfig, setSortConfig] = useState({
+    key: "arabic_name",
+    direction: "asc",
+  });
   const previousOrderIdsRef = useRef(new Set());
 
   // Load checked items from localStorage on mount
@@ -166,6 +172,41 @@ const DashboardCafeteria = () => {
       .join(" + ");
   };
 
+  // Handle sort by column
+  const handleSort = (key) => {
+    let direction = "desc";
+    if (sortConfig.key === key && sortConfig.direction === "desc") {
+      direction = "asc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Sort orders based on sort config
+  const sortedOrders = [...orders].sort((a, b) => {
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+
+    // Handle date comparison
+    if (sortConfig.key === "created_at") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    // Handle string comparison
+    if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+
+    if (aValue < bValue) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   // Handle checkbox change
   const handleCheckChange = (id) => {
     setCheckedItems((prev) => {
@@ -206,7 +247,7 @@ const DashboardCafeteria = () => {
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm md:text-base">
             <thead>
-              <tr className="border-b-2 border-gray-300">
+              <tr className="border-b-2 border-gray-300 align-middle">
                 <th className="px-4 py-3 text-left font-semibold">
                   <input
                     type="checkbox"
@@ -232,14 +273,26 @@ const DashboardCafeteria = () => {
                     }}
                   />
                 </th>
-                <th className="px-4 py-3 text-left font-semibold">Full Name</th>
+                <th
+                  className="px-4 py-3 text-left font-semibold cursor-pointer hover:bg-gray-100 align-middle"
+                  onClick={() => handleSort("arabic_name")}>
+                  <div className="flex items-center gap-2">
+                    Full Name
+                    {sortConfig.key === "arabic_name" &&
+                      (sortConfig.direction === "asc" ? (
+                        <IoMdArrowDropup className="w-4 h-4" />
+                      ) : (
+                        <IoMdArrowDropdown className="w-4 h-4" />
+                      ))}
+                  </div>
+                </th>
                 <th className="px-4 py-3 text-left font-semibold">Order</th>
                 <th className="px-4 py-3 text-left font-semibold">Meal Type</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {orders.length > 0 ? (
-                orders.map((order) => (
+              {sortedOrders.length > 0 ? (
+                sortedOrders.map((order) => (
                   <tr
                     key={order.id}
                     className={`hover:bg-gray-50 relative ${
@@ -250,7 +303,7 @@ const DashboardCafeteria = () => {
                         type="checkbox"
                         checked={checkedItems.has(order.id)}
                         onChange={() => handleCheckChange(order.id)}
-                        className="w-5 h-5 accent-blue-600 cursor-pointer"
+                        className="w-5 h-5  cursor-pointer"
                       />
                     </td>
                     <td className="px-4 py-3 text-xl font-medium text-gray-900">
@@ -288,8 +341,8 @@ const DashboardCafeteria = () => {
 
         {/* Mobile View */}
         <div className="md:hidden space-y-3">
-          {orders.length > 0 ? (
-            orders.map((order) => (
+          {sortedOrders.length > 0 ? (
+            sortedOrders.map((order) => (
               <div
                 key={order.id}
                 className={`relative p-4 border rounded-lg flex justify-between items-center overflow-hidden ${
@@ -309,9 +362,6 @@ const DashboardCafeteria = () => {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900">
-                        {order.name}
-                      </p>
-                      <p className="text-xs text-gray-600">
                         {order.arabic_name}
                       </p>
                     </div>
@@ -322,9 +372,8 @@ const DashboardCafeteria = () => {
                   </button> */}
                   </div>
                 </div>
-                <div className="ml-8 space-y-1 text-sm">
+                <div className="ml-8 space-y-3 text-sm">
                   <p className="text-gray-700">
-                    <span className="font-semibold">Order: </span>
                     {formatOrderItems(order.items)}
                   </p>
                   <p>

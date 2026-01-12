@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { FaLock } from "react-icons/fa";
+import { FaLockOpen } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 
 // small className join helper similar to `cn`
@@ -54,8 +56,7 @@ TextInput.displayName = "TextInput";
 export const PasswordInput = React.forwardRef(
   (
     {
-      icon,
-      iconPosition,
+      iconPosition = "right",
       iconClassName,
       containerClassName,
       showIcon = true,
@@ -64,28 +65,31 @@ export const PasswordInput = React.forwardRef(
     },
     ref
   ) => {
-    if (icon) {
-      return (
-        <IconInput
-          ref={ref}
-          icon={icon}
-          iconPosition={iconPosition}
-          iconClassName={iconClassName}
-          containerClassName={containerClassName}
-          showIcon={showIcon}
-          className={className}
-          {...props}
-          type="password"
-        />
-      );
-    }
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePassword = () => {
+      setShowPassword((prev) => !prev);
+    };
 
     return (
-      <input
-        {...props}
-        type="password"
-        className={cn("input-field text-responsive-sm", className)}
+      <IconInput
         ref={ref}
+        icon={
+          showPassword ? (
+            <FaLockOpen className="w-5 h-5" />
+          ) : (
+            <FaLock className="w-5 h-5" />
+          )
+        }
+        iconPosition={iconPosition}
+        iconClassName={iconClassName}
+        containerClassName={containerClassName}
+        showIcon={showIcon}
+        className={className}
+        type={showPassword ? "text" : "password"}
+        onIconClick={togglePassword}
+        iconClickable
+        {...props}
       />
     );
   }
@@ -114,10 +118,27 @@ const IconInput = React.forwardRef(
       containerClassName,
       showIcon = true,
       className,
+      onIconClick,
+      iconClickable = false,
       ...props
     },
     ref
   ) => {
+    const IconWrapper = ({ children }) => (
+      <div
+        onClick={iconClickable ? onIconClick : undefined}
+        className={cn(
+          "flex items-center justify-center px-2 sm:px-3 md:px-4",
+          iconClickable && "cursor-pointer hover:text-slate-900",
+          iconPosition === "left"
+            ? "bg-slate-100 text-slate-600 border-r border-slate-300"
+            : "text-slate-600 border-l border-slate-300",
+          iconClassName
+        )}>
+        {children}
+      </div>
+    );
+
     return (
       <div
         ref={ref}
@@ -126,13 +147,7 @@ const IconInput = React.forwardRef(
           containerClassName
         )}>
         {showIcon && iconPosition === "left" && (
-          <div
-            className={cn(
-              "flex items-center justify-center px-2 sm:px-3 md:px-4 bg-slate-100 text-slate-600 border-r border-slate-300",
-              iconClassName
-            )}>
-            {icon}
-          </div>
+          <IconWrapper>{icon}</IconWrapper>
         )}
 
         <input
@@ -144,13 +159,7 @@ const IconInput = React.forwardRef(
         />
 
         {showIcon && iconPosition === "right" && (
-          <div
-            className={cn(
-              "flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-slate-600 border-l border-slate-300",
-              iconClassName
-            )}>
-            {icon}
-          </div>
+          <IconWrapper>{icon}</IconWrapper>
         )}
       </div>
     );

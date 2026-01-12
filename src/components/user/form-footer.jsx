@@ -38,13 +38,7 @@ export default function FormFooter({
             ? "bg-gray-300 text-gray-600 cursor-not-allowed"
             : "text-gray-800 hover:bg-gray-200"
         } transition w-full sm:w-auto min-h-11 sm:min-h-10 md:min-h-11 flex items-center justify-center disabled:opacity-50`}>
-        {isSubmitting ? (
-          <PulseLoader color="#02356A" size={8} />
-        ) : disabled ? (
-          "Submit"
-        ) : (
-          "Submit"
-        )}
+        {isSubmitting ? <PulseLoader color="#02356A" size={8} /> : "Submit"}
       </button>
     </div>
   );

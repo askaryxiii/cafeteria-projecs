@@ -84,12 +84,25 @@ const Navbar = () => {
         <div
           ref={menuRef}
           className="absolute right-3 top-full bg-[#dfe1e9] rounded shadow-lg p-4 z-50 flex flex-col gap-1">
-          <Link
-            to="/user/drinks"
-            className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded"
-            onClick={() => setOpen(false)}>
-            <BsFillCupHotFill /> Drinks
-          </Link>
+          <div className="relative group inline-block">
+            <button
+              type="button"
+              disabled
+              className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">
+              <BsFillCupHotFill /> Drinks
+            </button>
+
+            {/* Tooltip */}
+            <div
+              className="
+        absolute bottom-full mb-2 left-1/2 -translate-x-1/2
+        whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white
+        opacity-0 group-hover:opacity-100 transition-opacity
+        pointer-events-none
+      ">
+              Drinks are currently unavailable
+            </div>
+          </div>
 
           <Link
             to="/"

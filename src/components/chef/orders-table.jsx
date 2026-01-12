@@ -10,7 +10,15 @@ export function OrdersTable() {
     (async () => {
       const fetchedOrders = await getChefOrders();
       if (!fetchedOrders.error) {
-        setOrders(fetchedOrders.items);
+        // Sort orders by item name in ascending order
+        const sortedOrders = [...fetchedOrders.items].sort((a, b) => {
+          const nameA = a.item_name?.toLowerCase() || "";
+          const nameB = b.item_name?.toLowerCase() || "";
+
+          return nameA.localeCompare(nameB);
+        });
+
+        setOrders(sortedOrders);
       }
     })();
   }, []);

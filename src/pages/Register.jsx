@@ -11,14 +11,17 @@ import {
   PrimaryButton,
 } from "../components/auth/FormElements";
 import { IoMailOutline } from "react-icons/io5";
-import { BsVectorPen } from "react-icons/bs";
+import { FaPenNib } from "react-icons/fa";
 import { GoUnlock } from "react-icons/go";
+import { PulseLoader } from "react-spinners";
+import { MdEmail } from "react-icons/md";
 
 const Register = () => {
   const { register: formRegister, handleSubmit } = useForm();
   const { register: registerFn } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const redirectByRole = (res) => {
     const role = res.user?.role || res.role || "user";
@@ -42,6 +45,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     setError(null);
+    setIsSubmitting(true);
     try {
       const res = await registerFn(data);
       // if backend only returns a success message, redirect to login
@@ -66,6 +70,8 @@ const Register = () => {
     } catch (e) {
       setError(e.message);
       toast.error(e.message || "Registration failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -75,7 +81,7 @@ const Register = () => {
         <InputRow>
           <TextInput
             placeholder="Full Name in English"
-            icon={<BsVectorPen className="w-5 h-5" />}
+            icon={<FaPenNib className="w-5 h-5" />}
             {...formRegister("name", { required: true })}
           />
         </InputRow>
@@ -83,7 +89,7 @@ const Register = () => {
         <InputRow>
           <TextInput
             placeholder="الاسم بالكامل بالعربيه"
-            icon={<BsVectorPen className="w-5 h-5" />}
+            icon={<FaPenNib className="w-5 h-5" />}
             {...formRegister("arabic_name", { required: true })}
           />
         </InputRow>
@@ -91,7 +97,7 @@ const Register = () => {
         <InputRow>
           <TextInput
             placeholder="Email Address"
-            icon={<IoMailOutline className="w-5 h-5" />}
+            icon={<MdEmail className="w-5 h-5" />}
             {...formRegister("email", { required: true })}
           />
         </InputRow>
@@ -99,7 +105,6 @@ const Register = () => {
         <InputRow>
           <PasswordInput
             placeholder="Password"
-            icon={<GoUnlock className="w-5 h-5" />}
             {...formRegister("password", { required: true })}
           />
         </InputRow>
@@ -107,7 +112,6 @@ const Register = () => {
         <InputRow>
           <PasswordInput
             placeholder="Confirm Password"
-            icon={<GoUnlock className="w-5 h-5" />}
             {...formRegister("confirmPassword", { required: true })}
           />
         </InputRow>
@@ -115,7 +119,9 @@ const Register = () => {
         {error && <div className="text-red-400 mb-2">{error}</div>}
 
         <InputRow customClass={"flex justify-center"}>
-          <PrimaryButton type="submit">SAVE</PrimaryButton>
+          <PrimaryButton type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <PulseLoader color="#FFFAEE" size={8} /> : "SAVE"}
+          </PrimaryButton>
         </InputRow>
       </form>
       <div className="mt-4 flex justify-center">

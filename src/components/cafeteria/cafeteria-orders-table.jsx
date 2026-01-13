@@ -7,6 +7,7 @@ import {
 } from "../../lib/apis";
 import toast from "react-hot-toast";
 import { MdDelete } from "react-icons/md";
+import { it } from "date-fns/locale/it";
 
 /**
  * CafeteriaOrdersTable - Shows all orders for cafeteria staff (no window filtering)
@@ -84,6 +85,8 @@ export function CafeteriaOrdersTable({
     }
   };
 
+  console.log(items);
+
   useEffect(() => {
     if (showDelete && onCountsChange) {
       onCountsChange({
@@ -111,7 +114,13 @@ export function CafeteriaOrdersTable({
     };
 
     if (mealType === "breakfast" || mealType === "drinks") {
-      return formatItemName(order.items?.[0]);
+      return order.items
+        .map((item) =>
+          item.weight_grams
+            ? `${item.item_name} (${item.weight_grams}g)`
+            : item.item_name
+        )
+        .join(" | ");
     }
 
     if (mealType === "lunch") {

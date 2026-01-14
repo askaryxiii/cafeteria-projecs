@@ -85,8 +85,6 @@ export function CafeteriaOrdersTable({
     }
   };
 
-  console.log(items);
-
   useEffect(() => {
     if (showDelete && onCountsChange) {
       onCountsChange({

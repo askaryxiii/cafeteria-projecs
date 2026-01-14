@@ -6,8 +6,13 @@ import {
   isTimeInWindow,
   getServerTimeComponents,
   getTodayWeekday,
+  deleteOrder,
+  getLunchOrderDate,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
+import DeleteConfirmModal from "../../components/admin/users/delete-confirm-modal";
+import { MdDelete } from "react-icons/md";
+import toast from "react-hot-toast";
 
 const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
@@ -15,6 +20,9 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   const [localBreakfastWindow, setLocalBreakfastWindow] =
     useState(isBreakfastWindow);
   const [todayWeekday, setTodayWeekday] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState(null);
+  const [targetWeekday, setTargetWeekday] = useState("");
 
   // Initialize windows on mount
   useEffect(() => {
@@ -53,7 +61,70 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   // Update when order prop changes
   useEffect(() => {
     setCurrentOrder(order);
+
+    // Calculate target weekday based on meal type
+    (async () => {
+      if (order && order.meal_type) {
+        const mealType = order.meal_type?.toLowerCase();
+        const weekday = await getTodayWeekday();
+
+        if (mealType === "breakfast") {
+          // Breakfast shows today
+          setTargetWeekday(weekday);
+        } else if (mealType === "lunch") {
+          // Lunch shows tomorrow (or Monday if weekend)
+          const lunchDate = await getLunchOrderDate();
+          // Parse the lunch date to get the weekday name
+          const lunchDateObj = new Date(lunchDate);
+          const dayIndex = lunchDateObj.getUTCDay();
+          const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+          setTargetWeekday(days[dayIndex]);
+        }
+      }
+    })();
   }, [order]);
+
+  const handleDeleteOrder = (orderId) => {
+    if (!orderId) return;
+    setDeletingOrderId(orderId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingOrderId) return;
+
+    setIsDeleting(true);
+    try {
+      const result = await deleteOrder(deletingOrderId);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Order deleted successfully");
+        // Reset the order to show the ordering form
+        setCurrentOrder(null);
+        if (typeof onOrderUpdated === "function") {
+          onOrderUpdated();
+        }
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsDeleting(false);
+      setDeletingOrderId(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeletingOrderId(null);
+  };
 
   // Filter order based on current window
   // During breakfast window, only show breakfast orders
@@ -77,7 +148,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   return (
     <div className="flex flex-col items-center w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
       <h2 className="text-2xl sm:text-3xl md:text-4xl text-center font-semibold text-[#032552] drop-shadow-[0_3px_2px_rgba(0,0,0,0.3)] mb-4 sm:mb-6 md:mb-8">
-        Your Order For <span className="font-bold">{todayWeekday}</span>
+        Your Order For <span className="font-bold">{targetWeekday}</span>
       </h2>
       <div className="px-3 sm:px-6 md:px-8 lg:px-32 py-4 sm:py-6 md:py-8 your-order w-full sm:w-11/12 md:w-10/12 lg:w-9/12">
         <div className="bg-[#032552] text-white py-4 sm:py-6 md:py-8 px-4 sm:px-6 md:px-10 rounded-lg shadow w-full">
@@ -101,12 +172,25 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
                 </span>
               )}
             </div>
-            <span className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-6 text-base sm:text-lg md:text-xl lg:text-2xl rounded">
-              {displayOrder?.total_cost} LE
-            </span>
+            <div className="flex justify-between w-full">
+              <span className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-6 text-base sm:text-lg md:text-xl lg:text-2xl rounded">
+                {displayOrder?.total_cost} LE
+              </span>
+              <button
+                onClick={() => handleDeleteOrder(displayOrder.id)}
+                className="bg-[#D9D9D9B2] text-center py-1.5 px-3 sm:px-4 md:px-3 text-base  md:text-xl lg:text-2xl rounded">
+                <MdDelete />
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      {deletingOrderId && (
+        <DeleteConfirmModal
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
     </div>
   );
 };

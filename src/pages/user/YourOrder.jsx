@@ -172,15 +172,22 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
                 </span>
               )}
             </div>
-            <div className="flex justify-between w-full">
+            <div
+              className={`flex ${
+                localBreakfastWindow == "lunch"
+                  ? `justify-between`
+                  : `justify-center`
+              } w-full`}>
               <span className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-6 text-base sm:text-lg md:text-xl lg:text-2xl rounded">
                 {displayOrder?.total_cost} LE
               </span>
-              <button
-                onClick={() => handleDeleteOrder(displayOrder.id)}
-                className="bg-[#D9D9D9B2] text-center py-1.5 px-3 sm:px-4 md:px-3 text-base  md:text-xl lg:text-2xl rounded">
-                <MdDelete />
-              </button>
+              {localBreakfastWindow == "lunch" && (
+                <button
+                  onClick={() => handleDeleteOrder(displayOrder.id)}
+                  className="bg-[#D9D9D9B2] text-center py-1.5 px-3 sm:px-4 md:px-3 text-base  md:text-xl lg:text-2xl rounded">
+                  <MdDelete />
+                </button>
+              )}
             </div>
           </div>
         </div>

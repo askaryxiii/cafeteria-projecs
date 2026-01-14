@@ -174,14 +174,14 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
             </div>
             <div
               className={`flex ${
-                localBreakfastWindow == "lunch"
+                displayOrder?.meal_type?.toLowerCase() === "lunch"
                   ? `justify-between`
                   : `justify-center`
               } w-full`}>
               <span className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-6 text-base sm:text-lg md:text-xl lg:text-2xl rounded">
                 {displayOrder?.total_cost} LE
               </span>
-              {localBreakfastWindow == "lunch" && (
+              {displayOrder?.meal_type?.toLowerCase() === "lunch" && (
                 <button
                   onClick={() => handleDeleteOrder(displayOrder.id)}
                   className="bg-[#D9D9D9B2] text-center py-1.5 px-3 sm:px-4 md:px-3 text-base  md:text-xl lg:text-2xl rounded">

@@ -1,5 +1,3 @@
-"use client";
-
 import { DropdownMenu } from "radix-ui";
 import { HiUser } from "react-icons/hi2";
 import { Link } from "react-router-dom";
@@ -9,6 +7,7 @@ import { PiSignOutBold } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { useContext } from "react";
 import AuthContext from "../../../context/AuthContext";
+import { RiUser3Fill } from "react-icons/ri";
 
 const UserAvatar = () => {
   const { logout, user } = useContext(AuthContext);
@@ -28,6 +27,15 @@ const UserAvatar = () => {
         <DropdownMenu.Content
           className="min-w-[280px] rounded-lg bg-white border-2 border-gray-200 shadow-lg overflow-hidden"
           sideOffset={5}>
+          <DropdownMenu.Item
+            disabled
+            className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
+            <span className="font-bold">
+              Welcome {user?.user?.name}
+            </span>
+          </DropdownMenu.Item>
+
+          <DropdownMenu.Separator className="bg-gray-200 h-px" />
           <DropdownMenu.Item className="group relative flex gap-3 px-6 py-3 select-none items-center leading-none text-gray-700 outline-none hover:bg-gray-50 cursor-pointer transition-colors">
             <LuPizza className="w-5 h-5 shrink-0" />
             <Link

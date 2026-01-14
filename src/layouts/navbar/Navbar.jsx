@@ -84,6 +84,9 @@ const Navbar = () => {
         <div
           ref={menuRef}
           className="absolute right-3 top-full bg-[#dfe1e9] rounded shadow-lg p-4 z-50 flex flex-col gap-1">
+          <div className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
+            <span className="font-bold">Welcome {user?.user?.name}</span>
+          </div>
           <div className="relative group inline-block">
             <button
               type="button"
@@ -103,16 +106,13 @@ const Navbar = () => {
               Drinks are currently unavailable
             </div>
           </div>
-
           <Link
             to="/"
             className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded"
             onClick={() => setOpen(false)}>
             <ImHome /> Home
           </Link>
-
-          <div className="border-t my-1" />
-
+          <div className="border-t border-[#02356A] my-0.5" />
           <MobileUserMenu onClose={() => setOpen(false)} />
         </div>
       )}

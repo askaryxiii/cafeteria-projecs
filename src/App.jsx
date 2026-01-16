@@ -35,14 +35,14 @@ const App = () => {
               </PublicRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/register"
             element={
               <PublicRoute>
                 <Register />
               </PublicRoute>
             }
-          />
+          /> */}
 
           <Route
             path="/user"

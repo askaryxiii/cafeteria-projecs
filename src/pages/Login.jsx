@@ -92,11 +92,11 @@ const Login = () => {
         </InputRow>
       </form>
 
-      <div className="mt-4 flex justify-center">
+      {/* <div className="mt-4 flex justify-center">
         <Link to="/register" className="link-muted">
           REGISTER NEW ACCOUNT
         </Link>
-      </div>
+      </div> */}
     </AuthLayout>
   );
 };

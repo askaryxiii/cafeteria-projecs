@@ -12,6 +12,9 @@ import {
   readToken,
   submitFeedback,
 } from "../../lib/apis";
+import { MdOutlineInfo } from "react-icons/md";
+import { Tooltip } from "recharts";
+import ToolTip from "../../components/ui/tooltip";
 
 const Feedback = () => {
   const { user } = useContext(AuthContext);
@@ -149,9 +152,9 @@ const Feedback = () => {
           <div className="flex flex-col md:flex-row gap-5 md:gap-14 justify-center">
             <div className="w-full  md:w-1/3">
               <label
-                className="block text-sm font-medium mb-2"
+                className="block gap-1.5 text-sm font-medium mb-2"
                 style={{ color: "#02356A" }}>
-                Name
+                Name <ToolTip text="This is not editable." />
               </label>
               <input
                 {...register("name", { required: "Name is required" })}
@@ -169,7 +172,7 @@ const Feedback = () => {
               <label
                 className="block text-sm font-medium mb-2"
                 style={{ color: "#02356A" }}>
-                Email
+                Email <ToolTip text="This is not editable." />
               </label>
               <input
                 {...register("email", { required: "Email is required" })}
@@ -191,7 +194,7 @@ const Feedback = () => {
               <label
                 className="block text-sm font-medium mb-2"
                 style={{ color: "#02356A" }}>
-                Date of Feedback
+                Today's Date <ToolTip text="This is not editable." />
               </label>
               <input
                 type="text"
@@ -256,7 +259,8 @@ const Feedback = () => {
               <label
                 className="block text-sm font-medium mb-2"
                 style={{ color: "#02356A" }}>
-                Menu Item *
+                Menu Item *{" "}
+                <ToolTip text="Must choose a date and a category first." />
               </label>
               <select
                 {...register("menu_item_id", {

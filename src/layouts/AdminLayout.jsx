@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { FaUserGroup } from "react-icons/fa6";
 import { PiChefHatBold, PiForkKnifeFill, PiBankFill } from "react-icons/pi";
+import { MdOutlineRateReview } from "react-icons/md";
 import { TbMenu3 } from "react-icons/tb";
 import { MdSettings, MdDashboard } from "react-icons/md";
 import AdminLogoNav from "./navbar/admin/AdminLogoNav";
@@ -14,6 +15,7 @@ import CafeteriaDashboard from "../pages/admin/CafeteriaDashboard";
 import AccountsDashboard from "../pages/admin/AccountsDashboard";
 import MenuDashboard from "../pages/admin/MenuDashboard";
 import Settings from "../pages/admin/settings/Settings";
+import FeedbackDashboard from "../pages/admin/FeedbackDashboard";
 
 const AdminLayout = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -63,6 +65,12 @@ const AdminLayout = () => {
     },
     { id: "menu", label: "Menu Items", icon: TbMenu3, path: "/admin/menu" },
     {
+      id: "feedback",
+      label: "Feedback",
+      icon: MdOutlineRateReview,
+      path: "/admin/feedback",
+    },
+    {
       id: "settings",
       label: "Settings",
       icon: MdSettings,
@@ -107,6 +115,7 @@ const AdminLayout = () => {
             <Route path="/cafeteria" element={<CafeteriaDashboard />} />
             <Route path="/accounts" element={<AccountsDashboard />} />
             <Route path="/menu" element={<MenuDashboard />} />
+            <Route path="/feedback" element={<FeedbackDashboard />} />
             <Route path="/settings" element={<Settings />} />
             <Route
               path="/"

@@ -44,7 +44,7 @@ const Navbar = () => {
               <div className="relative group inline-block">
                 <button
                   disabled
-                  className="nav-btn opacity-50 cursor-not-allowed">
+                  className="nav-btn  opacity-50 cursor-not-allowed">
                   <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
                 </button>
 
@@ -59,10 +59,10 @@ const Navbar = () => {
                   Drinks are currently unavailable
                 </div>
               </div>
-              <Link to="/user" className="nav-btn">
+              <Link to="/user" className="nav-btn bg-gray-200">
                 <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
               </Link>
-              <Link to="/" className="nav-btn">
+              <Link to="/" className="nav-btn bg-gray-200">
                 <ImHome className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
               </Link>
             </div>

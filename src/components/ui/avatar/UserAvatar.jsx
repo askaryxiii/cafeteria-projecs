@@ -7,7 +7,7 @@ import { PiSignOutBold } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { useContext } from "react";
 import AuthContext from "../../../context/AuthContext";
-import { RiUser3Fill } from "react-icons/ri";
+import { MdOutlineRateReview } from "react-icons/md";
 
 const UserAvatar = () => {
   const { logout, user } = useContext(AuthContext);
@@ -17,7 +17,7 @@ const UserAvatar = () => {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="inline-flex border-2 w-10 h-10 border-gray-400 items-center justify-center rounded outline-none"
+          className="cursor-pointer inline-flex border-2 w-10 h-10 border-gray-400 bg-gray-200 items-center justify-center rounded outline-none"
           aria-label="Customise options">
           <HiUser className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
         </button>
@@ -30,9 +30,7 @@ const UserAvatar = () => {
           <DropdownMenu.Item
             disabled
             className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
-            <span className="font-bold">
-              Welcome {user?.user?.name}
-            </span>
+            <span className="font-bold">Welcome {user?.user?.name}</span>
           </DropdownMenu.Item>
 
           <DropdownMenu.Separator className="bg-gray-200 h-px" />
@@ -53,6 +51,15 @@ const UserAvatar = () => {
               to="/user/change-password"
               className="text-gray-700 font-medium flex-1">
               Change Password
+            </Link>
+          </DropdownMenu.Item>
+          <DropdownMenu.Separator className="bg-gray-200 h-px" />
+          <DropdownMenu.Item className="group relative flex gap-3 px-6 py-3 select-none items-center leading-none text-gray-700 outline-none hover:bg-gray-50 cursor-pointer transition-colors">
+            <MdOutlineRateReview className="w-5 h-5 shrink-0" />
+            <Link
+              to="/user/feedback"
+              className="text-gray-700 font-medium flex-1">
+              Feedback
             </Link>
           </DropdownMenu.Item>
 

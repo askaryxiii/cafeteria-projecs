@@ -390,14 +390,14 @@ const WeeklyMenu = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="mb-6">
+      <div className="mb-6 w-full">
         <label className="block text-sm font-medium text-[#072A57] mb-2">
           Week Start Date
         </label>
         <input
           type="date"
           {...control.register("week_start_date")}
-          className="w-full pl-4 pr-4 py-1.5 rounded-sm border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
+          className="w-11/12 pl-4 pr-4 py-1.5 rounded-sm border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
         />
       </div>
 

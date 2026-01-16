@@ -354,6 +354,49 @@ export async function getTodayMenuByCategory(categoryName) {
   }
 }
 
+// Get menu items by category for a specific date
+export async function getMenuByCategoryAndDate(categoryName, dateString) {
+  try {
+    const token = readToken();
+    if (!token) return { error: "No auth token found" };
+
+    const verifyRes = await fetch(`${API_URL}/auth/verify-token`, {
+      headers: getHeaders({ Authorization: `Bearer ${token}` }),
+    });
+    if (!verifyRes.ok) {
+      const errBody = await verifyRes.json().catch(() => ({}));
+      return { error: errBody.message || "Token verification failed" };
+    }
+
+    const res = await fetch(`${API_URL}/daily-menu/${dateString}`, {
+      headers: getHeaders({
+        Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
+        "Content-Type": "application/json",
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return {
+        error: err.message || `Failed to fetch daily menu for ${dateString}`,
+      };
+    }
+
+    const data = await res.json();
+
+    // ✅ FILTER BY CATEGORY
+    const filtered = data.filter(
+      (item) => item.category.toLowerCase() === categoryName.toLowerCase()
+    );
+
+    return filtered;
+  } catch (err) {
+    console.error("Error Getting Data:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
 export async function getBreakfast() {
   try {
     const token = readToken();
@@ -773,6 +816,114 @@ export async function changePassword(currentPassword, newPassword, token) {
     return data;
   } catch (err) {
     console.error("Error changing password:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+export async function submitFeedback(feedbackData, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/feedbacks`, {
+      method: "POST",
+      headers: getHeaders({
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${t}`,
+      }),
+      body: JSON.stringify(feedbackData),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to submit feedback" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error submitting feedback:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+// Get all feedbacks
+export async function getAllFeedbacks(token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/feedbacks`, {
+      headers: getHeaders({
+        Authorization: `Bearer ${t}`,
+        "Content-Type": "application/json",
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to fetch feedbacks" };
+    }
+
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Error fetching feedbacks:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+// Delete a feedback by ID
+export async function deleteFeedback(feedbackId, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/feedbacks/${feedbackId}`, {
+      method: "DELETE",
+      headers: getHeaders({
+        Authorization: `Bearer ${t}`,
+        "Content-Type": "application/json",
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to delete feedback" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error deleting feedback:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+// Update feedback status
+export async function updateFeedbackStatus(feedbackId, status, token) {
+  try {
+    const t = token || readToken();
+    if (!t) return { error: "No auth token found" };
+
+    const res = await fetch(`${API_URL}/feedbacks/${feedbackId}/status`, {
+      method: "PATCH",
+      headers: getHeaders({
+        Authorization: `Bearer ${t}`,
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.message || "Failed to update feedback status" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error updating feedback status:", err);
     return { error: err.message || "Something went wrong" };
   }
 }

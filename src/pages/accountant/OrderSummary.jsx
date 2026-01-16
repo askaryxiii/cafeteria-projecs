@@ -276,7 +276,9 @@ const OrderSummary = () => {
                   <td colSpan={2} className="border px-4 py-2 text-right">
                     Total
                   </td>
-                  <td className="border px-4 py-2 text-center">98</td>
+                  <td className="border px-4 py-2 text-center">
+                    {mainTableData.reduce((sum, row) => sum + row.count, 0)}
+                  </td>
                 </tr>
               </tbody>
             </table>

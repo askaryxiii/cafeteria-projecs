@@ -19,6 +19,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import Drinks from "./pages/user/Drinks";
 import UsersPage from "./pages/accountant/UsersPage";
 import OrderSummary from "./pages/accountant/OrderSummary";
+import Feedback from "./pages/user/Feedback";
 
 const App = () => {
   return (
@@ -73,6 +74,17 @@ const App = () => {
                 allowedRoles={["employee", "admin", "accountant"]}>
                 <PrivateLayout>
                   <Orders />
+                </PrivateLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/feedback"
+            element={
+              <ProtectedRoute
+                allowedRoles={["employee", "admin", "accountant"]}>
+                <PrivateLayout>
+                  <Feedback />
                 </PrivateLayout>
               </ProtectedRoute>
             }

@@ -9,7 +9,8 @@ const OrderSummary = () => {
   const navigate = useNavigate();
 
   const [mainTableData, setMainTableData] = useState([]);
-  const [ordersData, setOrdersData] = useState([]);
+  const [breakfastData, setBreakfastData] = useState([]);
+  const [lunchData, setLunchData] = useState([]);
   const [priceData, setPriceData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,14 +50,36 @@ const OrderSummary = () => {
         count: Number(item.count),
       }));
 
-      const ordersTotal = res.ordersData.reduce(
-        (sum, row) => sum + Number(row.count),
-        0
-      );
+      // Handle new API response structure with data and totals
+      const ordersDataArray = res.ordersData?.data || [];
+      const ordersTotals = res.ordersData?.totals || {
+        breakfast_count: 0,
+        lunch_count: 0,
+      };
 
-      const mappedOrdersData = [
-        ...res.ordersData,
-        { date: "Grand Total", count: ordersTotal, isTotal: true },
+      // Map orders data to separate breakfast and lunch
+      const mappedBreakfastData = [
+        ...ordersDataArray.map((row) => ({
+          date: row.date,
+          count: row.breakfast,
+        })),
+        {
+          date: "Grand Total",
+          count: Number(ordersTotals.breakfast_count),
+          isTotal: true,
+        },
+      ];
+
+      const mappedLunchData = [
+        ...ordersDataArray.map((row) => ({
+          date: row.date,
+          count: row.lunch,
+        })),
+        {
+          date: "Grand Total",
+          count: Number(ordersTotals.lunch_count),
+          isTotal: true,
+        },
       ];
 
       const priceTotal = res.priceData.reduce(
@@ -77,7 +100,8 @@ const OrderSummary = () => {
       ];
 
       setMainTableData(mappedMainData);
-      setOrdersData(mappedOrdersData);
+      setBreakfastData(mappedBreakfastData);
+      setLunchData(mappedLunchData);
       setPriceData(mappedPriceData);
     } catch (err) {
       console.error("Failed to fetch summary:", err);
@@ -92,40 +116,78 @@ const OrderSummary = () => {
     /* ===============================
      LEFT TABLE – MEALS SUMMARY
   =============================== */
-    const mealsHeaderRow = 2; // Excel row 2 (like screenshot)
+    const mealsHeaderRow = 2;
 
-    const mealsHeader = [["Class", "Meal", "Count of Meal"]];
-    const mealsRows = mainTableData.map((r) => [r.class, r.meal, r.count]);
+    XLSX.utils.sheet_add_aoa(ws, [["Class", "Meal", "Count of Meal"]], {
+      origin: "A2",
+    });
 
-    const mealsTotalRowIndex = mealsHeaderRow + mealsRows.length + 1;
-
-    XLSX.utils.sheet_add_aoa(ws, mealsHeader, { origin: "A2" });
-    XLSX.utils.sheet_add_aoa(ws, mealsRows, { origin: "A3" });
     XLSX.utils.sheet_add_aoa(
       ws,
-      [["Grand Total", "", mainTableData.reduce((s, r) => s + r.count, 0)]],
+      mainTableData.map((r) => [r.class, r.meal, r.count]),
+      { origin: "A3" }
+    );
+
+    const mealsTotalRowIndex = mealsHeaderRow + mainTableData.length + 1;
+
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [["Total", "", mainTableData.reduce((s, r) => s + r.count, 0)]],
       { origin: `A${mealsTotalRowIndex}` }
     );
 
     /* ===============================
-     RIGHT TOP – ORDERS TABLE
+     RIGHT – BREAKFAST ORDERS
   =============================== */
-    XLSX.utils.sheet_add_aoa(ws, [["date", "Count of Orders"]], {
+    XLSX.utils.sheet_add_aoa(ws, [["date", "Breakfast Orders"]], {
       origin: "E2",
     });
 
     XLSX.utils.sheet_add_aoa(
       ws,
-      ordersData.map((r) => [r.date, r.count]),
+      breakfastData.filter((r) => !r.isTotal).map((r) => [r.date, r.count]),
       { origin: "E3" }
     );
 
-    const ordersTotalRow = 2 + ordersData.length;
+    const breakfastTotalRow =
+      2 + breakfastData.filter((r) => !r.isTotal).length + 1;
+
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [["Grand Total", breakfastData.find((r) => r.isTotal)?.count || 0]],
+      { origin: `E${breakfastTotalRow}` }
+    );
 
     /* ===============================
-     RIGHT BOTTOM – PRICE TABLE
+     RIGHT – LUNCH ORDERS
   =============================== */
-    const priceStartRow = ordersTotalRow + 4;
+    const lunchStartRow = breakfastTotalRow + 3;
+
+    XLSX.utils.sheet_add_aoa(ws, [["date", "Lunch Orders"]], {
+      origin: `E${lunchStartRow}`,
+    });
+
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      lunchData.filter((r) => !r.isTotal).map((r) => [r.date, r.count]),
+      { origin: `E${lunchStartRow + 1}` }
+    );
+
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [["Grand Total", lunchData.find((r) => r.isTotal)?.count || 0]],
+      {
+        origin: `E${
+          lunchStartRow + lunchData.filter((r) => !r.isTotal).length + 1
+        }`,
+      }
+    );
+
+    /* ===============================
+     RIGHT – SUM OF PRICE
+  =============================== */
+    const priceStartRow =
+      lunchStartRow + lunchData.filter((r) => !r.isTotal).length + 4;
 
     XLSX.utils.sheet_add_aoa(ws, [["date", "Sum of Price"]], {
       origin: `E${priceStartRow}`,
@@ -133,31 +195,41 @@ const OrderSummary = () => {
 
     XLSX.utils.sheet_add_aoa(
       ws,
-      priceData.map((r) => [r.date, r.sum]),
+      priceData
+        .filter((r) => !r.isTotal)
+        .map((r) => [r.date, Number(r.sum.replace(/,/g, ""))]),
       { origin: `E${priceStartRow + 1}` }
     );
 
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [
+        [
+          "Grand Total",
+          Number(priceData.find((r) => r.isTotal)?.sum.replace(/,/g, "") || 0),
+        ],
+      ],
+      {
+        origin: `E${
+          priceStartRow + priceData.filter((r) => !r.isTotal).length + 1
+        }`,
+      }
+    );
+
     /* ===============================
-     COLUMN WIDTHS (MATCH IMAGE)
+     COLUMN WIDTHS
   =============================== */
     ws["!cols"] = [
-      { wch: 22 }, // A - Class
-      { wch: 45 }, // B - Meal
-      { wch: 14 }, // C - Count
-      { wch: 4 }, // D - gap
-      { wch: 16 }, // E - Date
-      { wch: 18 }, // F - Value
+      { wch: 22 },
+      { wch: 45 },
+      { wch: 14 },
+      { wch: 4 },
+      { wch: 16 },
+      { wch: 18 },
     ];
 
     /* ===============================
-     FILTERS (LIKE EXCEL TABLE)
-  =============================== */
-    ws["!autofilter"] = {
-      ref: `A2:C${mealsTotalRowIndex - 1}`,
-    };
-
-    /* ===============================
-     STYLES (HEADERS, TOTALS, BORDERS)
+     STYLES
   =============================== */
     const range = XLSX.utils.decode_range(ws["!ref"]);
 
@@ -166,7 +238,6 @@ const OrderSummary = () => {
         const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
         if (!cell) continue;
 
-        // Borders
         cell.s = {
           border: {
             top: { style: "thin" },
@@ -174,23 +245,12 @@ const OrderSummary = () => {
             left: { style: "thin" },
             right: { style: "thin" },
           },
+          font:
+            cell.v === "Grand Total" || cell.v === "Total"
+              ? { bold: true }
+              : {},
         };
 
-        // Headers
-        if (R === mealsHeaderRow - 1 || R === 1 || R === priceStartRow - 1) {
-          cell.s.font = { bold: true };
-        }
-
-        // Totals
-        if (
-          R === mealsTotalRowIndex - 1 ||
-          ordersData[R - 2]?.isTotal ||
-          priceData[R - priceStartRow]?.isTotal
-        ) {
-          cell.s.font = { bold: true };
-        }
-
-        // Number formatting
         if (C === 2 || C === 5) {
           cell.z = "#,##0";
         }
@@ -198,7 +258,7 @@ const OrderSummary = () => {
     }
 
     /* ===============================
-     WORKBOOK EXPORT
+     EXPORT
   =============================== */
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Order Summary");
@@ -223,8 +283,8 @@ const OrderSummary = () => {
 
   return (
     <section className="px-3 pt-10">
-      <div className="min-h-fit">
-        <div className="order-first lg:order-last w-fit">
+      <div className="min-h-fit space-y-3">
+        <div className="order-first lg:order-last flex justify-end w-full">
           <button
             className="flex items-center gap-1 bg-[#008000] text-white px-4 py-1.5 rounded-md cursor-pointer hover:bg-[#006400]"
             onClick={exportToExcel}>
@@ -287,17 +347,18 @@ const OrderSummary = () => {
           {/* Right Side Tables */}
           <div className="w-full lg:w-auto flex flex-col gap-6">
             {/* Orders Table */}
+            {/* breakfast table */}
             <table className="border-collapse border border-gray-300 bg-white w-full min-w-max">
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border px-4 py-2">date</th>
                   <th className="border px-4 py-2 text-center">
-                    Count of Orders
+                    Breakfast Orders
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {ordersData.map((row, index) => (
+                {breakfastData.map((row, index) => (
                   <tr
                     key={index}
                     className={row.isTotal ? "bg-gray-300 font-bold" : ""}>
@@ -309,27 +370,48 @@ const OrderSummary = () => {
                 ))}
               </tbody>
             </table>
-
-            {/* Price Table */}
+            {/* lunch table */}
             <table className="border-collapse border border-gray-300 bg-white w-full min-w-max">
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border px-4 py-2">date</th>
-                  <th className="border px-4 py-2 text-center">Sum of Price</th>
+                  <th className="border px-4 py-2 text-center">Lunch Orders</th>
                 </tr>
               </thead>
               <tbody>
-                {priceData.map((row, index) => (
+                {lunchData.map((row, index) => (
                   <tr
                     key={index}
                     className={row.isTotal ? "bg-gray-300 font-bold" : ""}>
                     <td className="border px-4 py-2">{row.date}</td>
-                    <td className="border px-4 py-2 text-center">{row.sum}</td>
+                    <td className="border px-4 py-2 text-center">
+                      {row.count}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {/* Price Table */}
+          <table className="border-collapse border border-gray-300 bg-white min-w-max h-fit">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border px-4 py-2">date</th>
+                <th className="border px-4 py-2 text-center">Sum of Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {priceData.map((row, index) => (
+                <tr
+                  key={index}
+                  className={row.isTotal ? "bg-gray-300 font-bold " : ""}>
+                  <td className="border px-4 py-2">{row.date}</td>
+                  <td className="border px-4 py-2 text-center">{row.sum}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </section>

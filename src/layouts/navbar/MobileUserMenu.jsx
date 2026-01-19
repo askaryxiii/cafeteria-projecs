@@ -1,7 +1,7 @@
 import { FaPizzaSlice } from "react-icons/fa";
 import { FaUnlock } from "react-icons/fa";
 import { FaSignOutAlt } from "react-icons/fa";
-import { MdAdminPanelSettings } from "react-icons/md";
+import { MdAdminPanelSettings, MdOutlineRateReview } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
@@ -26,6 +26,12 @@ const MobileUserMenu = ({ onClose }) => {
         onClick={onClose}
         className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded transition">
         <FaUnlock className="" /> Change Password
+      </Link>
+      <Link
+        to="/user/feedback"
+        onClick={onClose}
+        className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded transition">
+        <MdOutlineRateReview className="" /> Feedback
       </Link>
 
       {isAdmin && (

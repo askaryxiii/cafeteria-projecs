@@ -158,10 +158,7 @@ const DashboardAdmin = () => {
                     </p>
                   </div>
                 </div>
-                <RevenueChart
-                  timePeriod={activeTab}
-                  revenue={currentData?.total_revenue}
-                />
+                <RevenueChart timePeriod={activeTab} data={currentData} />
               </Card>
 
               {/* Order Time Card */}

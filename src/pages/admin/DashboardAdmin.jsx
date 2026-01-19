@@ -144,7 +144,10 @@ const DashboardAdmin = () => {
                       Revenue
                     </p>
                     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-                      EGP {currentData?.total_revenue || "0.00"}
+                      EGP{" "}
+                      {currentData?.total_revenue?.total ||
+                        currentData?.total_revenue ||
+                        "0.00"}
                     </h2>
 
                     <p className="text-gray-500 text-xs mt-1 sm:mt-2">

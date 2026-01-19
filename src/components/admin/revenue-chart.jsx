@@ -19,49 +19,84 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Transform API data into chart format based on time period
-  useEffect(() => {
-    if (!data || !data.revenue_by_period) {
-      setChartData([]);
-      return;
+  // Format data from API breakdown
+  const formatRevenueData = (totalRevenueObj, timePeriod) => {
+    if (
+      !totalRevenueObj ||
+      !totalRevenueObj.breakdown ||
+      !totalRevenueObj.breakdown.data
+    ) {
+      return [];
     }
 
-    let formattedData = [];
+    const breakdownData = totalRevenueObj.breakdown.data;
+    let chartDataArray = [];
 
     switch (timePeriod) {
-      case "24hours":
-        // 24 hours - hourly data (0-23)
-        formattedData = (data.revenue_by_period.hourly || []).map(
-          (item, index) => ({
-            name: String(index).padStart(2, "0"),
-            value: Math.round(parseFloat(item.revenue || 0)),
-          })
-        );
+      case "24hours": {
+        // Convert hourly breakdown to chart format
+        chartDataArray = Array.from({ length: 24 }, (_, hour) => {
+          const timeKey = String(hour).padStart(2, "0") + ":00";
+          const hourData = breakdownData[timeKey];
+          return {
+            name: String(hour).padStart(2, "0"),
+            value: hourData ? Math.round(parseFloat(hourData.revenue || 0)) : 0,
+          };
+        });
         break;
+      }
 
-      case "weeks":
-        // Weekly data (7 days)
+      case "weeks": {
+        // Convert daily breakdown to chart format (7 days)
         const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        formattedData = (data.revenue_by_period.daily || []).map(
-          (item, index) => ({
-            name: dayNames[index % 7],
-            value: Math.round(parseFloat(item.revenue || 0)),
-          })
-        );
-        break;
+        const dayMap = {};
 
-      case "months":
-        // Monthly data (days of month, ~30 days)
-        formattedData = (data.revenue_by_period.daily || []).map(
-          (item, index) => ({
-            name: String(index + 1).padStart(2, "0"),
-            value: Math.round(parseFloat(item.revenue || 0)),
-          })
-        );
-        break;
+        // Group by day name
+        Object.values(breakdownData).forEach((dayData) => {
+          if (dayData.day_name) {
+            if (!dayMap[dayData.day_name]) {
+              dayMap[dayData.day_name] = 0;
+            }
+            dayMap[dayData.day_name] += parseFloat(dayData.revenue || 0);
+          }
+        });
 
-      case "years":
-        // Yearly data (12 months)
+        // Create chart data with all 7 days
+        chartDataArray = dayNames.map((day) => ({
+          name: day,
+          value: Math.round(dayMap[day] || 0),
+        }));
+        break;
+      }
+
+      case "months": {
+        // Convert daily breakdown to chart format (30 days)
+        const dayMap = {};
+
+        // Group by day of month
+        Object.values(breakdownData).forEach((dayData) => {
+          if (dayData.day !== undefined) {
+            const dayStr = String(dayData.day).padStart(2, "0");
+            if (!dayMap[dayStr]) {
+              dayMap[dayStr] = 0;
+            }
+            dayMap[dayStr] += parseFloat(dayData.revenue || 0);
+          }
+        });
+
+        // Create chart data with all 30 days
+        chartDataArray = Array.from({ length: 30 }, (_, i) => {
+          const day = String(i + 1).padStart(2, "0");
+          return {
+            name: day,
+            value: Math.round(dayMap[day] || 0),
+          };
+        });
+        break;
+      }
+
+      case "years": {
+        // Convert monthly breakdown to chart format (12 months)
         const monthNames = [
           "Jan",
           "Feb",
@@ -76,19 +111,43 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
           "Nov",
           "Dec",
         ];
-        formattedData = (data.revenue_by_period.monthly || []).map(
-          (item, index) => ({
-            name: monthNames[index % 12],
-            value: Math.round(parseFloat(item.revenue || 0)),
-          })
-        );
+        const monthMap = {};
+
+        // Group by month
+        Object.values(breakdownData).forEach((monthData) => {
+          if (monthData.month_label) {
+            // Extract month name from label like "January 2026"
+            const monthName = monthData.month_label.split(" ")[0];
+            monthMap[monthName] = Math.round(
+              parseFloat(monthData.revenue || 0)
+            );
+          }
+        });
+
+        // Create chart data with all 12 months
+        chartDataArray = monthNames.map((month) => ({
+          name: month,
+          value: monthMap[month] || 0,
+        }));
         break;
+      }
 
       default:
-        formattedData = [];
+        chartDataArray = [];
     }
 
-    setChartData(formattedData);
+    return chartDataArray;
+  };
+
+  // Update chart when data or timePeriod changes
+  useEffect(() => {
+    if (!data || !data.total_revenue) {
+      setChartData([]);
+      return;
+    }
+
+    const revenueData = formatRevenueData(data.total_revenue, timePeriod);
+    setChartData(revenueData);
   }, [timePeriod, data]);
 
   if (!chartData || chartData.length === 0) {

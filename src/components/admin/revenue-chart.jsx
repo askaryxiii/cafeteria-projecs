@@ -26,10 +26,12 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
       !totalRevenueObj.breakdown ||
       !totalRevenueObj.breakdown.data
     ) {
+      console.log("Missing breakdown data", totalRevenueObj);
       return [];
     }
 
     const breakdownData = totalRevenueObj.breakdown.data;
+    console.log(`${timePeriod} breakdown data:`, breakdownData);
     let chartDataArray = [];
 
     switch (timePeriod) {
@@ -49,22 +51,50 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
       case "weeks": {
         // Convert daily breakdown to chart format (7 days)
         const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const fullDayNames = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
         const dayMap = {};
 
+        // Initialize all days
+        dayNames.forEach((day) => {
+          dayMap[day] = 0;
+        });
+
         // Group by day name
-        Object.values(breakdownData).forEach((dayData) => {
+        Object.entries(breakdownData).forEach(([key, dayData]) => {
+          let dayName = null;
+
+          // Check if day_name exists and convert to short form
           if (dayData.day_name) {
-            if (!dayMap[dayData.day_name]) {
-              dayMap[dayData.day_name] = 0;
+            const fullDay = dayData.day_name.trim();
+            const dayIndex = fullDayNames.indexOf(fullDay);
+            if (dayIndex !== -1) {
+              dayName = dayNames[dayIndex];
             }
-            dayMap[dayData.day_name] += parseFloat(dayData.revenue || 0);
+          }
+
+          // Fallback: calculate from date if day_name not found
+          if (!dayName && dayData.date) {
+            const date = new Date(dayData.date);
+            dayName = dayNames[date.getDay()];
+          }
+
+          if (dayName) {
+            dayMap[dayName] += parseFloat(dayData.revenue || 0);
           }
         });
 
         // Create chart data with all 7 days
         chartDataArray = dayNames.map((day) => ({
           name: day,
-          value: Math.round(dayMap[day] || 0),
+          value: Math.round(dayMap[day]),
         }));
         break;
       }
@@ -73,13 +103,23 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
         // Convert daily breakdown to chart format (30 days)
         const dayMap = {};
 
+        // Initialize all 30 days
+        for (let i = 1; i <= 30; i++) {
+          dayMap[String(i).padStart(2, "0")] = 0;
+        }
+
         // Group by day of month
-        Object.values(breakdownData).forEach((dayData) => {
-          if (dayData.day !== undefined) {
-            const dayStr = String(dayData.day).padStart(2, "0");
-            if (!dayMap[dayStr]) {
-              dayMap[dayStr] = 0;
-            }
+        Object.entries(breakdownData).forEach(([key, dayData]) => {
+          let dayNum = dayData.day;
+
+          // If no day property, try to extract from date
+          if (dayNum === undefined && dayData.date) {
+            const date = new Date(dayData.date);
+            dayNum = date.getDate();
+          }
+
+          if (dayNum !== undefined) {
+            const dayStr = String(dayNum).padStart(2, "0");
             dayMap[dayStr] += parseFloat(dayData.revenue || 0);
           }
         });
@@ -89,7 +129,7 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
           const day = String(i + 1).padStart(2, "0");
           return {
             name: day,
-            value: Math.round(dayMap[day] || 0),
+            value: Math.round(dayMap[day]),
           };
         });
         break;
@@ -113,21 +153,51 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
         ];
         const monthMap = {};
 
+        // Initialize all months
+        monthNames.forEach((month) => {
+          monthMap[month] = 0;
+        });
+
         // Group by month
-        Object.values(breakdownData).forEach((monthData) => {
+        Object.entries(breakdownData).forEach(([key, monthData]) => {
+          let monthNum = monthData.month;
+          let monthName = null;
+
+          // Try to get month name from label (e.g., "January 2026" -> "Jan")
           if (monthData.month_label) {
-            // Extract month name from label like "January 2026"
-            const monthName = monthData.month_label.split(" ")[0];
-            monthMap[monthName] = Math.round(
-              parseFloat(monthData.revenue || 0)
-            );
+            const fullMonthName = monthData.month_label.split(" ")[0];
+            // Convert full month name to 3-letter abbreviation
+            const monthAbbreviations = {
+              January: "Jan",
+              February: "Feb",
+              March: "Mar",
+              April: "Apr",
+              May: "May",
+              June: "Jun",
+              July: "Jul",
+              August: "Aug",
+              September: "Sep",
+              October: "Oct",
+              November: "Nov",
+              December: "Dec",
+            };
+            monthName = monthAbbreviations[fullMonthName];
+          }
+
+          // If no month name yet, try to use month number
+          if (!monthName && monthNum !== undefined) {
+            monthName = monthNames[monthNum - 1];
+          }
+
+          if (monthName && monthNames.includes(monthName)) {
+            monthMap[monthName] += parseFloat(monthData.revenue || 0);
           }
         });
 
         // Create chart data with all 12 months
         chartDataArray = monthNames.map((month) => ({
           name: month,
-          value: monthMap[month] || 0,
+          value: Math.round(monthMap[month]),
         }));
         break;
       }
@@ -136,6 +206,7 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
         chartDataArray = [];
     }
 
+    console.log(`${timePeriod} chart data:`, chartDataArray);
     return chartDataArray;
   };
 

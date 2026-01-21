@@ -114,7 +114,7 @@ const App = () => {
           <Route
             path="/chef"
             element={
-              <ProtectedRoute allowedRoles={["chef"]}>
+              <ProtectedRoute allowedRoles={["chef", "admin"]}>
                 <PrivateLayout>
                   <DashboardChef />
                 </PrivateLayout>

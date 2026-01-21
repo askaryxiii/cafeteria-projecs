@@ -1,5 +1,5 @@
 import Logo from "../../../components/ui/logos/Logo";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import AuthContext from "../../../context/AuthContext";
 import { TbLogout } from "react-icons/tb";

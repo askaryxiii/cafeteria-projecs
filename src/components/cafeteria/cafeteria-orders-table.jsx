@@ -183,24 +183,26 @@ export function CafeteriaOrdersTable({
       {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm md:text-base">
-          <thead className="bg-gray-200">
+          <thead className="bg-[#DDDBDB]">
             <tr>
-              <th className="px-4 py-2 text-left border">Checkbox</th>
-              <th className="px-4 py-2 text-left border">Full Name</th>
-              <th className="px-4 py-2 text-left border">Order</th>
-              <th className="px-4 py-2 text-left border">Meal Type</th>
-              {showDelete && (
-                <th className="px-4 py-2 text-center border">Actions</th>
-              )}
+              <th className="px-4 py-2 text-center">Checkbox</th>
+              <th className="px-4 py-2 text-center">Full Name</th>
+              <th className="px-4 py-2 text-center">Order</th>
+              <th className="px-4 py-2 text-center">Meal Type</th>
+              {showDelete && <th className="px-4 py-2 text-center">Actions</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="border-t-[0.1rem] border-t-[#d3d3d3]">
             {items.length > 0 ? (
               items.map((item) => (
                 <tr
                   key={item.id}
-                  className={item.checked ? "bg-gray-100 opacity-50" : ""}>
-                  <td className="px-4 py-2 border">
+                  className={
+                    item.checked
+                      ? "bg-gray-100 opacity-50"
+                      : "border-b-[0.1rem] border-b-[#d3d3d3]"
+                  }>
+                  <td className="px-4 py-2 text-center border">
                     <input
                       type="checkbox"
                       checked={checkedItems.has(item.id)}
@@ -208,11 +210,13 @@ export function CafeteriaOrdersTable({
                       className="w-4 h-4 accent-blue-600 cursor-pointer"
                     />
                   </td>
-                  <td className="px-4 py-2 border font-medium">{item.name}</td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-center font-medium">
+                    {item.name}
+                  </td>
+                  <td className="px-4 py-2 border text-center">
                     {formatOrderDetails(item)}
                   </td>
-                  <td className="px-4 py-2 border text-sm capitalize">
+                  <td className="px-4 py-2 border text-center text-sm capitalize">
                     {item.meal_type}
                   </td>
                   {showDelete && (

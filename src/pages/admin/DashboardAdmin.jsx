@@ -17,10 +17,18 @@ const DashboardAdmin = () => {
 
   // Map tab values to API response keys
   const tabToStatsKey = {
-    "24hours": "last_24_hours",
+    "24hours": "current_week",
     weeks: "last_week",
     months: "last_month",
-    years: "last_year",
+    years: "current_year",
+  };
+
+  // Update tab labels based on API response
+  const tabLabels = {
+    "24hours": "Current Week",
+    weeks: "Last Week",
+    months: "Last Month",
+    years: "Current Year",
   };
 
   // Fetch stats on mount and when tab changes
@@ -103,7 +111,7 @@ const DashboardAdmin = () => {
             <TabsTrigger
               value="24hours"
               className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
-              Last 24 hours
+              Current Week
             </TabsTrigger>
             <TabsTrigger
               value="weeks"
@@ -118,7 +126,7 @@ const DashboardAdmin = () => {
             <TabsTrigger
               value="years"
               className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
-              Last Years
+              Current Year
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -135,9 +143,9 @@ const DashboardAdmin = () => {
         ) : (
           <>
             {/* Revenue and Order Time Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+            <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
               {/* Revenue Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 col-span-1 lg:col-span-1 ">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 flex w-full lg:w-1/2 min-w-0">
                 <div className="flex justify-between items-start mb-3 sm:mb-4 md:mb-4">
                   <div>
                     <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">
@@ -145,19 +153,19 @@ const DashboardAdmin = () => {
                     </p>
                     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                       EGP{" "}
-                      {currentData?.total_revenue?.total ||
-                        currentData?.total_revenue ||
-                        "0.00"}
+                      {typeof currentData?.total_revenue === "object"
+                        ? currentData?.total_revenue?.total || "0.00"
+                        : currentData?.total_revenue || "0.00"}
                     </h2>
 
                     <p className="text-gray-500 text-xs mt-1 sm:mt-2">
                       {activeTab === "24hours"
-                        ? "Last 24 hours"
+                        ? "Current week"
                         : activeTab === "weeks"
                         ? "Last week"
                         : activeTab === "months"
                         ? "Last month"
-                        : "Last year"}
+                        : "Current year"}
                     </p>
                   </div>
                 </div>
@@ -165,7 +173,7 @@ const DashboardAdmin = () => {
               </Card>
 
               {/* Order Time Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 col-span-1 lg:col-span-2">
+              <Card className="bg-[#E2E2E2] rounded-none p-3 w-full lg:w-1/2 sm:p-4 md:p-6 ">
                 <div className="flex justify-between items-start mb-4 sm:mb-5 md:mb-6">
                   <div>
                     <p className="text-gray-600 text-xs sm:text-sm mb-0.5 sm:mb-1">
@@ -174,10 +182,35 @@ const DashboardAdmin = () => {
                     <p className="text-gray-500 text-xs">
                       Most common:{" "}
                       <span className="font-semibold">
-                        {currentData?.most_common_time_range?.time_range ||
-                          "N/A"}
-                      </span>{" "}
-                      ({currentData?.most_common_time_range?.count || 0} orders)
+                        {(() => {
+                          const dist = currentData?.time_range_distribution;
+                          if (!dist) return "N/A";
+
+                          const timeRanges = [
+                            {
+                              name: "Morning",
+                              value: parseFloat(dist.morning?.percentage) || 0,
+                            },
+                            {
+                              name: "Afternoon",
+                              value:
+                                parseFloat(dist.afternoon?.percentage) || 0,
+                            },
+                            {
+                              name: "Evening",
+                              value: parseFloat(dist.evening?.percentage) || 0,
+                            },
+                          ];
+
+                          const mostCommon = timeRanges.reduce((max, curr) =>
+                            curr.value > max.value ? curr : max
+                          );
+
+                          return `${
+                            mostCommon.name
+                          } (${mostCommon.value.toFixed(2)}%)`;
+                        })()}
+                      </span>
                     </p>
                   </div>
                 </div>

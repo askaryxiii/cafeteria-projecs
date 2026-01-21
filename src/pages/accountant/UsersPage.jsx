@@ -159,7 +159,7 @@ const UsersPage = () => {
           <Table className="w-full table-fixed">
             <TableHeader
               className={
-                "bg-transparent border-b border-b-[#ACA4A4] text-[#072A57]! "
+                "bg-[#DDDBDB] border-b border-b-[#ACA4A4] text-[#072A57]! "
               }
               columns={[...columns, { label: "", key: "actions" }]}
             />

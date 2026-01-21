@@ -13,7 +13,7 @@ export default function ItemsTableContent({
     <div className="w-full overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="bg-[#E2E2E2] border-b border-t border-[#ACA4A4]">
+          <tr className="bg-[#d6d4d4] border-b border-[#ACA4A4]">
             <th className="px-6 py-4 text-left text-sm font-bold text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition">
               <button
                 className="flex items-center gap-2 w-full cursor-pointer"

@@ -12,11 +12,17 @@ import {
 export default function RevenueChart({ timePeriod = "24hours", data = null }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [chartData, setChartData] = useState([]);
+  const [mounted, setMounted] = useState(false);
+  const THEME_COLOR = "#02356A"; // Projecs Blue
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   // Format data from API breakdown
@@ -31,40 +37,28 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
     }
 
     const breakdownData = totalRevenueObj.breakdown.data;
-    console.log(`${timePeriod} breakdown data:`, breakdownData);
     let chartDataArray = [];
+
+    // Weekday names (excluding Saturday and Sunday)
+    const weekdayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+    const fullWeekdayNames = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+    ];
 
     switch (timePeriod) {
       case "24hours": {
-        // Convert hourly breakdown to chart format
-        chartDataArray = Array.from({ length: 24 }, (_, hour) => {
-          const timeKey = String(hour).padStart(2, "0") + ":00";
-          const hourData = breakdownData[timeKey];
-          return {
-            name: String(hour).padStart(2, "0"),
-            value: hourData ? Math.round(parseFloat(hourData.revenue || 0)) : 0,
-          };
-        });
-        break;
-      }
-
-      case "weeks": {
-        // Convert daily breakdown to chart format (7 days)
-        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const fullDayNames = [
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ];
+        // For current_week, data is daily (Mon-Fri only)
         const dayMap = {};
+        const dayDateMap = {};
 
-        // Initialize all days
-        dayNames.forEach((day) => {
+        // Initialize weekdays only
+        weekdayNames.forEach((day) => {
           dayMap[day] = 0;
+          dayDateMap[day] = null;
         });
 
         // Group by day name
@@ -74,37 +68,76 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
           // Check if day_name exists and convert to short form
           if (dayData.day_name) {
             const fullDay = dayData.day_name.trim();
-            const dayIndex = fullDayNames.indexOf(fullDay);
+            const dayIndex = fullWeekdayNames.indexOf(fullDay);
             if (dayIndex !== -1) {
-              dayName = dayNames[dayIndex];
+              dayName = weekdayNames[dayIndex];
             }
-          }
-
-          // Fallback: calculate from date if day_name not found
-          if (!dayName && dayData.date) {
-            const date = new Date(dayData.date);
-            dayName = dayNames[date.getDay()];
           }
 
           if (dayName) {
             dayMap[dayName] += parseFloat(dayData.revenue || 0);
+            // Store the date (extract day number from date YYYY-MM-DD)
+            if (dayData.date && !dayDateMap[dayName]) {
+              dayDateMap[dayName] = dayData.date.split("-")[2];
+            }
           }
         });
 
-        // Create chart data with all 7 days
-        chartDataArray = dayNames.map((day) => ({
-          name: day,
+        // Create chart data with weekdays and dates
+        chartDataArray = weekdayNames.map((day) => ({
+          name: dayDateMap[day] ? `${day} ${dayDateMap[day]}` : day,
+          value: Math.round(dayMap[day]),
+        }));
+        break;
+      }
+
+      case "weeks": {
+        // Convert daily breakdown to chart format (weekdays only)
+        const dayMap = {};
+        const dayDateMap = {};
+
+        // Initialize weekdays only
+        weekdayNames.forEach((day) => {
+          dayMap[day] = 0;
+          dayDateMap[day] = null;
+        });
+
+        // Group by day name
+        Object.entries(breakdownData).forEach(([key, dayData]) => {
+          let dayName = null;
+
+          // Check if day_name exists and convert to short form
+          if (dayData.day_name) {
+            const fullDay = dayData.day_name.trim();
+            const dayIndex = fullWeekdayNames.indexOf(fullDay);
+            if (dayIndex !== -1) {
+              dayName = weekdayNames[dayIndex];
+            }
+          }
+
+          if (dayName) {
+            dayMap[dayName] += parseFloat(dayData.revenue || 0);
+            // Store the date (extract day number from date YYYY-MM-DD)
+            if (dayData.date && !dayDateMap[dayName]) {
+              dayDateMap[dayName] = dayData.date.split("-")[2];
+            }
+          }
+        });
+
+        // Create chart data with weekdays and dates
+        chartDataArray = weekdayNames.map((day) => ({
+          name: dayDateMap[day] ? `${day} ${dayDateMap[day]}` : day,
           value: Math.round(dayMap[day]),
         }));
         break;
       }
 
       case "months": {
-        // Convert daily breakdown to chart format (30 days)
+        // Convert daily breakdown to chart format (weekdays only)
         const dayMap = {};
 
-        // Initialize all 30 days
-        for (let i = 1; i <= 30; i++) {
+        // Initialize weekdays only (1-31, but only show Mon-Fri)
+        for (let i = 1; i <= 31; i++) {
           dayMap[String(i).padStart(2, "0")] = 0;
         }
 
@@ -124,14 +157,14 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
           }
         });
 
-        // Create chart data with all 30 days
-        chartDataArray = Array.from({ length: 30 }, (_, i) => {
+        // Create chart data with all weekdays (filter out weekends in rendering)
+        chartDataArray = Array.from({ length: 31 }, (_, i) => {
           const day = String(i + 1).padStart(2, "0");
           return {
             name: day,
             value: Math.round(dayMap[day]),
           };
-        });
+        }).filter((item) => item.value > 0); // Only show days with data
         break;
       }
 
@@ -206,7 +239,6 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
         chartDataArray = [];
     }
 
-    console.log(`${timePeriod} chart data:`, chartDataArray);
     return chartDataArray;
   };
 
@@ -231,17 +263,21 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
 
   // Calculate the height based on number of data points
   const getChartHeight = () => {
-    if (timePeriod === "24hours") return 300;
-    if (timePeriod === "weeks") return 250;
-    if (timePeriod === "months") return 350;
-    if (timePeriod === "years") return 250;
+    if (timePeriod === "24hours") return 250; // 5 weekdays
+    if (timePeriod === "weeks") return 250; // 5 weekdays
+    if (timePeriod === "months") return 350; // variable weekday count
+    if (timePeriod === "years") return 250; // 12 months
     return 250;
   };
 
+  if (!mounted) return null;
+
   return (
-    <div className="relative w-full">
-      <div style={{ height: `${getChartHeight()}px`, minHeight: "220px" }}>
-        <ResponsiveContainer width="100%" height="100%">
+    <div className="relative w-full overflow-hidden">
+      <div
+        className="w-full"
+        style={{ height: `${getChartHeight()}px`, minWidth: 0 }}>
+        <ResponsiveContainer width="100%" height="100%" debounceEnd={100}>
           <BarChart
             data={chartData}
             margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
@@ -250,9 +286,9 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
               dataKey="name"
               fontSize={isMobile ? 10 : 12}
               stroke="#9ca3af"
-              angle={timePeriod === "24hours" ? -45 : 0}
-              textAnchor={timePeriod === "24hours" ? "end" : "middle"}
-              height={timePeriod === "24hours" ? 60 : 30}
+              angle={timePeriod === "months" ? -45 : 0}
+              textAnchor={timePeriod === "months" ? "end" : "middle"}
+              height={timePeriod === "months" ? 60 : 30}
             />
             <YAxis
               stroke="#9ca3af"
@@ -269,7 +305,7 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
               formatter={(value) => [`EGP ${value.toFixed(2)}`, "Revenue"]}
               labelFormatter={(label) => `${label}`}
             />
-            <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="value" fill={THEME_COLOR} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -277,15 +313,17 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
       {/* Legend */}
       <div className="flex justify-between mt-2 sm:mt-3 md:mt-4 text-xs sm:text-xs md:text-sm text-gray-600 gap-2">
         <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
-          <div className="w-1.5 sm:w-2 md:w-2.5 h-1.5 sm:h-2 md:h-2.5 bg-blue-600 rounded-full"></div>
+          <div
+            className="w-1.5 sm:w-2 md:w-2.5 h-1.5 sm:h-2 md:h-2.5 rounded-full"
+            style={{ backgroundColor: THEME_COLOR }}></div>
           <span>
             {timePeriod === "24hours"
-              ? "24 Hours"
+              ? "Current Week (Mon-Fri)"
               : timePeriod === "weeks"
-              ? "7 Days"
+              ? "Last Week (Mon-Fri)"
               : timePeriod === "months"
-              ? "30 Days"
-              : "12 Months"}
+              ? "Current Month (Weekdays)"
+              : "Current Year (Months)"}
           </span>
         </div>
         <span>

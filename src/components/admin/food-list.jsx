@@ -1,15 +1,18 @@
 import { MdOutlineFastfood } from "react-icons/md";
 export default function FoodList({ items }) {
-
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
         <div
           key={index}
-          className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+          className="flex items-center justify-between py-2 border-b border-gray-400 last:border-b-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-xl">
-              <MdOutlineFastfood className="text-gray-600 w-6 h-6" />
+            <div className=" w-12 h-12 rounded-full flex items-center justify-center">
+              <img
+                src="/assets/logo/dish.webp"
+                alt="Food icon"
+                className=" object-contain"
+              />
             </div>
             <span className="text-gray-700 text-sm font-medium">
               {item.name}{" "}

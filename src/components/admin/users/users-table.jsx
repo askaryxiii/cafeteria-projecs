@@ -11,6 +11,7 @@ import { MdArrowUpward } from "react-icons/md";
 import { getAllUsers, deleteUser } from "../../../lib/apis";
 import toast from "react-hot-toast";
 import DashboardHeader from "../../../layouts/navbar/admin/DashboardHeader";
+import SearchBar from "../menu/search-bar";
 
 export default function UsersTable() {
   const [users, setUsers] = useState([]);
@@ -147,17 +148,8 @@ export default function UsersTable() {
               <Plus className="w-3 sm:w-4 md:w-5 h-3 sm:h-4 md:h-5" />
               Create New User
             </button>
-            <div className="flex-1 relative shadow-lg">
-              <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] bg-[#D9D9D9] focus:outline-none text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11"
-              />
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
+            <SearchBar value={searchTerm} onChange={setSearchTerm} />
+            <div className="flex items-center gap-1 sm:gap-2 px-2 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
               Showing <span className="font-semibold">{usersCount}</span> users
             </div>
           </div>

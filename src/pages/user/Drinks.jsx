@@ -36,6 +36,12 @@ const Drinks = ({ onOrderPlaced }) => {
         const codes = selectedDrinks.drinks || [];
         const items = codes.map((c) => ({ code: c }));
 
+        // DEBUG: Check if items is empty
+        if (items.length === 0) {
+          toast.error("No drinks selected");
+          return;
+        }
+
         const orderBody = {
           date: components.dateString,
           meal_type: "drinks",
@@ -43,6 +49,8 @@ const Drinks = ({ onOrderPlaced }) => {
           total_cost: Number(totalPrice),
           items,
         };
+
+        console.log("Order body:", orderBody);
 
         const response = await fetch(`${API_URL}/orders`, {
           method: "POST",
@@ -56,6 +64,7 @@ const Drinks = ({ onOrderPlaced }) => {
 
         if (!response.ok) {
           const error = await response.json();
+          console.error("Backend error response:", error); // DEBUG
           throw new Error(error.message || "Failed to place order");
         }
 
@@ -69,7 +78,7 @@ const Drinks = ({ onOrderPlaced }) => {
           onOrderPlaced(result);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Full error:", err);
         toast.error(err.message || "Failed to place order");
       }
     })();

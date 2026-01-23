@@ -5,12 +5,12 @@ export default function CheckboxItem({ item, isChecked, onChange }) {
         type="checkbox"
         checked={isChecked}
         onChange={(e) => onChange(e.target.checked)}
-        className="w-4 sm:w-5 md:w-5 h-4 sm:h-5 md:h-5 cursor-pointer accent-blue-950 shrink-0"
+        className="w-4 md:w-5 h-4 md:h-5 cursor-pointer accent-navy-light shrink-0"
       />
-      <span className="text-[#02356A] flex-1 text-sm sm:text-base md:text-lg lg:text-xl font-semibold">
+      <span className="text-navy-dark flex-1 text-sm sm:text-base md:text-lg lg:text-xl font-semibold">
         {item?.item_name} {item.weight_grams && `- ${item.weight_grams} جرام`}
       </span>
-      <span className="text-[#02356A] text-xs sm:text-sm md:text-base font-semibold whitespace-nowrap">
+      <span className="text-navy-dark text-xs sm:text-sm md:text-base font-semibold whitespace-nowrap">
         {item.price} LE
       </span>
     </label>

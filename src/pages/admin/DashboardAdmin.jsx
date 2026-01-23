@@ -94,7 +94,7 @@ const DashboardAdmin = () => {
     : [];
 
   return (
-    <div className="bg-[#E2E2E2] min-h-screen w-full">
+    <div className="bg-mid-grey shadow-lg/30 min-h-screen w-full rounded-md">
       {/* Header */}
       <DashboardHeader
         title="Dashboard"
@@ -105,27 +105,27 @@ const DashboardAdmin = () => {
       />
 
       {/* Time Period Tabs */}
-      <div className="px-2.5 md:px-6 py-2 sm:py-3 md:py-4 border-b border-gray-400 overflow-x-auto">
+      <div className="mx-2.5 md:mx-6  border-b border-dark-grey overflow-x-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-max">
-          <TabsList className="bg-transparent p-1 gap-3 md:gap-4 ">
+          <TabsList className="bg-transparent gap-3 md:gap-4 ">
             <TabsTrigger
               value="24hours"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
+              className="bg-transparent text-dark-grey data-[state=active]:text-primary-navy rounded-none px-0 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Current Week
             </TabsTrigger>
             <TabsTrigger
               value="weeks"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
+              className="bg-transparent text-dark-grey data-[state=active]:text-primary-navy rounded-none px-0 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Last Weeks
             </TabsTrigger>
             <TabsTrigger
               value="months"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
+              className="bg-transparent text-dark-grey data-[state=active]:text-primary-navy rounded-none px-0 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Last Months
             </TabsTrigger>
             <TabsTrigger
               value="years"
-              className="bg-transparent text-[#8A919A] data-[state=active]:text-[#011844B2] rounded-none px-0 py-1 sm:py-2 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
+              className="bg-transparent text-dark-grey data-[state=active]:text-primary-navy rounded-none px-0 font-base text-xs sm:text-sm md:text-base whitespace-nowrap">
               Current Year
             </TabsTrigger>
           </TabsList>
@@ -143,22 +143,22 @@ const DashboardAdmin = () => {
         ) : (
           <>
             {/* Revenue and Order Time Row */}
-            <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
+            <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 ">
               {/* Revenue Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6 flex w-full lg:w-1/2 min-w-0">
+              <Card className="bg-light-grey rounded-none p-3 sm:p-4 md:p-6 flex w-full lg:w-1/2 min-w-0">
                 <div className="flex justify-between items-start mb-3 sm:mb-4 md:mb-4">
                   <div>
-                    <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">
+                    <p className="text-dark-grey text-xs sm:text-sm mb-1 sm:mb-2">
                       Revenue
                     </p>
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-dark">
                       EGP{" "}
                       {typeof currentData?.total_revenue === "object"
                         ? currentData?.total_revenue?.total || "0.00"
                         : currentData?.total_revenue || "0.00"}
                     </h2>
 
-                    <p className="text-gray-500 text-xs mt-1 sm:mt-2">
+                    <p className="text-dark-grey text-xs mt-1 sm:mt-2">
                       {activeTab === "24hours"
                         ? "Current week"
                         : activeTab === "weeks"
@@ -173,7 +173,7 @@ const DashboardAdmin = () => {
               </Card>
 
               {/* Order Time Card */}
-              <Card className="bg-[#E2E2E2] rounded-none p-3 w-full lg:w-1/2 sm:p-4 md:p-6 ">
+              <Card className="bg-light-grey rounded-none p-3 w-full lg:w-1/2 sm:p-4 md:p-6 ">
                 <div className="flex justify-between items-start mb-4 sm:mb-5 md:mb-6">
                   <div>
                     <p className="text-gray-600 text-xs sm:text-sm mb-0.5 sm:mb-1">
@@ -220,21 +220,21 @@ const DashboardAdmin = () => {
 
             {/* Most and Least Ordered Food Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
-                <span className="text-gray-900 text-base sm:text-lg md:text-xl font-bold block">
+              <Card className="bg-light-grey rounded-none p-3 sm:p-4 md:p-6">
+                <span className="text-text-dark text-base sm:text-lg md:text-xl font-bold block">
                   Most Ordered Food
                 </span>
-                <p className="text-gray-500 text-xs">
+                <p className="text-dark-grey text-xs">
                   Top {mostOrderedItems.length} items by order quantity
                 </p>
                 <FoodList items={mostOrderedItems} />
               </Card>
 
-              <Card className="bg-[#E2E2E2] rounded-none p-3 sm:p-4 md:p-6">
-                <span className="text-gray-900 text-base sm:text-lg md:text-xl font-bold block">
+              <Card className="bg-light-grey rounded-none p-3 sm:p-4 md:p-6">
+                <span className="text-text-dark text-base sm:text-lg md:text-xl font-bold block">
                   Least Ordered Food
                 </span>
-                <p className="text-gray-500 text-xs">
+                <p className="text-dark-grey text-xs">
                   Bottom {leastOrderedItems.length} items by order quantity
                 </p>
                 <FoodList items={leastOrderedItems} />

@@ -47,7 +47,7 @@ const CafeteriaDashboard = () => {
   };
 
   return (
-    <div className="">
+    <div className="bg-light-grey rounded-md">
       <DashboardHeader
         title="Cafeteria"
         dist="/"

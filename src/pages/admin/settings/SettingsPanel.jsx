@@ -111,7 +111,7 @@ const SettingsPanel = () => {
     <div className="space-y-6 p-6">
       <h3 className="font-semibold text-lg text-[#072A57]">{label}</h3>
 
-      <div className="flex flex-col md:grid md:grid-cols-2 gap-8 lg:gap-0">
+      <div className="flex flex-col md:flex-row items-center gap-8 lg:gap-8">
         <Controller
           name={startKey}
           control={control}
@@ -119,7 +119,7 @@ const SettingsPanel = () => {
             <CustomTimePicker value={value} onChange={onChange} label="From" />
           )}
         />
-
+        <div className="hidden md:block w-px h-28 bg-gray-300" />
         <Controller
           name={endKey}
           control={control}
@@ -140,8 +140,10 @@ const SettingsPanel = () => {
   }
 
   return (
-    <div className="w-full px-6 pb-8 ">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="lg:w-2/3 px-6 py-8 bg-light-grey rounded-md shadow-md">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4 flex flex-col items-center text-center">
         <div>
           <h2 className="text-lg font-medium text-[#072A57]">Meals Hours</h2>
           <p className="text-muted-foreground mt-1">

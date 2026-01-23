@@ -9,8 +9,12 @@ import {
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import DeleteConfirmModal from "../../components/admin/users/delete-confirm-modal";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdDeleteOutline } from "react-icons/md";
 import toast from "react-hot-toast";
+import { PiCurrencyGbpBold } from "react-icons/pi";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { Trash2 } from "lucide-react";
+import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
 
 const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
@@ -144,18 +148,28 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   }
 
   return (
-    <div className="flex flex-col items-center w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
-      <h2 className="text-2xl sm:text-3xl md:text-4xl text-center font-semibold text-[#032552] drop-shadow-[0_3px_2px_rgba(0,0,0,0.3)] mb-4 sm:mb-6 md:mb-8">
+    <div className="flex flex-col items-center w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-3">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl text-center font-semibold text-primary-navy drop-shadow-[0_3px_2px_rgba(0,0,0,0.3)] mb-4 sm:mb-6 md:mb-8">
         Your Order For <span className="font-bold">{targetWeekday}</span>
       </h2>
       <div className="px-3 sm:px-6 md:px-8 lg:px-32 py-4 sm:py-6 md:py-8 your-order w-full sm:w-11/12 md:w-10/12 lg:w-9/12">
-        <div className="bg-[#032552] text-white py-4 sm:py-6 md:py-8 px-4 sm:px-6 md:px-10 rounded-lg shadow w-full">
+        <div className="relative bg-primary-navy text-primary-navy py-6 md:py-8 px-4 sm:px-6 md:px-10 rounded-lg shadow w-full">
+          {displayOrder?.meal_type?.toLowerCase() === "lunch" && (
+            <button
+              onClick={() => handleDeleteOrder(displayOrder.id)}
+              className="absolute  top-2 right-4 md:top-5 md:right-10
+                  flex items-center justify-center w-8 h-8 rounded-full
+                  bg-light-grey text-primary-navy cursor-pointer
+                  hover:bg-[#FF0000] hover:text-light-grey transition">
+              <MdDeleteOutline size={23} />
+            </button>
+          )}
           <div className="justify-center flex flex-col items-center">
-            <div className="flex flex-col gap-4 sm:gap-5 md:gap-7 pt-6 sm:pt-8 md:pt-10 pb-3 sm:pb-4 md:pb-5 w-full">
+            <div className="flex flex-col gap-4 md:gap-5 pt-6 sm:pt-8 md:pt-10 pb-3 sm:pb-4 md:pb-5 w-full">
               {displayOrder?.items && displayOrder?.items.length ? (
                 displayOrder?.items.map((it, idx) => (
                   <div
-                    className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-2 sm:px-3 md:px-4 text-sm sm:text-base md:text-lg lg:text-xl font-medium rounded"
+                    className="bg-mid-grey text-center  py-1.5 md:py-2 px-2 md:px-4 text-base md:text-lg lg:text-xl font-semibold rounded"
                     key={idx}>
                     <span>{it.item_name}</span> -{" "}
                     <span className="text-xs sm:text-sm md:text-base lg:text-lg font-normal">
@@ -171,21 +185,11 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
               )}
             </div>
             <div
-              className={`flex ${
-                displayOrder?.meal_type?.toLowerCase() === "lunch"
-                  ? `justify-between`
-                  : `justify-center`
-              } w-full`}>
-              <span className="bg-[#D9D9D9B2] text-center py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-6 text-base sm:text-lg md:text-xl lg:text-2xl rounded">
-                {displayOrder?.total_cost} LE
-              </span>
-              {displayOrder?.meal_type?.toLowerCase() === "lunch" && (
-                <button
-                  onClick={() => handleDeleteOrder(displayOrder.id)}
-                  className="bg-[#D9D9D9B2] text-center py-1.5 px-3 sm:px-4 md:px-3 text-base  md:text-xl lg:text-2xl rounded">
-                  <MdDelete />
-                </button>
-              )}
+              className={`mt-3 inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1.5  font-normal text-base  text-light-grey border-b border-b-light-grey `}>
+              {/* <div className="flex items-center justify-center w-7 h-7 rounded-full shrink-0 bg-navy-dark text-light-grey">
+                  <PiCurrencyGbpBold size={18} />
+                </div> */}
+              {displayOrder?.total_cost} LE
             </div>
           </div>
         </div>

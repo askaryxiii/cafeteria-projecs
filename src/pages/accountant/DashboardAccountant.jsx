@@ -29,9 +29,7 @@ const DashboardAccountant = () => {
         )}`;
 
         // encode the dates segment to be safe in the URL
-        navigate(`/accountant/users/${encodeURIComponent(dates)}`, {
-          replace: true,
-        });
+        navigate(`/accountant/users/${encodeURIComponent(dates)}`, {});
       }
     }
     if (action === "ordersSummary") {

@@ -72,6 +72,7 @@ const DishDropdown = ({
               loading={loading}
               selectedIds={field.value}
               onChange={field.onChange}
+              isOpen={isOpen}
             />
           </div>
         </div>

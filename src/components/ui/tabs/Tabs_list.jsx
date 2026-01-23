@@ -6,8 +6,8 @@ const CustTabList = ({ tab }) => {
       value={tab.value}
       className="
     bg-transparent
-    text-[#8A919A]
-    data-[state=active]:text-[#011844B2]
+    text-dark-grey
+    data-[state=active]:text-primary-navy
     transition-none!  
     rounded-none
     px-0

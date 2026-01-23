@@ -185,7 +185,7 @@ const Ordering = ({ onOrderPlaced }) => {
 
   return (
     <div className="sm:px-6 md:px-12 lg:px-32 xl:px-44 py-4 sm:py-6 md:py-8">
-      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-[#032552] mb-4 sm:mb-6 md:mb-8 uppercase tracking-wide text-center">
+      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-primary-navy mb-4 sm:mb-6 md:mb-8 uppercase tracking-wide text-center">
         Select Your Favorite Dishes For{" "}
         <span className="font-bold">{targetWeekday}</span>
       </h2>

@@ -5,6 +5,7 @@ export default function DropdownContent({
   loading,
   selectedIds,
   onChange,
+  isOpen,
 }) {
   if (loading) {
     return (
@@ -27,7 +28,10 @@ export default function DropdownContent({
   }
 
   return (
-    <div className="bg-gray-200 border-2 rounded-2xl border-gray-300 p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-2.5 md:space-y-3">
+    <div
+      className={`bg-mid-grey border-2 ${
+        isOpen ? "rounded-b-lg" : "rounded-lg"
+      } border-gray-300 p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-2.5 md:space-y-3`}>
       {items.map((item, index) => (
         <div
           key={item.code}

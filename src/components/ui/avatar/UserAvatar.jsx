@@ -17,19 +17,19 @@ const UserAvatar = () => {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="cursor-pointer inline-flex border-2 w-10 h-10 border-gray-400 bg-gray-200 items-center justify-center rounded outline-none"
+          className="cursor-pointer inline-flex border-2 w-10 h-10 border-dark-grey/50 bg-light-grey items-center justify-center rounded outline-none"
           aria-label="Customise options">
-          <HiUser className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+          <HiUser className="w-7 h-7 p-0.5 bg-light-grey text-primary-navy" />
         </button>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[280px] rounded-lg bg-white border-2 border-gray-200 shadow-lg overflow-hidden"
+          className="min-w-[280px] rounded-lg bg-white border-2 shadow-lg overflow-hidden"
           sideOffset={5}>
           <DropdownMenu.Item
             disabled
-            className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
+            className="bg-dark-grey/50 flex items-center justify-center px-6 py-1.5 text-gray-700">
             <span className="font-bold">Welcome {user?.user?.name}</span>
           </DropdownMenu.Item>
 

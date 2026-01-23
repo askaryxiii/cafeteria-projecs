@@ -5,7 +5,7 @@ export default function TableCell({ children, isHeader, className, ...props }) {
   if (isHeader) {
     return (
       <th
-        className={`${baseStyles} font-bold text-[#011844] ${className}`}
+        className={`${baseStyles} font-bold text-primary-navy ${className}`}
         {...props}>
         {children}
       </th>
@@ -14,7 +14,7 @@ export default function TableCell({ children, isHeader, className, ...props }) {
 
   return (
     <td
-      className={`${baseStyles} font-medium text-[#011844] ${className}`}
+      className={`${baseStyles} font-medium text-primary-navy ${className}`}
       {...props}>
       {children}
     </td>

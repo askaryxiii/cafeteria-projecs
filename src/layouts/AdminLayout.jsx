@@ -79,7 +79,7 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="bg-[#E2E2E2]">
+    <div className="bg-burned-grey">
       {/* Logo Navigation (top bar) */}
       <div>
         <AdminLogoNav
@@ -107,7 +107,7 @@ const AdminLayout = () => {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-0 lg:p-6">
+        <main className="flex-1 overflow-y-auto p-0 lg:p-6 rounded-md">
           <Routes>
             <Route path="/dashboard" element={<DashboardAdmin />} />
             <Route path="/users" element={<UsersDashboard />} />

@@ -180,7 +180,7 @@ const MenuDashboard = () => {
   };
 
   return (
-    <main className="p-1 sm:p-1.5 md:p-2">
+    <main className="p-1 sm:p-1.5 md:p-2 bg-mid-grey rounded-md shadow-xl">
       <DashboardHeader
         title={"Menu Items"}
         icon={
@@ -189,7 +189,7 @@ const MenuDashboard = () => {
         dist="/"
       />
       <Tabs defaultValue="items" className="w-full">
-        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-[#ACA4A4] border-t-[#ACA4A4] rounded-none ">
+        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-burned-grey border-t-burned-grey rounded-none ">
           {tabs.map((tab, index) => (
             <CustTabList key={index} tab={tab} />
           ))}

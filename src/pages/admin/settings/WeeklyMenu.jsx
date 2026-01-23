@@ -82,7 +82,7 @@ const DaySection = ({ itemIndex, control, watch, menuItems, errors }) => {
   const date = watch(`items.${itemIndex}.date`);
 
   return (
-    <div className="p-6  border border-[#ACA4A4] rounded-sm">
+    <div className="p-6 border border-[#ACA4A4] rounded-sm bg-light-grey shadow-md">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 capitalize">
         {day} - {date}
       </h3>
@@ -389,15 +389,15 @@ const WeeklyMenu = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="mb-6 w-full">
-        <label className="block text-sm font-medium text-[#072A57] mb-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-5 pb-5">
+      <div className="mb-6 w-full flex flex-col justify-center items-center">
+        <label className="block text-sm font-medium text-primary-navy mb-2">
           Week Start Date
         </label>
         <input
           type="date"
           {...control.register("week_start_date")}
-          className="w-11/12 pl-4 pr-4 py-1.5 rounded-sm border border-[#072A57] bg-[#D9D9D9] focus:outline-none "
+          className="w-11/12 pl-4 pr-4 py-1.5 rounded-sm border border-primary-navy bg-light-grey focus:outline-none "
         />
       </div>
 
@@ -412,7 +412,7 @@ const WeeklyMenu = () => {
       <button
         type="submit"
         disabled={loading}
-        className="bg-[#072A57] hover:bg-[#0a3c7e] shadow-lg text-white font-semibold py-1.5 px-4  whitespace-nowrap transition-colors">
+        className="bg-primary-navy hover:bg-navy-light shadow-lg text-light-grey font-semibold py-1.5 px-4 rounded-md whitespace-nowrap transition-colors">
         {loading ? "Submitting..." : "Submit Weekly Menu"}
       </button>
     </form>

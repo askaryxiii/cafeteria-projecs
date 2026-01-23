@@ -157,7 +157,7 @@ const CustomTimePicker = ({ value, onChange, label }) => {
           </button>
           <div
             ref={hourDivRef}
-            className="px-6 py-2 bg-muted rounded-lg text-2xl font-bold">
+            className="px-6 py-2 bg-burned-grey rounded-lg text-2xl font-bold">
             {hour}
           </div>
           <button type="button" onClick={() => handleHourChange(-1)}>
@@ -166,7 +166,7 @@ const CustomTimePicker = ({ value, onChange, label }) => {
           <p className="text-xs text-muted-foreground text-center mt-1">Hour</p>
         </div>
 
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center justify-center gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-foreground"></div>
           <div className="w-1.5 h-1.5 rounded-full bg-foreground"></div>
         </div>
@@ -178,7 +178,7 @@ const CustomTimePicker = ({ value, onChange, label }) => {
           </button>
           <div
             ref={minuteDivRef}
-            className="px-6 py-2 bg-muted rounded-lg text-2xl font-bold">
+            className="px-6 py-2 bg-burned-grey rounded-lg text-2xl font-bold">
             {minute}
           </div>
           <button type="button" onClick={() => handleMinuteChange(-1)}>

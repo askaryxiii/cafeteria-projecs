@@ -7,7 +7,7 @@ const defaultData = [
   { name: "Morning", value: 0 },
 ];
 
-const COLORS = ["#02356A", "#4F6F94", "#8793a1"];
+const COLORS = ["#6366f1", "#3B82F6", "#a5b4fc"];
 
 // Generate pie chart data from time_range_distribution
 const generatePieData = (timeRangeDistribution, mostCommonTimeRange) => {

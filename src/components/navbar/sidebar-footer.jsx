@@ -12,7 +12,7 @@ export function SidebarFooter({ onItemClick }) {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:p-4 border-t border-gray-200">
+    <div className="px-2.5 border-t border-gray-200">
       <SidebarItem Icon={TbLogout} label="Logout" onclickfunc={handleLogout} />
     </div>
   );

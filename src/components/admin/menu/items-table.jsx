@@ -128,7 +128,7 @@ export default function ItemsTable({ items, onUpdate, onDelete, onCreate }) {
       <div className="flex gap-2.5 mb-6 items-center px-2">
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-[#072A57] hover:bg-[#0a3c7e] shadow-lg text-white font-semibold py-1.5 px-4  whitespace-nowrap transition-colors">
+          className="bg-primary-navy hover:bg-primary-navy shadow-lg text-white font-semibold py-1.5 px-4  whitespace-nowrap transition-colors">
           + Create Item
         </button>
         <SearchBar value={searchTerm} onChange={setSearchTerm} />

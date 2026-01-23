@@ -18,7 +18,7 @@ const Settings = () => {
   ];
 
   return (
-    <main className="p-1 sm:p-1.5 md:p-2">
+    <main className="p-1 sm:p-1.5 md:p-2 bg-mid-grey rounded-md shadow-xl">
       <DashboardHeader
         title={"Settings"}
         icon={
@@ -27,14 +27,17 @@ const Settings = () => {
         dist="/"
       />
       <Tabs defaultValue="weekly-menu" className="w-full">
-        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-[#ACA4A4] border-t-[#ACA4A4] rounded-none ">
+        <TabsList className="bg-transparent p-1 gap-3 w-full md:gap-4 border border-b-burned-grey border-t-burned-grey rounded-none ">
           {tabs.map((tab) => (
             <CustTabList key={tab.value} tab={tab} />
           ))}
         </TabsList>
 
         {tabs.map((tab) => (
-          <TabsContent key={tab.value} value={tab.value} className="mt-6">
+          <TabsContent
+            key={tab.value}
+            value={tab.value}
+            className="mt-2 flex justify-center">
             {tab.value === "weekly-menu" ? <WeeklyMenu /> : <SettingsPanel />}
           </TabsContent>
         ))}

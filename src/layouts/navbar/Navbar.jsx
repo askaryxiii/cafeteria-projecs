@@ -38,17 +38,18 @@ const Navbar = () => {
           user.user.role === "employee" ||
           user.user.role === "accountant" ? (
             <div className="flex gap-3">
-              {/* <Link to="/user/drinks" className="nav-btn">
-                <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
-              </Link> */}
-              <div className="relative group inline-block">
+              <Link to="/user/drinks" className="nav-btn">
+                <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-light-grey text-primary-navy" />
+              </Link>
+
+              {/* previously disabled drinks */}
+              {/* <div className="relative group inline-block">
                 <button
                   disabled
                   className="nav-btn  opacity-50 cursor-not-allowed">
                   <BsFillCupHotFill className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
                 </button>
 
-                {/* Tooltip */}
                 <div
                   className="
       absolute bottom-full mb-2 left-1/2 -translate-x-1/2
@@ -58,12 +59,12 @@ const Navbar = () => {
     ">
                   Drinks are currently unavailable
                 </div>
-              </div>
-              <Link to="/user" className="nav-btn bg-gray-200">
-                <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+              </div> */}
+              <Link to="/user" className="nav-btn bg-light-grey">
+                <IoFastFoodSharp className="w-7 h-7 p-0.5 bg-light-grey text-primary-navy" />
               </Link>
-              <Link to="/" className="nav-btn bg-gray-200">
-                <ImHome className="w-7 h-7 p-0.5 bg-gray-200 text-[#02356A]" />
+              <Link to="/" className="nav-btn bg-light-grey">
+                <ImHome className="w-7 h-7 p-0.5 bg-light-grey text-primary-navy" />
               </Link>
             </div>
           ) : (
@@ -76,22 +77,22 @@ const Navbar = () => {
         <button
           className="md:hidden w-10 h-10 flex items-center justify-center"
           onClick={() => setOpen(!open)}>
-          <GiHamburgerMenu className="text-2xl text-[#02356A]" />
+          <GiHamburgerMenu className="text-2xl text-primary-navy" />
         </button>
       </div>
 
       {open && (
         <div
           ref={menuRef}
-          className="absolute right-3 top-full bg-[#dfe1e9] rounded shadow-lg p-4 z-50 flex flex-col gap-1">
+          className="absolute right-3 top-full bg-light-grey rounded shadow-lg p-4 z-50 flex flex-col gap-1">
           <div className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
             <span className="font-bold">Welcome {user?.user?.name}</span>
           </div>
-          <div className="relative group inline-block">
+          <div className="relative  group inline-block">
             <button
               type="button"
               disabled
-              className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">
+              className="flex w-full items-center gap-2 p-2 rounded">
               <BsFillCupHotFill /> Drinks
             </button>
 
@@ -108,11 +109,11 @@ const Navbar = () => {
           </div>
           <Link
             to="/"
-            className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded"
+            className="flex items-center gap-2 p-2 rounded"
             onClick={() => setOpen(false)}>
             <ImHome /> Home
           </Link>
-          <div className="border-t border-[#02356A] my-0.5" />
+          <div className="border-t border-dark-grey/50 my-0.5" />
           <MobileUserMenu onClose={() => setOpen(false)} />
         </div>
       )}

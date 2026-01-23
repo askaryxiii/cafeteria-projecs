@@ -173,9 +173,9 @@ export function CafeteriaOrdersTable({
   }
 
   return (
-    <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-2 sm:p-3 md:p-4">
+    <div className="bg-mid-grey border-none rounded-b-lg  p-2 sm:p-3 md:p-4">
       {true && (
-        <div className="px-4 py-4 flex justify-between text-sm font-semibold text-gray-700">
+        <div className="px-4 py-4 flex justify-between text-sm font-semibold text-dark-grey">
           <span>Total Orders Today: {orderCounts.total}</span>
           <span>Checked Orders: {orderCounts.checked}</span>
         </div>
@@ -183,7 +183,7 @@ export function CafeteriaOrdersTable({
       {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm md:text-base">
-          <thead className="bg-[#DDDBDB]">
+          <thead className="bg-burned-grey">
             <tr>
               <th className="px-4 py-2 text-center">Checkbox</th>
               <th className="px-4 py-2 text-center">Full Name</th>
@@ -192,7 +192,7 @@ export function CafeteriaOrdersTable({
               {showDelete && <th className="px-4 py-2 text-center">Actions</th>}
             </tr>
           </thead>
-          <tbody className="border-t-[0.1rem] border-t-[#d3d3d3]">
+          <tbody className="border-t-[0.1rem] border-t-dark-grey/50">
             {items.length > 0 ? (
               items.map((item) => (
                 <tr
@@ -200,7 +200,7 @@ export function CafeteriaOrdersTable({
                   className={
                     item.checked
                       ? "bg-gray-100 opacity-50"
-                      : "border-b-[0.1rem] border-b-[#d3d3d3]"
+                      : "border-b-[0.1rem] border-b-dark-grey/50 "
                   }>
                   <td className="px-4 py-2 text-center border">
                     <input

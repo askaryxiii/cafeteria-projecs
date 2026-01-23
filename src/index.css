@@ -30,6 +30,15 @@
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
+  --primary-navy: oklch(0.3321 0.1052 254.52);
+  --navy-dark: oklch(0.2763 0.083 252.75);
+  --navy-light: oklch(0.4852 0.1333 254.58);
+  --accent-blue: oklch(0.6231 0.188 259.81);
+  --light-grey: oklch(0.967 0.0029 264.54);
+  --burned-grey: oklch(88.837% 0.0001 271.152);
+  --mid-grey: oklab(94.603% 0 -0.00011);
+  --dark-grey: oklch(0.551 0.0234 264.36);
+  --text-dark: oklch(0.2101 0.0318 264.66);
 }
 
 /* Responsive Typography */
@@ -524,7 +533,7 @@ body {
 
 /* Main Calendar box */
 .custom-calendar {
-  background-color: #e2e2e2 !important;
+  background-color: #e2e2e2 ;
   border: 1px solid #e2e2e2;
   border-radius: 36px;
   padding: 1rem 1.5rem;
@@ -643,10 +652,6 @@ body {
   transition: background-color 150ms; /* transition */
 }
 
-.nav-btn:hover {
-  background-color: #e5e7eb; /* hover:bg-gray-200 */
-}
-
 .icon {
   width: 1.5rem; /* w-6 */
   height: 1.5rem; /* h-6 */
@@ -692,6 +697,15 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-primary-navy: var(--primary-navy);
+  --color-navy-dark: var(--navy-dark);
+  --color-navy-light: var(--navy-light);
+  --color-accent-blue: var(--accent-blue);
+  --color-light-grey: var(--light-grey);
+  --color-mid-grey: var(--mid-grey);
+  --color-burned-grey: var(--burned-grey);
+  --color-dark-grey: var(--dark-grey);
+  --color-text-dark: var(--text-dark);
 }
 
 .dark {
@@ -726,6 +740,15 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --primary-navy: oklch(0.3321 0.1052 254.52);
+  --navy-dark: oklch(0.2763 0.083 252.75);
+  --navy-light: oklch(0.4852 0.1333 254.58);
+  --accent-blue: oklch(0.6231 0.188 259.81);
+  --light-grey: oklch(0.967 0.0029 264.54);
+  --mid-grey: oklch(90.67% 0.0001 271.152);
+  --burned-grey: oklch(82.032% 0.00009 271.152);
+  --dark-grey: oklch(0.551 0.0234 264.36);
+  --text-dark: oklch(0.2101 0.0318 264.66);
 }
 
 @layer base {

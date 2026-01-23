@@ -13,7 +13,7 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [chartData, setChartData] = useState([]);
   const [mounted, setMounted] = useState(false);
-  const THEME_COLOR = "#02356A"; // Projecs Blue
+  const THEME_COLOR = "#3B82F6"; // Projecs Blue
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);

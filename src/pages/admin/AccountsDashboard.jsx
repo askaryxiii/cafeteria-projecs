@@ -31,9 +31,7 @@ const AccountsDashboard = () => {
         )}`;
 
         // encode the dates segment to be safe in the URL
-        navigate(`/accountant/users/${encodeURIComponent(dates)}`, {
-          replace: true,
-        });
+        navigate(`/accountant/users/${encodeURIComponent(dates)}`, {});
       }
     }
     if (action === "ordersSummary") {
@@ -43,9 +41,7 @@ const AccountsDashboard = () => {
         )}`;
 
         // encode the dates segment to be safe in the URL
-        navigate(`/accountant/ordersSummary/${encodeURIComponent(dates)}`, {
-          replace: true,
-        });
+        navigate(`/accountant/ordersSummary/${encodeURIComponent(dates)}`, {});
       }
     }
   };
@@ -71,7 +67,7 @@ const AccountsDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="w-full bg-mid-grey rounded-md shadow-xl">
       <DashboardHeader
         title="Accounts"
         dist="/"
@@ -81,7 +77,7 @@ const AccountsDashboard = () => {
       />
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full sm:px-0 md:px-4 py-2 sm:py-3 md:py-4 max-w-full md:max-w-5xl mx-auto">
+        className="w-full px-4 md:px-4 py-4 md:py-4 max-w-full md:max-w-5xl mx-auto">
         <div>
           <DateRangeHeader
             title="users orders"
@@ -113,14 +109,14 @@ const AccountsDashboard = () => {
             type="submit"
             name="action"
             value="users"
-            className="uppercase w-full md:w-1/3 border-2 border-[#072A57] text-[#072A57] py-1.5 rounded-md hover:bg-[#072A57] hover:text-white cursor-pointer">
+            className="uppercase w-full md:w-1/3 border-2 border-primary-navy text-primary-navy bg-light-grey py-1.5 rounded-md hover:bg-primary-navy hover:text-white cursor-pointer">
             Users
           </button>
           <button
             type="submit"
             name="action"
             value="ordersSummary"
-            className="uppercase w-full md:w-1/3 border-2 border-[#072A57] text-[#072A57] py-1.5 rounded-md hover:bg-[#072A57] hover:text-white cursor-pointer">
+            className="uppercase w-full md:w-1/3 border-2 border-primary-navy text-primary-navy bg-light-grey py-1.5 rounded-md hover:bg-primary-navy hover:text-white cursor-pointer">
             Order Summary
           </button>
         </div>

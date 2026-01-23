@@ -27,3 +27,7 @@ dist-ssr
 
 # Ignore screenshot script
 screenshot.js
+
+# Ignore screenshots
+screenshots/
+screenshots.zip

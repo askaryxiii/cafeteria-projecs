@@ -310,9 +310,9 @@ const OrderSummary = () => {
         <div className="flex flex-col lg:flex-row gap-5 overflow-x-auto">
           {/* Main Large Table */}
           <div className="lg:shrink-0 overflow-x-auto">
-            <table className="border-collapse border border-gray-300 bg-white w-full lg:w-auto min-w-max">
+            <table className="border-collapse border border-light-grey bg-white w-full lg:w-auto min-w-max">
               <thead>
-                <tr className="bg-gray-200">
+                <tr className="bg-mid-grey">
                   <th className="border px-4 py-2">Class</th>
                   <th className="border px-4 py-2">Meal</th>
                   <th className="border px-4 py-2 text-center">
@@ -332,7 +332,7 @@ const OrderSummary = () => {
                 ))}
 
                 {/* ✅ TOTAL ROW */}
-                <tr className="bg-gray-300 font-bold">
+                <tr className="bg-mid-grey font-bold">
                   <td colSpan={2} className="border px-4 py-2 text-right">
                     Total
                   </td>
@@ -348,9 +348,9 @@ const OrderSummary = () => {
           <div className="w-full lg:w-auto flex flex-col gap-6">
             {/* Orders Table */}
             {/* breakfast table */}
-            <table className="border-collapse border border-gray-300 bg-white w-full min-w-max">
+            <table className="border-collapse border border-light-grey bg-white w-full min-w-max">
               <thead>
-                <tr className="bg-gray-200">
+                <tr className="bg-mid-grey">
                   <th className="border px-4 py-2">date</th>
                   <th className="border px-4 py-2 text-center">
                     Breakfast Orders
@@ -361,7 +361,7 @@ const OrderSummary = () => {
                 {breakfastData.map((row, index) => (
                   <tr
                     key={index}
-                    className={row.isTotal ? "bg-gray-300 font-bold" : ""}>
+                    className={row.isTotal ? "bg-mid-grey font-bold" : ""}>
                     <td className="border px-4 py-2">{row.date}</td>
                     <td className="border px-4 py-2 text-center">
                       {row.count}
@@ -371,9 +371,9 @@ const OrderSummary = () => {
               </tbody>
             </table>
             {/* lunch table */}
-            <table className="border-collapse border border-gray-300 bg-white w-full min-w-max">
+            <table className="border-collapse border border-light-grey bg-white w-full min-w-max">
               <thead>
-                <tr className="bg-gray-200">
+                <tr className="bg-mid-grey">
                   <th className="border px-4 py-2">date</th>
                   <th className="border px-4 py-2 text-center">Lunch Orders</th>
                 </tr>
@@ -382,7 +382,7 @@ const OrderSummary = () => {
                 {lunchData.map((row, index) => (
                   <tr
                     key={index}
-                    className={row.isTotal ? "bg-gray-300 font-bold" : ""}>
+                    className={row.isTotal ? "bg-mid-grey font-bold" : ""}>
                     <td className="border px-4 py-2">{row.date}</td>
                     <td className="border px-4 py-2 text-center">
                       {row.count}
@@ -394,9 +394,9 @@ const OrderSummary = () => {
           </div>
 
           {/* Price Table */}
-          <table className="border-collapse border border-gray-300 bg-white min-w-max h-fit">
+          <table className="border-collapse border border-light-grey bg-white min-w-max h-fit">
             <thead>
-              <tr className="bg-gray-200">
+              <tr className="bg-mid-grey">
                 <th className="border px-4 py-2">date</th>
                 <th className="border px-4 py-2 text-center">Sum of Price</th>
               </tr>
@@ -405,7 +405,7 @@ const OrderSummary = () => {
               {priceData.map((row, index) => (
                 <tr
                   key={index}
-                  className={row.isTotal ? "bg-gray-300 font-bold " : ""}>
+                  className={row.isTotal ? "bg-mid-grey font-bold " : ""}>
                   <td className="border px-4 py-2">{row.date}</td>
                   <td className="border px-4 py-2 text-center">{row.sum}</td>
                 </tr>

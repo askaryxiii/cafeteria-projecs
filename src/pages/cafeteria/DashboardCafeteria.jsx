@@ -242,12 +242,12 @@ const DashboardCafeteria = () => {
           {currentWindow} Orders
         </h2>
       </div>
-      <div className="bg-[#FDF6F633] border-none rounded-lg shadow p-2 sm:p-3 md:p-4">
+      <div className="border-none rounded-lg shadow ">
         {/* Desktop View */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto rounded-lg ">
           <table className="w-full text-sm md:text-base">
             <thead>
-              <tr className="border-b-2 border-gray-300 align-middle">
+              <tr className="border-b-2  border-gray-300 align-middle bg-burned-grey">
                 <th className="px-4 py-3 text-left font-semibold">
                   <input
                     type="checkbox"
@@ -274,7 +274,7 @@ const DashboardCafeteria = () => {
                   />
                 </th>
                 <th
-                  className="px-4 py-3 text-left font-semibold cursor-pointer hover:bg-gray-100 align-middle"
+                  className="px-4 py-3 text-left font-semibold cursor-pointer align-middle"
                   onClick={() => handleSort("arabic_name")}>
                   <div className="flex items-center gap-2">
                     Full Name

@@ -79,6 +79,7 @@ const DrinkDropdown = ({ control }) => {
               loading={loading}
               selectedIds={field.value}
               onChange={field.onChange}
+              isOpen={isOpen}
             />
           </div>
         </div>

@@ -23,7 +23,7 @@ export default function DateRangeHeader({
   title = "MY ORDERS",
 }) {
   return (
-    <div className="bg-[#032552] text-white rounded-lg p-2 sm:p-3 md:p-2 mb-4 sm:mb-6 md:mb-8 flex items-center justify-between gap-2 sm:gap-4">
+    <div className="bg-primary-navy text-white rounded-lg p-2 sm:p-3 md:p-2 mb-2 md:mb-4 flex items-center justify-between gap-2 sm:gap-4">
       <DateButton
         date={fromDate}
         label="From"

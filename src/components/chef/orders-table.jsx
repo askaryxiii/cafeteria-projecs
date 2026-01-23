@@ -24,7 +24,7 @@ export function OrdersTable() {
   }, []);
 
   return (
-    <div className="w-full bg-[#FDF6F633] border-none rounded-lg shadow p-2 sm:p-2.5 md:p-3">
+    <div className="w-full bg-mid-grey border-none rounded-b-lg shadow p-2 sm:p-2.5 md:p-3">
       <TableHeader label1="NUM" label2="ORDERS" />
       {orders.map((item) => (
         <TableRow

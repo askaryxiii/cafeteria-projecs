@@ -56,7 +56,7 @@ const App = () => {
             }
           />
           {/* disabling drinks temporary */}
-          {/* <Route
+          <Route
             path="/user/drinks"
             element={
               <ProtectedRoute
@@ -66,7 +66,7 @@ const App = () => {
                 </PrivateLayout>
               </ProtectedRoute>
             }
-          /> */}
+          />
           <Route
             path="/user/orders"
             element={

@@ -148,10 +148,10 @@ const UsersPage = () => {
       </div>
 
       {/* Table */}
-      <div className="max-w-7xl mx-auto bg-[#DDDBDB]">
+      <div className="max-w-7xl mx-auto bg-light-grey">
         {tableData.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow text-center">
-            <p className="text-gray-500 text-lg">
+            <p className="text-dark-grey text-lg">
               No orders found for this date range
             </p>
           </div>
@@ -159,7 +159,7 @@ const UsersPage = () => {
           <Table className="w-full table-fixed">
             <TableHeader
               className={
-                "bg-[#DDDBDB] border-b border-b-[#ACA4A4] text-[#072A57]! "
+                "bg-burned-grey border-b border-b-[#ACA4A4] text-[#072A57]! "
               }
               columns={[...columns, { label: "", key: "actions" }]}
             />
@@ -191,18 +191,18 @@ const UsersPage = () => {
         <div className="fixed inset-0 bg-[#868686]/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative">
             <button
-              className="absolute top-3 right-3 text-2xl text-gray-700 hover:text-black"
+              className="absolute top-3 right-3 text-2xl text-dark-grey hover:text-black"
               onClick={closeModal}>
               <IoClose />
             </button>
 
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-semibold mb-4 text-text-dark/70">
               Orders for {selectedUser?.name}
             </h2>
 
             <table className="w-full border-collapse border">
               <thead>
-                <tr className="bg-gray-100 ">
+                <tr className="bg-burned-grey text-text-dark/80">
                   <th className="p-2 border">Order Date</th>
                   <th className="p-2 border">Order Items</th>
                   <th className="p-2 border">Total</th>

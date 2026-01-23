@@ -118,7 +118,7 @@ const FeedbackDashboard = () => {
   };
 
   return (
-    <div className="w-full bg-[#E2E2E2]">
+    <div className="w-full bg-mid-grey">
       {/* Header */}
       <DashboardHeader
         title="Feedback"
@@ -137,37 +137,37 @@ const FeedbackDashboard = () => {
         <>
           {/* Controls */}
           <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-b flex gap-2 sm:gap-3 md:gap-4">
-            <div className="flex-1 relative shadow-lg">
-              <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
+            <div className="flex-1 relative shadow-lg h-8">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by name, email, or category..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] bg-[#D9D9D9] focus:outline-none text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11"
+                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] bg-[#D9D9D9] focus:outline-none text-xs sm:text-sm md:text-base  h-8"
               />
             </div>
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
+              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base h-8 justify-center sm:justify-start whitespace-nowrap">
                 <span className="font-medium">New:</span>
                 <span className="font-bold ">{feedbackCounts.newCount}</span>
               </div>
-              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
+              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base h-8 justify-center sm:justify-start whitespace-nowrap">
                 <span className="font-medium">Read:</span>
                 <span className="font-bold ">{feedbackCounts.readCount}</span>
               </div>
-              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
+              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base h-8 justify-center sm:justify-start whitespace-nowrap">
                 <span className="font-medium">Total:</span>
                 <span className="font-bold">{filteredFeedbacks.length}</span>
               </div>
             </div>
           </div>
 
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto p-5">
             <table className="w-full text-xs sm:text-sm md:text-base">
               <thead>
-                <tr className="bg-[#DDDBDB]">
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-24 sm:min-w-32">
+                <tr className="bg-burned-grey">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-primary-navy cursor-pointer min-w-24 sm:min-w-32">
                     <button
                       className="flex items-center gap-1 sm:gap-2 w-full justify-center"
                       onClick={() => handleSort("name")}>
@@ -182,7 +182,7 @@ const FeedbackDashboard = () => {
                       />
                     </button>
                   </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-28 sm:min-w-40">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-primary-navy cursor-pointer min-w-28 sm:min-w-40">
                     <button
                       className="flex items-center justify-center gap-1 sm:gap-2 w-full"
                       onClick={() => handleSort("created_at")}>
@@ -197,7 +197,7 @@ const FeedbackDashboard = () => {
                       />
                     </button>
                   </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-24 sm:min-w-32">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-primary-navy cursor-pointer min-w-24 sm:min-w-32">
                     <button
                       className="flex items-center gap-1 sm:gap-2 w-full justify-center"
                       onClick={() => handleSort("status")}>
@@ -212,7 +212,7 @@ const FeedbackDashboard = () => {
                       />
                     </button>
                   </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-20 sm:min-w-24">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-primary-navy cursor-pointer min-w-20 sm:min-w-24">
                     <button
                       className="flex items-center gap-1 sm:gap-2 w-full justify-center"
                       onClick={() => handleSort("status")}>
@@ -227,7 +227,7 @@ const FeedbackDashboard = () => {
                       />
                     </button>
                   </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] min-w-16 sm:min-w-20">
+                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-primary-navy min-w-16 sm:min-w-20">
                     Action
                   </th>
                 </tr>
@@ -241,7 +241,7 @@ const FeedbackDashboard = () => {
                       index % 2 === 0 ? "bg-[#E9E7E7]" : "bg-[#E9E7E7]"
                     } hover:bg-[#dadada] transition-colors text-xs sm:text-sm md:text-base cursor-pointer`}>
                     <td className="px-3 md:px-6 py-2 sm:py-3 md:py-4 flex flex-col gap-1 items-center">
-                      <span className="text-[#072A57] font-medium truncate">
+                      <span className="text-primary-navy font-medium truncate">
                         {feedback.name}
                       </span>
                       <span className="truncate text-xs font-light text-gray-500">
@@ -249,14 +249,14 @@ const FeedbackDashboard = () => {
                       </span>
                     </td>
                     <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center">
-                      <span className="text-[#072A57] text-xs sm:text-sm">
+                      <span className="text-primary-navy text-xs sm:text-sm">
                         {new Date(feedback.created_at).toLocaleDateString(
                           "en-US"
                         )}
                       </span>
                     </td>
                     <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center">
-                      <p className="text-[#072A57] text-sm line-clamp-2 max-w-[35ch] mx-auto">
+                      <p className="text-primary-navy text-sm line-clamp-2 max-w-[35ch] mx-auto">
                         {feedback.feedback_paragraph}
                       </p>
                     </td>
@@ -297,7 +297,7 @@ const FeedbackDashboard = () => {
                 {/* Top Section: Amount and Status Badge */}
                 <div className="flex justify-between items-center mb-3 pb-3 border-b border-[#E9E7E7]">
                   <div className="flex flex-col">
-                    <span className="text-[#072A57] font-medium text-xl truncate">
+                    <span className="text-primary-navy font-medium text-xl truncate">
                       {feedback.name}
                     </span>
                     <span className="truncate text-base font-light text-gray-500">
@@ -316,7 +316,7 @@ const FeedbackDashboard = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600 font-medium">Created:</span>
-                    <span className="text-[#072A57] text-right">
+                    <span className="text-primary-navy text-right">
                       {new Date(feedback.created_at).toLocaleDateString(
                         "en-US"
                       )}
@@ -324,7 +324,7 @@ const FeedbackDashboard = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600 font-medium">Category:</span>
-                    <span className="text-[#072A57] font-medium text-right">
+                    <span className="text-primary-navy font-medium text-right">
                       {feedback.category || "N/A"}
                     </span>
                   </div>
@@ -334,7 +334,7 @@ const FeedbackDashboard = () => {
                 <div className="flex justify-between items-center mt-4 pt-3 border-t border-[#E9E7E7]">
                   <button
                     onClick={() => setSelectedFeedback(feedback)}
-                    className="text-[#072A57] font-medium text-sm hover:text-[#02356A] transition-colors underline">
+                    className="text-primary-navy font-medium text-sm hover:text-[#02356A] transition-colors underline">
                     View Details
                   </button>
                   <button

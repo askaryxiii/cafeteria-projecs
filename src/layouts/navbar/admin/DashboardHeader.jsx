@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 
 const DashboardHeader = ({ title, dist, icon }) => {
   return (
-    <div className=" px-6 py-7 flex justify-between items-center bg-[#E2E2E2] ">
+    <div className=" px-6 pt-7 pb-3 flex justify-between rounded-t-md items-center bg-mid-grey ">
       <div className="flex items-center gap-3">
         {icon}
-        <h1 className="text-2xl font-semibold text-[#02356A]"> {title} </h1>
+        <h1 className="text-2xl font-semibold text-primary-navy"> {title} </h1>
       </div>
       <Link to={dist}>
-        <ImHome className="w-7 h-7 p-0.5 text-[#02356A]" />
+        <ImHome className="w-7 h-7 p-0.5 text-primary-navy" />
       </Link>
     </div>
   );

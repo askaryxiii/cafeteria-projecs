@@ -2,12 +2,11 @@ import { useState, useMemo, useEffect } from "react";
 import CreateUserModal from "./create-user-modal";
 import EditUserModal from "./edit-user-modal";
 import DeleteConfirmModal from "./delete-confirm-modal";
-import { Search, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
 import { RiPencilFill } from "react-icons/ri";
-import { MdDelete } from "react-icons/md";
-import { MdArrowUpward } from "react-icons/md";
+import { MdDelete, MdArrowUpward } from "react-icons/md";
 import { getAllUsers, deleteUser } from "../../../lib/apis";
 import toast from "react-hot-toast";
 import DashboardHeader from "../../../layouts/navbar/admin/DashboardHeader";
@@ -25,35 +24,29 @@ export default function UsersTable() {
     direction: "asc",
   });
 
-  // Fetch users on component mount
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
       const result = await getAllUsers();
-      if (result.error) {
+      if (result?.error) {
         toast.error(result.error);
         setUsers([]);
       } else {
-        // Transform API response to match component structure
-        const transformedUsers = (Array.isArray(result) ? result : []).map(
-          (user) => ({
+        setUsers(
+          (Array.isArray(result) ? result : []).map((user) => ({
             id: user.id,
             name: user.name,
             arabic_name: user.arabic_name,
             email: user.email,
-            password: user.password_hash,
             role: user.role || "employee",
-          })
+          }))
         );
-        setUsers(transformedUsers);
       }
       setIsLoading(false);
     };
-
     fetchUsers();
   }, []);
 
-  // Filter users based on search term
   const filteredUsers = useMemo(() => {
     let filtered = users.filter(
       (user) =>
@@ -62,198 +55,142 @@ export default function UsersTable() {
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Sort users
     filtered.sort((a, b) => {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
-
-      if (typeof aValue === "string") {
-        if (sortConfig.direction === "asc") {
-          return aValue.localeCompare(bValue);
-        } else {
-          return bValue.localeCompare(aValue);
-        }
-      } else {
-        if (sortConfig.direction === "asc") {
-          return aValue > bValue ? 1 : -1;
-        } else {
-          return aValue < bValue ? 1 : -1;
-        }
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
+      if (sortConfig.direction === "asc") {
+        return aVal.localeCompare(bVal);
       }
+      return bVal.localeCompare(aVal);
     });
 
     return filtered;
   }, [users, searchTerm, sortConfig]);
 
-  const usersCount = useMemo(() => filteredUsers.length, [filteredUsers]);
-
   const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const handleCreateUser = (userData) => {
-    const newUser = {
-      ...userData,
-      id: Date.now().toString(),
-    };
-    setUsers([...users, newUser]);
-    setIsCreateModalOpen(false);
-  };
-
-  const handleEditUser = (userData) => {
-    setUsers(users.map((u) => (u.id === userData.id ? userData : u)));
-    setEditingUser(null);
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
   };
 
   const handleDeleteUser = async () => {
-    if (deletingUserId) {
-      const result = await deleteUser(deletingUserId);
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        setUsers(users.filter((u) => u.id !== deletingUserId));
-        toast.success("User deleted successfully");
-      }
-      setDeletingUserId(null);
+    if (!deletingUserId) return;
+    const result = await deleteUser(deletingUserId);
+    if (result?.error) {
+      toast.error(result.error);
+    } else {
+      setUsers(users.filter((u) => u.id !== deletingUserId));
+      toast.success("User deleted successfully");
     }
+    setDeletingUserId(null);
   };
 
   return (
     <div className="w-full bg-[#E2E2E2]">
-      {/* Header */}
       <DashboardHeader
         title="Users"
         dist="/"
         icon={<FaUserGroup className="w-8 h-8 text-[#02356A]" />}
       />
 
-      {/* Loading State */}
       {isLoading && (
-        <div className="p-4 sm:p-6 md:p-8 text-center text-gray-500 text-sm sm:text-base">
-          Loading users...
-        </div>
+        <div className="p-6 text-center text-gray-500">Loading users...</div>
       )}
 
       {!isLoading && (
-        <>
+        <div>
           {/* Controls */}
-          <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-b flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4">
+          <div className="px-4 py-3 flex flex-wrap gap-3 bg-mid-grey">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57] hover:bg-[#b9b9b9] transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
-              <Plus className="w-3 sm:w-4 md:w-5 h-3 sm:h-4 md:h-5" />
+              className="flex items-center gap-2 px-4 max-h-9 border border-light-grey bg-primary-navy text-light-grey hover:bg-navy-light">
+              <Plus className="w-4 h-4" />
               Create New User
             </button>
+
             <SearchBar value={searchTerm} onChange={setSearchTerm} />
-            <div className="flex items-center gap-1 sm:gap-2 px-2 md:px-4 py-1 sm:py-1.5 md:py-2 border border-[#072A57] shadow-lg bg-[#D9D9D9] text-[#072A57]  transition-colors font-normal text-xs sm:text-sm md:text-base min-h-9 sm:min-h-10 md:min-h-11 justify-center sm:justify-start whitespace-nowrap">
-              Showing <span className="font-semibold">{usersCount}</span> users
+
+            <div className="px-4 max-h-9 border flex gap-2 justify-center items-center border-primary-navy bg-[#D9D9D9] text-primary-navy">
+              Showing{" "}
+              <span className="font-semibold">{filteredUsers.length}</span>{" "}
+              users
             </div>
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs sm:text-sm md:text-base">
+          <div className="overflow-x-auto p-3 bg-mid-grey">
+            <table className="w-full table-auto text-sm">
               <thead>
-                <tr className="bg-[#DDDBDB]">
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-24 sm:min-w-32">
-                    <button
-                      className="flex items-center gap-1 sm:gap-2 w-full justify-center"
-                      onClick={() => handleSort("name")}>
-                      Full Name
-                      <MdArrowUpward
-                        className={`w-3 sm:w-4 h-3 sm:h-4 text-gray-600 transition ${
-                          sortConfig.key === "name" &&
-                          sortConfig.direction === "desc"
-                            ? "rotate-180"
-                            : ""
-                        }`}
-                      />
-                    </button>
-                  </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-24 sm:min-w-32">
-                    <button
-                      className="flex items-center justify-center gap-1 sm:gap-2 w-full"
-                      onClick={() => handleSort("arabic_name")}>
-                      الاسم بالعربية
-                      <MdArrowUpward
-                        className={`w-3 sm:w-4 h-3 sm:h-4 text-gray-600 transition ${
-                          sortConfig.key === "arabic_name" &&
-                          sortConfig.direction === "desc"
-                            ? "rotate-180"
-                            : ""
-                        }`}
-                      />
-                    </button>
-                  </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57] cursor-pointer hover:bg-[#c5c3c3] transition min-w-32 sm:min-w-40">
-                    <button
-                      className="flex items-center gap-1 sm:gap-2 w-full justify-center"
-                      onClick={() => handleSort("email")}>
-                      E-mail
-                      <MdArrowUpward
-                        className={`w-3 sm:w-4 h-3 sm:h-4 text-gray-600 transition ${
-                          sortConfig.key === "email" &&
-                          sortConfig.direction === "desc"
-                            ? "rotate-180"
-                            : ""
-                        }`}
-                      />
-                    </button>
-                  </th>
-                  <th className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center font-medium text-[#072A57]">
+                <tr className="bg-burned-grey">
+                  {[
+                    { key: "name", label: "Full Name" },
+                    { key: "arabic_name", label: "الاسم بالعربية" },
+                    { key: "email", label: "E-mail" },
+                  ].map((col) => (
+                    <th
+                      key={col.key}
+                      className="px-4 py-3 text-center text-primary-navy ">
+                      <button
+                        onClick={() => handleSort(col.key)}
+                        className="flex w-full items-center gap-2 justify-center whitespace-nowrap">
+                        {col.label}
+                        <MdArrowUpward
+                          className={`transition ${
+                            sortConfig.key === col.key &&
+                            sortConfig.direction === "desc"
+                              ? "rotate-180"
+                              : ""
+                          }`}
+                        />
+                      </button>
+                    </th>
+                  ))}
+
+                  {/* 🔒 LOCKED ACTIONS COLUMN */}
+                  <th className="px-4 py-3 text-center text-primary-navy w-[110px]">
                     Actions
                   </th>
                 </tr>
               </thead>
+
               <tbody>
-                {filteredUsers.map((user, index) => (
+                {filteredUsers.map((user) => (
                   <tr
                     key={user.id}
-                    className={`border-b border-[#A9AFBAB2] ${
-                      index % 2 === 0 ? "bg-[#E9E7E7]" : "bg-[#E9E7E7]"
-                    } hover:bg-[#dadada] transition-colors text-xs sm:text-sm md:text-base`}>
-                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4">
-                      <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
-                        <div className="flex items-center justify-center shrink-0">
-                          <FaUserCircle className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
-                        </div>
-                        <span className="text-[#072A57] font-medium truncate">
+                    className="border-b items-center text-center bg-light-grey hover:bg-mid-grey">
+                    {/* Name */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2 w-full">
+                        <FaUserCircle className="text-primary-navy" />
+                        <span className="text-primary-navy font-medium truncate sm:whitespace-nowrap sm:overflow-visible">
                           {user.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-right">
-                      <div className="flex items-center justify-end gap-1 sm:gap-2 md:gap-3">
-                        <span className="text-[#072A57] font-medium truncate">
-                          {user.arabic_name}
-                        </span>
-                        <div className="flex items-center justify-center shrink-0">
-                          <FaUserCircle className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
-                        </div>
-                      </div>
+
+                    {/* Arabic Name */}
+                    <td className="px-4 py-3 text-right">
+                      <span className="text-primary-navy font-medium truncate sm:whitespace-nowrap sm:overflow-visible">
+                        {user.arabic_name}
+                      </span>
                     </td>
-                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4">
-                      <span className="text-[#072A57] truncate block">
+
+                    {/* Email */}
+                    <td className="px-4 py-3">
+                      <span className="text-primary-navy truncate sm:whitespace-nowrap sm:overflow-visible">
                         {user.email}
                       </span>
                     </td>
-                    <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-right">
-                      <div className="flex items-center justify-end gap-1 sm:gap-2 md:gap-3">
-                        <button
-                          onClick={() => setEditingUser(user)}
-                          className="p-1 sm:p-1.5 md:p-2 hover:scale-110 transition min-h-8 sm:min-h-9 md:min-h-10 flex items-center justify-center"
-                          title="Edit user">
-                          <RiPencilFill className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
+
+                    {/* 🔒 Actions */}
+                    <td className="px-4 py-3 w-[110px]">
+                      <div className="flex justify-center gap-3">
+                        <button onClick={() => setEditingUser(user)}>
+                          <RiPencilFill className="text-primary-navy w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => setDeletingUserId(user.id)}
-                          className="p-1 sm:p-1.5 md:p-2 hover:scale-110 transition min-h-8 sm:min-h-9 md:min-h-10 flex items-center justify-center"
-                          title="Delete user">
-                          <MdDelete className="w-4 sm:w-5 h-4 sm:h-5 text-[#072A57]" />
+                        <button onClick={() => setDeletingUserId(user.id)}>
+                          <MdDelete className="text-primary-navy w-5 h-5" />
                         </button>
                       </div>
                     </td>
@@ -262,32 +199,19 @@ export default function UsersTable() {
               </tbody>
             </table>
           </div>
-
-          {/* No results message */}
-          {filteredUsers.length === 0 && !isLoading && (
-            <div className="p-4 sm:p-6 md:p-8 text-center text-gray-500 text-sm sm:text-base">
-              No users found matching your search.
-            </div>
-          )}
-        </>
+        </div>
       )}
 
       {/* Modals */}
       {isCreateModalOpen && (
-        <CreateUserModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onSubmit={handleCreateUser}
-        />
+        <CreateUserModal onClose={() => setIsCreateModalOpen(false)} />
       )}
-
       {editingUser && (
         <EditUserModal
           user={editingUser}
           onClose={() => setEditingUser(null)}
-          onSubmit={handleEditUser}
         />
       )}
-
       {deletingUserId && (
         <DeleteConfirmModal
           onConfirm={handleDeleteUser}

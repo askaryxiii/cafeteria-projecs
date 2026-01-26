@@ -89,6 +89,114 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
         break;
       }
 
+      case "months": {
+        // Convert daily breakdown to chart format (days 1-31, only show days with data)
+        const dayMap = {};
+        const dayOrderMap = {};
+
+        // Group by day of month
+        Object.values(breakdownData).forEach((dayData) => {
+          let dayNum = dayData.day;
+
+          // If no day property, try to extract from date
+          if (dayNum === undefined && dayData.date) {
+            const date = new Date(dayData.date);
+            dayNum = date.getDate();
+          }
+
+          if (dayNum !== undefined) {
+            const dayStr = String(dayNum).padStart(2, "0");
+            dayMap[dayStr] =
+              (dayMap[dayStr] || 0) + parseFloat(dayData.revenue || 0);
+            dayOrderMap[dayStr] =
+              (dayOrderMap[dayStr] || 0) + parseInt(dayData.order_count || 0);
+          }
+        });
+
+        // Create chart data, only showing days with data
+        chartDataArray = Object.keys(dayMap)
+          .sort((a, b) => parseInt(a) - parseInt(b))
+          .map((day) => ({
+            name: `Day ${parseInt(day)}`,
+            value: Math.round(dayMap[day]),
+            orderCount: dayOrderMap[day],
+          }));
+
+        break;
+      }
+
+      case "years": {
+        // Convert monthly breakdown to chart format (12 months)
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        const monthMap = {};
+        const monthOrderMap = {};
+
+        // Initialize all months
+        monthNames.forEach((month) => {
+          monthMap[month] = 0;
+          monthOrderMap[month] = 0;
+        });
+
+        // Group by month
+        Object.values(breakdownData).forEach((monthData) => {
+          let monthNum = monthData.month;
+          let monthName = null;
+
+          // Try to get month name from label (e.g., "January 2026" -> "Jan")
+          if (monthData.month_label) {
+            const fullMonthName = monthData.month_label.split(" ")[0];
+            // Convert full month name to 3-letter abbreviation
+            const monthAbbreviations = {
+              January: "Jan",
+              February: "Feb",
+              March: "Mar",
+              April: "Apr",
+              May: "May",
+              June: "Jun",
+              July: "Jul",
+              August: "Aug",
+              September: "Sep",
+              October: "Oct",
+              November: "Nov",
+              December: "Dec",
+            };
+            monthName = monthAbbreviations[fullMonthName];
+          }
+
+          // If no month name yet, try to use month number
+          if (!monthName && monthNum !== undefined) {
+            monthName = monthNames[monthNum - 1];
+          }
+
+          if (monthName && monthNames.includes(monthName)) {
+            monthMap[monthName] += parseFloat(monthData.revenue || 0);
+            monthOrderMap[monthName] += parseInt(monthData.order_count || 0);
+          }
+        });
+
+        // Create chart data with all 12 months
+        chartDataArray = monthNames.map((month) => ({
+          name: month,
+          value: Math.round(monthMap[month]),
+          orderCount: monthOrderMap[month],
+        }));
+
+        break;
+      }
+
       default:
         chartDataArray = [];
     }

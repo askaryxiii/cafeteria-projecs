@@ -53,127 +53,37 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
       case "weeks": {
         const dayRevenueMap = {};
         const dayOrderCountMap = {};
+        const dayDateMap = {};
 
-        // Initialize weekdays
+        // Initialize all weekdays (KEEP empty days)
         weekdayNames.forEach((day) => {
           dayRevenueMap[day] = 0;
           dayOrderCountMap[day] = 0;
+          dayDateMap[day] = null;
         });
 
-        // Group by weekday
+        // Group backend data
         Object.values(breakdownData).forEach((dayData) => {
           if (!dayData.day_name) return;
 
-          const fullDay = dayData.day_name.trim();
-          const dayIndex = fullWeekdayNames.indexOf(fullDay);
+          const dayIndex = fullWeekdayNames.indexOf(dayData.day_name.trim());
           if (dayIndex === -1) return;
 
           const dayKey = weekdayNames[dayIndex];
 
           dayRevenueMap[dayKey] += parseFloat(dayData.revenue || 0);
           dayOrderCountMap[dayKey] += parseInt(dayData.order_count || 0);
-        });
 
-        // Build chart data → ONLY order count as label
-        chartDataArray = weekdayNames
-          .map((day) => ({
-            name: `${dayOrderCountMap[day]} orders`,
-            value: Math.round(dayRevenueMap[day]),
-          }))
-          .filter((item) => !item.name.startsWith("0")); // optional: hide 0 orders
-
-        break;
-      }
-
-      case "months": {
-        const dayMap = {};
-
-        for (let i = 1; i <= 31; i++) {
-          dayMap[String(i).padStart(2, "0")] = 0;
-        }
-
-        Object.values(breakdownData).forEach((dayData) => {
-          let dayNum = dayData.day;
-
-          if (dayNum === undefined && dayData.date) {
-            const date = new Date(dayData.date);
-            dayNum = date.getDate();
-          }
-
-          if (dayNum !== undefined) {
-            const dayStr = String(dayNum).padStart(2, "0");
-            dayMap[dayStr] += parseFloat(dayData.revenue || 0);
+          if (dayData.date && !dayDateMap[dayKey]) {
+            dayDateMap[dayKey] = dayData.date.split("-")[2];
           }
         });
 
-        chartDataArray = Array.from({ length: 31 }, (_, i) => {
-          const day = String(i + 1).padStart(2, "0");
-          return {
-            name: day,
-            value: Math.round(dayMap[day]),
-          };
-        }).filter((item) => item.value > 0);
-
-        break;
-      }
-
-      case "years": {
-        const monthNames = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ];
-
-        const monthRevenueMap = {};
-        const monthOrderCountMap = {};
-
-        monthNames.forEach((month) => {
-          monthRevenueMap[month] = 0;
-          monthOrderCountMap[month] = 0;
-        });
-
-        Object.values(breakdownData).forEach((monthData) => {
-          let monthName = null;
-
-          if (monthData.month_label) {
-            const fullMonth = monthData.month_label.split(" ")[0];
-            const map = {
-              January: "Jan",
-              February: "Feb",
-              March: "Mar",
-              April: "Apr",
-              May: "May",
-              June: "Jun",
-              July: "Jul",
-              August: "Aug",
-              September: "Sep",
-              October: "Oct",
-              November: "Nov",
-              December: "Dec",
-            };
-            monthName = map[fullMonth];
-          }
-
-          if (monthName) {
-            monthRevenueMap[monthName] += parseFloat(monthData.revenue || 0);
-            monthOrderCountMap[monthName] += parseInt(
-              monthData.order_count || 0,
-            );
-          }
-        });
-
-        chartDataArray = monthNames.map((month) => ({
-          name: `${monthOrderCountMap[month]} orders`,
-          value: Math.round(monthRevenueMap[month]),
+        // 🔥 X-axis stays date-based like before
+        chartDataArray = weekdayNames.map((day) => ({
+          name: dayDateMap[day] ? `${day} ${dayDateMap[day]}` : day,
+          value: Math.round(dayRevenueMap[day]),
+          orderCount: dayOrderCountMap[day], // 👈 available for tooltip
         }));
 
         break;
@@ -240,14 +150,11 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
               tickFormatter={(value) => `${value}`}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                fontSize: isMobile ? "11px" : "12px",
-              }}
               formatter={(value) => [`EGP ${value.toFixed(2)}`, "Revenue"]}
-              labelFormatter={(label) => `${label}`}
+              labelFormatter={(label, payload) => {
+                if (!payload || !payload.length) return label;
+                return `${payload[0].payload.orderCount} orders`;
+              }}
             />
             <Bar dataKey="value" fill={THEME_COLOR} radius={[4, 4, 0, 0]} />
           </BarChart>

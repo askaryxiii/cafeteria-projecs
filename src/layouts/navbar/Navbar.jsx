@@ -160,25 +160,12 @@ const Navbar = () => {
           <div className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
             <span className="font-bold">Welcome {user?.user?.name}</span>
           </div>
-          <div className="relative  group inline-block">
-            <button
-              type="button"
-              disabled
-              className="flex w-full items-center gap-2 p-2 rounded">
-              <BsFillCupHotFill /> Drinks
-            </button>
-
-            {/* Tooltip */}
-            <div
-              className="
-        absolute bottom-full mb-2 left-1/2 -translate-x-1/2
-        whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white
-        opacity-0 group-hover:opacity-100 transition-opacity
-        pointer-events-none
-      ">
-              Drinks are currently unavailable
-            </div>
-          </div>
+          <Link
+            to="/user/drinks"
+            className="flex items-center gap-2 p-2 rounded"
+            onClick={() => setOpen(false)}>
+            <BsFillCupHotFill /> Drinks
+          </Link>
           <Link
             to="/"
             className="flex items-center gap-2 p-2 rounded"

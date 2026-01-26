@@ -39,7 +39,6 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
     const breakdownData = totalRevenueObj.breakdown.data;
     let chartDataArray = [];
 
-    // Weekday names (excluding Saturday and Sunday)
     const weekdayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
     const fullWeekdayNames = [
       "Monday",
@@ -50,102 +49,52 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
     ];
 
     switch (timePeriod) {
-      case "24hours": {
-        // For current_week, data is daily (Mon-Fri only)
-        const dayMap = {};
-        const dayDateMap = {};
-
-        // Initialize weekdays only
-        weekdayNames.forEach((day) => {
-          dayMap[day] = 0;
-          dayDateMap[day] = null;
-        });
-
-        // Group by day name
-        Object.entries(breakdownData).forEach(([key, dayData]) => {
-          let dayName = null;
-
-          // Check if day_name exists and convert to short form
-          if (dayData.day_name) {
-            const fullDay = dayData.day_name.trim();
-            const dayIndex = fullWeekdayNames.indexOf(fullDay);
-            if (dayIndex !== -1) {
-              dayName = weekdayNames[dayIndex];
-            }
-          }
-
-          if (dayName) {
-            dayMap[dayName] += parseFloat(dayData.revenue || 0);
-            // Store the date (extract day number from date YYYY-MM-DD)
-            if (dayData.date && !dayDateMap[dayName]) {
-              dayDateMap[dayName] = dayData.date.split("-")[2];
-            }
-          }
-        });
-
-        // Create chart data with weekdays and dates
-        chartDataArray = weekdayNames.map((day) => ({
-          name: dayDateMap[day] ? `${day} ${dayDateMap[day]}` : day,
-          value: Math.round(dayMap[day]),
-        }));
-        break;
-      }
-
+      case "24hours":
       case "weeks": {
-        // Convert daily breakdown to chart format (weekdays only)
-        const dayMap = {};
-        const dayDateMap = {};
+        const dayRevenueMap = {};
+        const dayOrderCountMap = {};
 
-        // Initialize weekdays only
+        // Initialize weekdays
         weekdayNames.forEach((day) => {
-          dayMap[day] = 0;
-          dayDateMap[day] = null;
+          dayRevenueMap[day] = 0;
+          dayOrderCountMap[day] = 0;
         });
 
-        // Group by day name
-        Object.entries(breakdownData).forEach(([key, dayData]) => {
-          let dayName = null;
+        // Group by weekday
+        Object.values(breakdownData).forEach((dayData) => {
+          if (!dayData.day_name) return;
 
-          // Check if day_name exists and convert to short form
-          if (dayData.day_name) {
-            const fullDay = dayData.day_name.trim();
-            const dayIndex = fullWeekdayNames.indexOf(fullDay);
-            if (dayIndex !== -1) {
-              dayName = weekdayNames[dayIndex];
-            }
-          }
+          const fullDay = dayData.day_name.trim();
+          const dayIndex = fullWeekdayNames.indexOf(fullDay);
+          if (dayIndex === -1) return;
 
-          if (dayName) {
-            dayMap[dayName] += parseFloat(dayData.revenue || 0);
-            // Store the date (extract day number from date YYYY-MM-DD)
-            if (dayData.date && !dayDateMap[dayName]) {
-              dayDateMap[dayName] = dayData.date.split("-")[2];
-            }
-          }
+          const dayKey = weekdayNames[dayIndex];
+
+          dayRevenueMap[dayKey] += parseFloat(dayData.revenue || 0);
+          dayOrderCountMap[dayKey] += parseInt(dayData.order_count || 0);
         });
 
-        // Create chart data with weekdays and dates
-        chartDataArray = weekdayNames.map((day) => ({
-          name: dayDateMap[day] ? `${day} ${dayDateMap[day]}` : day,
-          value: Math.round(dayMap[day]),
-        }));
+        // Build chart data → ONLY order count as label
+        chartDataArray = weekdayNames
+          .map((day) => ({
+            name: `${dayOrderCountMap[day]} orders`,
+            value: Math.round(dayRevenueMap[day]),
+          }))
+          .filter((item) => !item.name.startsWith("0")); // optional: hide 0 orders
+
         break;
       }
 
       case "months": {
-        // Convert daily breakdown to chart format (weekdays only)
         const dayMap = {};
 
-        // Initialize weekdays only (1-31, but only show Mon-Fri)
         for (let i = 1; i <= 31; i++) {
           dayMap[String(i).padStart(2, "0")] = 0;
         }
 
-        // Group by day of month
-        Object.entries(breakdownData).forEach(([key, dayData]) => {
+        Object.values(breakdownData).forEach((dayData) => {
           let dayNum = dayData.day;
 
-          // If no day property, try to extract from date
           if (dayNum === undefined && dayData.date) {
             const date = new Date(dayData.date);
             dayNum = date.getDate();
@@ -157,19 +106,18 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
           }
         });
 
-        // Create chart data with all weekdays (filter out weekends in rendering)
         chartDataArray = Array.from({ length: 31 }, (_, i) => {
           const day = String(i + 1).padStart(2, "0");
           return {
             name: day,
             value: Math.round(dayMap[day]),
           };
-        }).filter((item) => item.value > 0); // Only show days with data
+        }).filter((item) => item.value > 0);
+
         break;
       }
 
       case "years": {
-        // Convert monthly breakdown to chart format (12 months)
         const monthNames = [
           "Jan",
           "Feb",
@@ -184,23 +132,21 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
           "Nov",
           "Dec",
         ];
-        const monthMap = {};
 
-        // Initialize all months
+        const monthRevenueMap = {};
+        const monthOrderCountMap = {};
+
         monthNames.forEach((month) => {
-          monthMap[month] = 0;
+          monthRevenueMap[month] = 0;
+          monthOrderCountMap[month] = 0;
         });
 
-        // Group by month
-        Object.entries(breakdownData).forEach(([key, monthData]) => {
-          let monthNum = monthData.month;
+        Object.values(breakdownData).forEach((monthData) => {
           let monthName = null;
 
-          // Try to get month name from label (e.g., "January 2026" -> "Jan")
           if (monthData.month_label) {
-            const fullMonthName = monthData.month_label.split(" ")[0];
-            // Convert full month name to 3-letter abbreviation
-            const monthAbbreviations = {
+            const fullMonth = monthData.month_label.split(" ")[0];
+            const map = {
               January: "Jan",
               February: "Feb",
               March: "Mar",
@@ -214,24 +160,22 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
               November: "Nov",
               December: "Dec",
             };
-            monthName = monthAbbreviations[fullMonthName];
+            monthName = map[fullMonth];
           }
 
-          // If no month name yet, try to use month number
-          if (!monthName && monthNum !== undefined) {
-            monthName = monthNames[monthNum - 1];
-          }
-
-          if (monthName && monthNames.includes(monthName)) {
-            monthMap[monthName] += parseFloat(monthData.revenue || 0);
+          if (monthName) {
+            monthRevenueMap[monthName] += parseFloat(monthData.revenue || 0);
+            monthOrderCountMap[monthName] += parseInt(
+              monthData.order_count || 0,
+            );
           }
         });
 
-        // Create chart data with all 12 months
         chartDataArray = monthNames.map((month) => ({
-          name: month,
-          value: Math.round(monthMap[month]),
+          name: `${monthOrderCountMap[month]} orders`,
+          value: Math.round(monthRevenueMap[month]),
         }));
+
         break;
       }
 
@@ -320,10 +264,10 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
             {timePeriod === "24hours"
               ? "Current Week (Mon-Fri)"
               : timePeriod === "weeks"
-              ? "Last Week (Mon-Fri)"
-              : timePeriod === "months"
-              ? "Current Month (Weekdays)"
-              : "Current Year (Months)"}
+                ? "Last Week (Mon-Fri)"
+                : timePeriod === "months"
+                  ? "Current Month (Weekdays)"
+                  : "Current Year (Months)"}
           </span>
         </div>
         <span>

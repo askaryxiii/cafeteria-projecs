@@ -66,8 +66,6 @@ export default function OrderTimeChart({
     pieData.reduce((max, item) => (item.value > max.value ? item : max)) ||
     pieData[0];
 
-  console.log(data);
-
   return (
     <div className="w-full flex items-center justify-between">
       <div className="flex-1 h-64">
@@ -124,7 +122,8 @@ export default function OrderTimeChart({
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: COLORS[idx % COLORS.length] }}></div>
               <span className="text-gray-700">
-                {primaryTimeRange.percentage ? item.percentage.toFixed(2) : 0}%
+                {primaryTimeRange.percentage ? item.percentage.toFixed(2) : 0}%{" | "}
+                {item.name}
               </span>
             </div>
           ))}

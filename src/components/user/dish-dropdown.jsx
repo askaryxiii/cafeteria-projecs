@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import DropdownButton from "../user/dropdown-button";
 import DropdownContent from "../user/dropdown-content";
-import { getBreakfast, getTodayMenuByCategory, isFriday } from "../../lib/apis";
+import {
+  getBreakfast,
+  getTodayMenuByCategory,
+  isFridayOrWeekend,
+} from "../../lib/apis";
 
 const DishDropdown = ({
   categoryId,
@@ -17,7 +21,7 @@ const DishDropdown = ({
 
   useEffect(() => {
     const checkFriday = async () => {
-      const fridayCheck = await isFriday();
+      const fridayCheck = await isFridayOrWeekend();
       setIsFridayToday(fridayCheck);
     };
     checkFriday();

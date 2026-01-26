@@ -213,9 +213,9 @@ export async function getTodayWeekday() {
 }
 
 // Check if today is Friday (day 5)
-export async function isFriday() {
+export async function isFridayOrWeekend() {
   const day = await getCurrentDayOfWeek();
-  return day === 5;
+  return [5, 6, 0].includes(day);
 }
 
 export function readToken() {
@@ -344,7 +344,7 @@ export async function getTodayMenuByCategory(categoryName) {
 
     // ✅ FILTER HERE
     const filtered = data.filter(
-      (item) => item.category.toLowerCase() === categoryName.toLowerCase()
+      (item) => item.category.toLowerCase() === categoryName.toLowerCase(),
     );
 
     return filtered;
@@ -387,7 +387,7 @@ export async function getMenuByCategoryAndDate(categoryName, dateString) {
 
     // ✅ FILTER BY CATEGORY
     const filtered = data.filter(
-      (item) => item.category.toLowerCase() === categoryName.toLowerCase()
+      (item) => item.category.toLowerCase() === categoryName.toLowerCase(),
     );
 
     return filtered;
@@ -427,7 +427,7 @@ export async function getBreakfast() {
 
     // ✅ FILTER HERE
     const filtered = data.filter(
-      (item) => item.meal_type.toLowerCase() === "breakfast"
+      (item) => item.meal_type.toLowerCase() === "breakfast",
     );
 
     return filtered;
@@ -574,7 +574,7 @@ export async function getUserOrdersForMonth(userId, month, year, token) {
           Authorization: `Bearer ${t}`,
           "Content-Type": "application/json",
         }),
-      }
+      },
     );
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -605,7 +605,7 @@ export async function getUserOrdersByDate(dateStr, token) {
 
     // filter by date
     const filtered = (Array.isArray(monthly) ? monthly : []).filter(
-      (o) => o.date === dateStr
+      (o) => o.date === dateStr,
     );
 
     return filtered;
@@ -774,7 +774,7 @@ export async function getUserOrderFromTo(userId, from, to) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         }),
-      }
+      },
     );
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -1209,7 +1209,7 @@ export async function userDetailed(from, to) {
       `${API_URL}/accountant/users-detailed?from_date=${from}&to_date=${to}`,
       {
         headers: getHeaders({ Authorization: `Bearer ${token}` }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -1238,7 +1238,7 @@ export async function getExcelData(from, to) {
       `${API_URL}/accountant/export-excel?from_date=${from}&to_date=${to}`,
       {
         headers: getHeaders({ Authorization: `Bearer ${token}` }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -1256,5 +1256,61 @@ export async function getExcelData(from, to) {
   } catch (error) {
     console.error("Error fetching users detailed:", error);
     return null;
+  }
+}
+
+// Get all available drinks
+export async function getAvailableDrinks() {
+  try {
+    const token = readToken();
+    const res = await fetch(`${API_URL}/available-drinks/all`, {
+      headers: getHeaders({
+        Authorization: token ? `Bearer ${token}` : undefined,
+        "Content-Type": "application/json",
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => null);
+      return {
+        error: text || `Failed to fetch available drinks (${res.status})`,
+      };
+    }
+
+    const data = await res.json().catch(() => null);
+    return data || { items: [] };
+  } catch (err) {
+    console.error("Error fetching available drinks:", err);
+    return { error: err.message || "Something went wrong" };
+  }
+}
+
+// Update availability for multiple drinks
+export async function updateAvailableDrinks(items = []) {
+  try {
+    const token = readToken();
+    const body = { items };
+
+    const res = await fetch(`${API_URL}/available-drinks`, {
+      method: "PATCH",
+      headers: getHeaders({
+        Authorization: token ? `Bearer ${token}` : undefined,
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => null);
+      return {
+        error: text || `Failed to update available drinks (${res.status})`,
+      };
+    }
+
+    const data = await res.json().catch(() => null);
+    return data || { success: true };
+  } catch (err) {
+    console.error("Error updating available drinks:", err);
+    return { error: err.message || "Something went wrong" };
   }
 }

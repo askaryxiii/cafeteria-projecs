@@ -8,9 +8,9 @@ import {
   getOrderWindows,
   isTimeInWindow,
   getServerTimeComponents,
-  isFriday,
   getLunchOrderDate,
   getTodayWeekday,
+  isFridayOrWeekend,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -29,7 +29,7 @@ const Ordering = ({ onOrderPlaced }) => {
       try {
         const windows = await getOrderWindows();
         const components = await getServerTimeComponents();
-        const fridayCheck = await isFriday();
+        const fridayCheck = await isFridayOrWeekend();
         const weekday = await getTodayWeekday();
         setIsFridayToday(fridayCheck);
         setTodayWeekday(weekday);

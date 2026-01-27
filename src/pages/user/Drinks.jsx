@@ -8,6 +8,10 @@ import {
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DrinkDropdown from "../../components/user/drink-dropdown";
+import { IoCheckmarkCircle } from "react-icons/io5";
+import { MdClose } from "react-icons/md";
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
 
 const API_URL = import.meta.env.VITE_API_BASE;
 
@@ -18,6 +22,10 @@ const Drinks = ({ onOrderPlaced }) => {
 
   const selectedDrinks = watch();
   const [totalPrice, setTotalPrice] = useState(0);
+  const [open, setOpen] = useState(false);
+
+  const onOpenModal = () => setOpen(true);
+  const onCloseModal = () => setOpen(false);
 
   const onSubmit = () => {
     (async () => {
@@ -36,7 +44,6 @@ const Drinks = ({ onOrderPlaced }) => {
         const codes = selectedDrinks.drinks || [];
         const items = codes.map((c) => ({ code: c }));
 
-        // DEBUG: Check if items is empty
         if (items.length === 0) {
           toast.error("No drinks selected");
           return;
@@ -50,8 +57,6 @@ const Drinks = ({ onOrderPlaced }) => {
           items,
         };
 
-        console.log("Order body:", orderBody);
-
         const response = await fetch(`${API_URL}/orders`, {
           method: "POST",
           headers: {
@@ -64,14 +69,13 @@ const Drinks = ({ onOrderPlaced }) => {
 
         if (!response.ok) {
           const error = await response.json();
-          console.error("Backend error response:", error); // DEBUG
+          console.error("Backend error response:", error);
           throw new Error(error.message || "Failed to place order");
         }
 
         const result = await response.json();
-        toast.success("Drink order placed successfully");
+        onOpenModal();
 
-        // Reset form to clear selected drinks
         reset();
 
         if (typeof onOrderPlaced === "function") {
@@ -98,6 +102,48 @@ const Drinks = ({ onOrderPlaced }) => {
           onTotalChange={setTotalPrice}
         />
       </form>
+
+      <Modal
+        open={open}
+        onClose={onCloseModal}
+        center
+        classNames={{
+          modal:
+            "rounded-2xl shadow-2xl relative w-[75%] md:w-[55%] lg:w-[40%]",
+          closeButton: "hidden",
+          overlay: "flex items-center justify-center",
+        }}
+        closeIconButtonClassName="hidden"
+        styles={{
+          modal: {
+            padding: "1.5rem",
+            maxWidth: "90vw",
+            margin: "0 auto",
+            backgroundColor: "oklch(0.967 0.0029 264.54)",
+          },
+          overlay: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        }}>
+        <div className="flex flex-col items-center justify-center text-center ">
+          {/* Success Icon */}
+          <div className="mb-2">
+            <IoCheckmarkCircle className="w-20 h-20 md:w-28 md:h-28 text-green-500" />
+          </div>
+
+          {/* Success Title */}
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
+            Order Placed
+          </h2>
+
+          {/* Success Message */}
+          <p className="text-gray-600 text-sm md:text-base leading-relaxed px-2 sm:px-4">
+            Now pick up your order. You can order more.
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 };

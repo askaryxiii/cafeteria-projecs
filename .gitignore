@@ -31,3 +31,7 @@ screenshot.js
 # Ignore screenshots
 screenshots/
 screenshots.zip
+
+# Ignore generated files
+generate_docs.py
+PROJECS_CAFETERIA_DOCUMENTATION.docx

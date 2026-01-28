@@ -46,8 +46,8 @@ const DashboardCafeteria = () => {
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [currentWindow, setCurrentWindow] = useState("");
   const [sortConfig, setSortConfig] = useState({
-    key: "arabic_name",
-    direction: "asc",
+    key: "created_at",
+    direction: "desc",
   });
   const previousOrderIdsRef = useRef(new Set());
 
@@ -131,7 +131,7 @@ const DashboardCafeteria = () => {
       // Sort by created_at descending (newest first)
       filteredOrders.sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
 
       const newIds = new Set(filteredOrders.map((o) => o.id));
@@ -174,36 +174,39 @@ const DashboardCafeteria = () => {
 
   // Handle sort by column
   const handleSort = (key) => {
-    let direction = "desc";
-    if (sortConfig.key === key && sortConfig.direction === "desc") {
-      direction = "asc";
-    }
-    setSortConfig({ key, direction });
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      // default direction per key: dates/numeric -> desc, strings -> asc
+      const defaultDescKeys = ["created_at"];
+      const direction = defaultDescKeys.includes(key) ? "desc" : "asc";
+      return { key, direction };
+    });
   };
 
   // Sort orders based on sort config
   const sortedOrders = [...orders].sort((a, b) => {
-    let aValue = a[sortConfig.key];
-    let bValue = b[sortConfig.key];
+    const key = sortConfig.key;
 
-    // Handle date comparison
-    if (sortConfig.key === "created_at") {
-      aValue = new Date(aValue).getTime();
-      bValue = new Date(bValue).getTime();
-    }
+    const normalize = (val) => {
+      if (val === null || val === undefined) return "";
+      if (key === "created_at") {
+        const t = new Date(val).getTime();
+        return isNaN(t) ? 0 : t;
+      }
+      if (typeof val === "string" && val.trim() !== "" && !isNaN(Number(val))) {
+        return Number(val);
+      }
+      if (typeof val === "string") return val.toLowerCase();
+      return val;
+    };
 
-    // Handle string comparison
-    if (typeof aValue === "string") {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
+    const aValue = normalize(a[key]);
+    const bValue = normalize(b[key]);
 
-    if (aValue < bValue) {
-      return sortConfig.direction === "asc" ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return sortConfig.direction === "asc" ? 1 : -1;
-    }
+    if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
     return 0;
   });
 
@@ -219,7 +222,7 @@ const DashboardCafeteria = () => {
       // Save to localStorage
       localStorage.setItem(
         "cafeteriaCheckedItems",
-        JSON.stringify(Array.from(newSet))
+        JSON.stringify(Array.from(newSet)),
       );
       return newSet;
     });
@@ -261,13 +264,13 @@ const DashboardCafeteria = () => {
                         setCheckedItems(newSet);
                         localStorage.setItem(
                           "cafeteriaCheckedItems",
-                          JSON.stringify(Array.from(newSet))
+                          JSON.stringify(Array.from(newSet)),
                         );
                       } else {
                         setCheckedItems(new Set());
                         localStorage.setItem(
                           "cafeteriaCheckedItems",
-                          JSON.stringify([])
+                          JSON.stringify([]),
                         );
                       }
                     }}
@@ -319,8 +322,8 @@ const DashboardCafeteria = () => {
                           order.meal_type === "breakfast"
                             ? "bg-orange-100 text-orange-800"
                             : order.meal_type === "lunch"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-purple-100 text-purple-800"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-purple-100 text-purple-800"
                         }`}>
                         {order.meal_type.charAt(0).toUpperCase() +
                           order.meal_type.slice(1)}
@@ -382,8 +385,8 @@ const DashboardCafeteria = () => {
                         order.meal_type === "breakfast"
                           ? "bg-orange-100 text-orange-800"
                           : order.meal_type === "lunch"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-purple-100 text-purple-800"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-purple-100 text-purple-800"
                       }`}>
                       {order.meal_type.charAt(0).toUpperCase() +
                         order.meal_type.slice(1)}

@@ -5,7 +5,6 @@ import {
   isTimeInWindow,
 } from "../../lib/apis";
 import { unlockAudio, playNewOrderSound } from "../../lib/sound";
-import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 
 // Add CSS for smooth line animation
@@ -187,26 +186,41 @@ const DashboardCafeteria = () => {
 
   // Sort orders based on sort config
   const sortedOrders = [...orders].sort((a, b) => {
-    const key = sortConfig.key;
+    // Separate checked and unchecked items
+    const aIsChecked = checkedItems.has(a.id);
+    const bIsChecked = checkedItems.has(b.id);
 
-    const normalize = (val) => {
-      if (val === null || val === undefined) return "";
-      if (key === "created_at") {
-        const t = new Date(val).getTime();
-        return isNaN(t) ? 0 : t;
-      }
-      if (typeof val === "string" && val.trim() !== "" && !isNaN(Number(val))) {
-        return Number(val);
-      }
-      if (typeof val === "string") return val.toLowerCase();
-      return val;
-    };
+    // Checked items go to the bottom
+    if (aIsChecked && !bIsChecked) return 1;
+    if (!aIsChecked && bIsChecked) return -1;
 
-    const aValue = normalize(a[key]);
-    const bValue = normalize(b[key]);
+    // Custom sorting logic
+    // Priority: Drinks first, then Breakfast, then Lunch (least)
+    const mealTypePriority = { drinks: 0, breakfast: 1, lunch: 2 };
+    const aPriority = mealTypePriority[a.meal_type] ?? 3;
+    const bPriority = mealTypePriority[b.meal_type] ?? 3;
 
-    if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+
+    // Within same meal type, apply sorting
+    // Drinks and Breakfast: sort by creation date (newest first)
+    if (a.meal_type === "drinks" || a.meal_type === "breakfast") {
+      const aTime = new Date(a.created_at).getTime();
+      const bTime = new Date(b.created_at).getTime();
+      return bTime - aTime; // Newest first
+    }
+
+    // Lunch: sort alphabetically by arabic_name
+    if (a.meal_type === "lunch") {
+      const aName = (a.arabic_name || "").toLowerCase();
+      const bName = (b.arabic_name || "").toLowerCase();
+
+      if (aName < bName) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aName > bName) return sortConfig.direction === "asc" ? 1 : -1;
+    }
+
     return 0;
   });
 

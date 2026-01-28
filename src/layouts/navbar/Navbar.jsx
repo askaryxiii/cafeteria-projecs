@@ -197,7 +197,7 @@ const Navbar = () => {
                   <label key={d.id} className="flex items-center gap-3 text-xl">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 accent-primary-navy"
+                      className="min-w-4 min-h-4 accent-primary-navy"
                       checked={d.is_available}
                       onChange={() => toggleDrink(d.id)}
                     />

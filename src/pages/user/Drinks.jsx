@@ -16,13 +16,20 @@ import { Modal } from "react-responsive-modal";
 const API_URL = import.meta.env.VITE_API_BASE;
 
 const Drinks = ({ onOrderPlaced }) => {
-  const { control, watch, handleSubmit, reset } = useForm({
+  const {
+    control,
+    watch,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm({
     defaultValues: { drinks: [] },
   });
 
   const selectedDrinks = watch();
   const [totalPrice, setTotalPrice] = useState(0);
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const onOpenModal = () => setOpen(true);
   const onCloseModal = () => setOpen(false);
@@ -100,6 +107,7 @@ const Drinks = ({ onOrderPlaced }) => {
         <FormFooter
           selectedItems={selectedDrinks}
           onTotalChange={setTotalPrice}
+          isSubmitting={isSubmitting}
         />
       </form>
 

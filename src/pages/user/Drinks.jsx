@@ -34,65 +34,63 @@ const Drinks = ({ onOrderPlaced }) => {
   const onOpenModal = () => setOpen(true);
   const onCloseModal = () => setOpen(false);
 
-  const onSubmit = () => {
-    (async () => {
-      try {
-        const token = readToken();
-        if (!token) {
-          toast.error("Sign out and sign in again to place order");
-          return;
-        }
-
-        const u = await getVerifiedUser(token);
-        const user_email = u?.email || null;
-
-        const components = await getServerTimeComponents();
-
-        const codes = selectedDrinks.drinks || [];
-        const items = codes.map((c) => ({ code: c }));
-
-        if (items.length === 0) {
-          toast.error("No drinks selected");
-          return;
-        }
-
-        const orderBody = {
-          date: components.dateString,
-          meal_type: "drinks",
-          user_email,
-          total_cost: Number(totalPrice),
-          items,
-        };
-
-        const response = await fetch(`${API_URL}/orders`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-          body: JSON.stringify(orderBody),
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          console.error("Backend error response:", error);
-          throw new Error(error.message || "Failed to place order");
-        }
-
-        const result = await response.json();
-        onOpenModal();
-
-        reset();
-
-        if (typeof onOrderPlaced === "function") {
-          onOrderPlaced(result);
-        }
-      } catch (err) {
-        console.error("Full error:", err);
-        toast.error(err.message || "Failed to place order");
+  const onSubmit = async () => {
+    try {
+      const token = readToken();
+      if (!token) {
+        toast.error("Sign out and sign in again to place order");
+        return;
       }
-    })();
+
+      const u = await getVerifiedUser(token);
+      const user_email = u?.email || null;
+
+      const components = await getServerTimeComponents();
+
+      const codes = selectedDrinks.drinks || [];
+      const items = codes.map((c) => ({ code: c }));
+
+      if (items.length === 0) {
+        toast.error("No drinks selected");
+        return;
+      }
+
+      const orderBody = {
+        date: components.dateString,
+        meal_type: "drinks",
+        user_email,
+        total_cost: Number(totalPrice),
+        items,
+      };
+
+      const response = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+        body: JSON.stringify(orderBody),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Backend error response:", error);
+        throw new Error(error.message || "Failed to place order");
+      }
+
+      const result = await response.json();
+      onOpenModal();
+
+      reset();
+
+      if (typeof onOrderPlaced === "function") {
+        onOrderPlaced(result);
+      }
+    } catch (err) {
+      console.error("Full error:", err);
+      toast.error(err.message || "Failed to place order");
+    }
   };
 
   return (

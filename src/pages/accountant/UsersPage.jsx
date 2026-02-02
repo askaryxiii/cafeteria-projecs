@@ -216,7 +216,7 @@ const UsersPage = () => {
             <div className="overflow-y-auto flex-1 p-6">
               <table className="w-full border-collapse border">
                 <thead>
-                  <tr className="bg-burned-grey text-text-dark/80 sticky top-0">
+                  <tr className="bg-burned-grey text-text-dark/80">
                     <th className="p-2 border">Order Date</th>
                     <th className="p-2 border">Order Items</th>
                     <th className="p-2 border">Total</th>

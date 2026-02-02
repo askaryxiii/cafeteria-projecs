@@ -30,8 +30,8 @@ const UsersPage = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((item) =>
         Object.values(item).some((value) =>
-          value?.toString().toLowerCase().includes(term)
-        )
+          value?.toString().toLowerCase().includes(term),
+        ),
       );
     }
 
@@ -96,12 +96,23 @@ const UsersPage = () => {
   const openModal = (user) => {
     setSelectedUser(user);
     setModalOpen(true);
+    // Prevent body scroll
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setModalOpen(false);
     setSelectedUser(null);
+    // Restore body scroll
+    document.body.style.overflow = "unset";
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   const getOrderItemsText = (items) => {
     if (!items) return "-";
@@ -189,40 +200,44 @@ const UsersPage = () => {
       {/* ------------------ MODAL ------------------ */}
       {modalOpen && (
         <div className="fixed inset-0 bg-[#868686]/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative">
+          <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg relative flex flex-col max-h-[90vh]">
             <button
-              className="absolute top-3 right-3 text-2xl text-dark-grey hover:text-black"
+              className="absolute top-3 right-3 text-2xl text-dark-grey hover:text-black z-10"
               onClick={closeModal}>
               <IoClose />
             </button>
 
-            <h2 className="text-xl font-semibold mb-4 text-text-dark/70">
-              Orders for {selectedUser?.name}
-            </h2>
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-text-dark/70">
+                Orders for {selectedUser?.name}
+              </h2>
+            </div>
 
-            <table className="w-full border-collapse border">
-              <thead>
-                <tr className="bg-burned-grey text-text-dark/80">
-                  <th className="p-2 border">Order Date</th>
-                  <th className="p-2 border">Order Items</th>
-                  <th className="p-2 border">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedUser?.orders?.map((o, idx) => (
-                  <tr key={idx}>
-                    <td className="p-2 border text-center">
-                      {o.date_of_order}
-                    </td>
-                    <td className="p-2 border text-center">
-                      {" "}
-                      {getOrderItemsText(o.items)}
-                    </td>
-                    <td className="p-2 border text-center">{o.total_cost}</td>
+            <div className="overflow-y-auto flex-1 p-6">
+              <table className="w-full border-collapse border">
+                <thead>
+                  <tr className="bg-burned-grey text-text-dark/80 sticky top-0">
+                    <th className="p-2 border">Order Date</th>
+                    <th className="p-2 border">Order Items</th>
+                    <th className="p-2 border">Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {selectedUser?.orders?.map((o, idx) => (
+                    <tr key={idx}>
+                      <td className="p-2 border text-center">
+                        {o.date_of_order}
+                      </td>
+                      <td className="p-2 border text-center">
+                        {" "}
+                        {getOrderItemsText(o.items)}
+                      </td>
+                      <td className="p-2 border text-center">{o.total_cost}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

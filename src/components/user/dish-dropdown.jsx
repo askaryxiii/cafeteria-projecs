@@ -13,6 +13,8 @@ const DishDropdown = ({
   categoryName,
   categoryNameAr,
   control,
+  selectionMode = "multiple",
+  maxSelections = null,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState([]);
@@ -48,8 +50,8 @@ const DishDropdown = ({
   };
 
   // Disable breakfast dropdown on Friday
-  const isDisabled =
-    isFridayToday && categoryName.toLowerCase() === "breakfast";
+  const isDisabled = categoryName.toLowerCase() === "breakfast";
+  // isFridayToday && categoryName.toLowerCase() === "breakfast";
 
   return (
     <Controller
@@ -77,6 +79,8 @@ const DishDropdown = ({
               selectedIds={field.value}
               onChange={field.onChange}
               isOpen={isOpen}
+              selectionMode={selectionMode}
+              maxSelections={maxSelections}
             />
           </div>
         </div>

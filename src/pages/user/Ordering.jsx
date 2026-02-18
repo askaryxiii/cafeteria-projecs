@@ -41,7 +41,7 @@ const Ordering = ({ onOrderPlaced }) => {
             components.hour,
             components.minute,
             windows?.lunch_start || "15:00",
-            windows?.lunch_end || "23:59"
+            windows?.lunch_end || "23:59",
           )
         ) {
           // In lunch window - show lunch target date
@@ -68,7 +68,7 @@ const Ordering = ({ onOrderPlaced }) => {
               components.hour,
               components.minute,
               windows.breakfast_start,
-              windows.breakfast_end
+              windows.breakfast_end,
             )
           ) {
             setMealType("breakfast");
@@ -77,7 +77,7 @@ const Ordering = ({ onOrderPlaced }) => {
               components.hour,
               components.minute,
               windows.lunch_start,
-              windows.lunch_end
+              windows.lunch_end,
             )
           ) {
             setMealType("lunch");
@@ -90,8 +90,8 @@ const Ordering = ({ onOrderPlaced }) => {
             components.hour >= 11 && components.hour < 15
               ? "breakfast"
               : components.hour >= 15
-              ? "lunch"
-              : null
+                ? "lunch"
+                : null,
           );
         }
       } catch (error) {
@@ -169,14 +169,44 @@ const Ordering = ({ onOrderPlaced }) => {
   };
 
   const categories = [
-    { id: "protein", name: "Protein", nameAr: "بروتين" },
-    { id: "carbs", name: "Carbs", nameAr: "نشويات" },
-    { id: "salad", name: "Salad", nameAr: "سلطة" },
-    { id: "side", name: "Side", nameAr: "جانبي" },
+    {
+      id: "protein",
+      name: "Protein",
+      nameAr: "بروتين",
+      selectionMode: "single",
+      maxSelections: 1,
+    },
+    {
+      id: "carbs",
+      name: "Carbs",
+      nameAr: "نشويات",
+      selectionMode: "single",
+      maxSelections: 1,
+    },
+    {
+      id: "salad",
+      name: "Salad",
+      nameAr: "سلطة",
+      selectionMode: "multiple",
+      maxSelections: 2,
+    },
+    {
+      id: "side",
+      name: "Side",
+      nameAr: "جانبي",
+      selectionMode: "multiple",
+      maxSelections: null,
+    },
   ];
 
   const breakfastCategories = [
-    { id: "breakfast", name: "Breakfast", nameAr: "افطار" },
+    {
+      id: "breakfast",
+      name: "Breakfast",
+      nameAr: "افطار",
+      selectionMode: "multiple",
+      maxSelections: null,
+    },
   ];
 
   if (isLoading) {
@@ -201,6 +231,8 @@ const Ordering = ({ onOrderPlaced }) => {
                 categoryName={category.name}
                 categoryNameAr={category.nameAr}
                 control={control}
+                selectionMode={category.selectionMode}
+                maxSelections={category.maxSelections}
               />
             ))
           : categories.map((category) => (
@@ -210,6 +242,8 @@ const Ordering = ({ onOrderPlaced }) => {
                 categoryName={category.name}
                 categoryNameAr={category.nameAr}
                 control={control}
+                selectionMode={category.selectionMode}
+                maxSelections={category.maxSelections}
               />
             ))}
 
@@ -217,7 +251,7 @@ const Ordering = ({ onOrderPlaced }) => {
           selectedItems={selectedItems}
           onTotalChange={setTotalPrice}
           isSubmitting={isSubmitting}
-          disabled={isFridayToday && mealType === "breakfast"}
+          disabled={mealType === "breakfast"}
           mealType={mealType}
         />
       </form>

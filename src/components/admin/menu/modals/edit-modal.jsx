@@ -35,11 +35,21 @@ export default function EditModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Map input names to formData properties
+    let propertyName = name;
+    if (name === "itemName") propertyName = "item_name";
+    if (name === "weightGrams") propertyName = "weight_grams";
+    if (name === "mealType") propertyName = "meal_type";
+    if (name === "proteinType") propertyName = "protein_type";
+
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name.includes("price") || name.includes("Weight")
-          ? parseFloat(value)
+      [propertyName]:
+        propertyName === "price" || propertyName === "weight_grams"
+          ? value === ""
+            ? ""
+            : value
           : value,
     }));
   };
@@ -90,6 +100,7 @@ export default function EditModal({
               name="price"
               value={formData.price || ""}
               onChange={handleChange}
+              step="0.01"
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
               disabled={isFetchingItem || isLoading}

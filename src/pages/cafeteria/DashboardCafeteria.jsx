@@ -265,31 +265,7 @@ const DashboardCafeteria = () => {
           <table className="w-full text-sm md:text-base">
             <thead>
               <tr className="border-b-2  border-gray-300 align-middle bg-burned-grey">
-                <th className="px-4 py-3 text-left font-semibold">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 accent-blue-600 cursor-pointer"
-                    checked={
-                      checkedItems.size === orders.length && orders.length > 0
-                    }
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        const newSet = new Set(orders.map((o) => o.id));
-                        setCheckedItems(newSet);
-                        localStorage.setItem(
-                          "cafeteriaCheckedItems",
-                          JSON.stringify(Array.from(newSet)),
-                        );
-                      } else {
-                        setCheckedItems(new Set());
-                        localStorage.setItem(
-                          "cafeteriaCheckedItems",
-                          JSON.stringify([]),
-                        );
-                      }
-                    }}
-                  />
-                </th>
+                <th className="px-4 py-3 text-left font-semibold">{" "}</th>
                 <th
                   className="px-4 py-3 text-left font-semibold cursor-pointer align-middle"
                   onClick={() => handleSort("arabic_name")}>

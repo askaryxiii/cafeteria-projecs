@@ -78,6 +78,7 @@ export default function CreateItemModal({
               placeholder="Enter price"
               value={formData.price}
               onChange={handleChange}
+              step="0.01"
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
             />

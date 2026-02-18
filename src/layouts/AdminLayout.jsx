@@ -77,7 +77,7 @@ const AdminLayout = () => {
       path: "/admin/settings",
     },
   ];
-
+  
   return (
     <div className="bg-burned-grey">
       {/* Logo Navigation (top bar) */}

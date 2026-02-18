@@ -6,6 +6,8 @@ export default function DropdownContent({
   selectedIds,
   onChange,
   isOpen,
+  selectionMode = "multiple",
+  maxSelections = null,
 }) {
   if (loading) {
     return (
@@ -27,6 +29,32 @@ export default function DropdownContent({
     );
   }
 
+  const handleItemChange = (item, isChecked) => {
+    const safeSelected = Array.isArray(selectedIds) ? selectedIds : [];
+
+    if (selectionMode === "single") {
+      // Radio-like behavior: only one item can be selected
+      if (isChecked) {
+        onChange([item.code]);
+      } else {
+        onChange([]);
+      }
+    } else if (
+      maxSelections &&
+      isChecked &&
+      safeSelected.length >= maxSelections
+    ) {
+      // Prevent adding more items if max is reached
+      return;
+    } else {
+      // Multiple selection with optional limit
+      const newValue = isChecked
+        ? [...safeSelected, item.code]
+        : safeSelected.filter((id) => id !== item.code);
+      onChange(newValue);
+    }
+  };
+
   return (
     <div
       className={`bg-mid-grey border-2 ${
@@ -39,18 +67,23 @@ export default function DropdownContent({
           className="animate-fadeIn">
           {(() => {
             const safeSelected = Array.isArray(selectedIds) ? selectedIds : [];
+            const isChecked = safeSelected.includes(item.code);
+            const isDisabled =
+              maxSelections &&
+              safeSelected.length >= maxSelections &&
+              !isChecked;
+
             return (
-              <CheckboxItem
-                key={item.code}
-                item={item}
-                isChecked={safeSelected.includes(item.code)}
-                onChange={(isChecked) => {
-                  const newValue = isChecked
-                    ? [...safeSelected, item.code]
-                    : safeSelected.filter((id) => id !== item.code);
-                  onChange(newValue);
-                }}
-              />
+              <div
+                className={isDisabled ? "opacity-50 cursor-not-allowed" : ""}>
+                <CheckboxItem
+                  key={item.code}
+                  item={item}
+                  isChecked={isChecked}
+                  onChange={(checked) => handleItemChange(item, checked)}
+                  disabled={isDisabled}
+                />
+              </div>
             );
           })()}
         </div>

@@ -19,7 +19,7 @@ export default function DropdownButton({
       } font-normal py-2 sm:py-2.5 md:py-3 sm:px-5 md:px-6 flex items-center justify-center transition duration-200 min-h-11 sm:min-h-11 md:min-h-12`}>
       <span className="text-sm sm:text-base md:text-lg lg:text-xl text-center">
         {disabled
-          ? " Today is on us 😉"
+          ? "Fasting Time 🥴"
           : `${categoryName} - ${categoryNameAr}`}
       </span>
 

@@ -207,10 +207,10 @@ const WeeklyMenu = () => {
         day,
         date: "",
         menu: {
-          protein: [{}, {}, {}, {}],
-          carbs: [{}, {}, {}, {}],
-          salad: [{}, {}, {}, {}],
-          side: [{}, {}, {}, {}],
+          protein: [{}, {}, {}, {}, {}, {}],
+          carbs: [{}, {}, {}, {}, {}, {}],
+          salad: [{}, {}, {}, {}, {}, {}],
+          side: [{}, {}, {}, {}, {}, {}],
         },
       })),
     },
@@ -248,7 +248,7 @@ const WeeklyMenu = () => {
       // First, reset all fields to empty
       WEEKDAYS.forEach((day, dayIndex) => {
         ["protein", "carbs", "salad", "side"].forEach((category) => {
-          for (let i = 0; i < 4; i++) {
+          for (let i = 0; i < 6; i++) {
             setValue(`items.${dayIndex}.menu.${category}.${i}.code`, "");
           }
         });
@@ -273,15 +273,19 @@ const WeeklyMenu = () => {
 
       // Autofill the form with fetched data - API response uses "menu" array
       if (data && data.menu) {
-        data.menu.forEach((dayMenu, dayIndex) => {
+        data.menu.forEach((dayMenu) => {
+          // Find the correct day index based on the day name
+          const dayIndex = WEEKDAYS.indexOf(dayMenu.day);
+          if (dayIndex === -1) return; // Skip if day not found
+
           // Fill each category with the fetched data
           ["protein", "carbs", "salad", "side"].forEach((category) => {
             const items = dayMenu.menu?.[category] || [];
-            // Fill with fetched data (only first 4 items)
-            items.slice(0, 4).forEach((item, itemIndex) => {
+            // Fill with fetched data (all items, up to 6)
+            items.slice(0, 6).forEach((item, itemIndex) => {
               setValue(
                 `items.${dayIndex}.menu.${category}.${itemIndex}.code`,
-                item.code || ""
+                item.code || "",
               );
             });
           });
@@ -397,7 +401,7 @@ const WeeklyMenu = () => {
         <input
           type="date"
           {...control.register("week_start_date")}
-          className="w-11/12 pl-4 pr-4 py-1.5 rounded-sm border border-primary-navy bg-light-grey focus:outline-none "
+          className="w-11/12 pl-4 pr-4 py-1.5 text-prim rounded-sm border border-primary-navy bg-light-grey focus:outline-none "
         />
       </div>
 

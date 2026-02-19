@@ -217,8 +217,8 @@ const DashboardCafeteria = () => {
       const aName = (a.arabic_name || "").toLowerCase();
       const bName = (b.arabic_name || "").toLowerCase();
 
-      if (aName < bName) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aName > bName) return sortConfig.direction === "asc" ? 1 : -1;
+      if (aName < bName) return -1;
+      if (aName > bName) return 1;
     }
 
     return 0;
@@ -265,7 +265,7 @@ const DashboardCafeteria = () => {
           <table className="w-full text-sm md:text-base">
             <thead>
               <tr className="border-b-2  border-gray-300 align-middle bg-burned-grey">
-                <th className="px-4 py-3 text-left font-semibold">{" "}</th>
+                <th className="px-4 py-3 text-left font-semibold"> </th>
                 <th
                   className="px-4 py-3 text-left font-semibold cursor-pointer align-middle"
                   onClick={() => handleSort("arabic_name")}>

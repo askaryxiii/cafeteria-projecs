@@ -44,7 +44,6 @@
 /* Responsive Typography */
 html {
   font-size: 16px;
-  user-select: none;
 }
 
 @media (max-width: 640px) {

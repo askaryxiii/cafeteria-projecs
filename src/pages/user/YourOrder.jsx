@@ -9,12 +9,9 @@ import {
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import DeleteConfirmModal from "../../components/admin/users/delete-confirm-modal";
-import { MdDelete, MdDeleteOutline } from "react-icons/md";
+import OrderSkeleton from "../../components/skeleton/loading/order/OrderSkeleton";
+import { MdDeleteOutline } from "react-icons/md";
 import toast from "react-hot-toast";
-import { PiCurrencyGbpBold } from "react-icons/pi";
-import { RiDeleteBinLine } from "react-icons/ri";
-import { Trash2 } from "lucide-react";
-import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
 
 const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
@@ -40,14 +37,14 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
             components.hour,
             components.minute,
             windows.breakfast_start,
-            windows.breakfast_end
+            windows.breakfast_end,
           );
 
           setLocalBreakfastWindow(isBreakfast);
         } else {
           // Fallback to default timing
           setLocalBreakfastWindow(
-            components.hour >= 11 && components.hour < 15
+            components.hour >= 11 && components.hour < 15,
           );
         }
       } catch (error) {
@@ -141,9 +138,12 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
 
           return isCorrectWindow ? currentOrder : null;
         })()
-      : currentOrder;
+      : null;
 
   if (!displayOrder) {
+    if (!windowsInitialized) {
+      return <OrderSkeleton />;
+    }
     return <Ordering onOrderPlaced={onOrderUpdated} />;
   }
 

@@ -2,41 +2,28 @@ import { Skeleton, SVGSkeleton } from "../../Skeleton";
 
 const OrderSkeleton = () => {
   return (
-    <>
-      <Skeleton className="w-[5008px] max-w-full " />
-      <div>
-        <Skeleton className="w-[112px] max-w-full" />
+    <div className="px-6 md:px-12 lg:px-32 xl:px-44 py-6 md:py-8 flex flex-col w-full justify-center align-middle animate-pulse">
+      {/* Title Skeleton */}
+      <div className="flex justify-center mb-6 md:mb-8">
+        <div className="h-7 md:h-10 w-56 md:w-120 bg-gray-200 rounded"></div>
       </div>
-      <div>
-        <h2>
-          <Skeleton className="w-[208px] max-w-full" />
-        </h2>
-        <div>
-          <div>
-            <div>
-              <div>
-                <Skeleton className="w-[2480px] max-w-full" />
-                <div>
-                  <Skeleton className="w-[776px] max-w-full" />
-                  <span>
-                    <Skeleton className="w-[112px] max-w-full" />
-                  </span>
-                  <span>
-                    <Skeleton className="w-[80px] max-w-full" />
-                  </span>
-                </div>
-                <span>
-                  <Skeleton className="w-[64px] max-w-full" />
-                </span>
-              </div>
-              <span>
-                <Skeleton className="w-[368px] max-w-full" />
-              </span>
-            </div>
+
+      <div className="space-y-6 md:space-y-6">
+        {/* DishDropdown Skeletons */}
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="space-y-3">
+            {/* Dropdown */}
+            <div className="h-12 w-full bg-gray-200 rounded-lg"></div>
           </div>
+        ))}
+
+        {/* Footer Skeleton */}
+        <div className="flex flex-row sm:items-center justify-between pt-4">
+          <div className="h-10 w-32 bg-gray-200 rounded"></div>
+          <div className="h-10 w-32 bg-gray-200 rounded-lg"></div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

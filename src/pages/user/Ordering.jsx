@@ -1,13 +1,11 @@
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import {
   readToken,
   getVerifiedUser,
   placeOrder,
   getLunchOrderDate,
-  getTodayWeekday,
-  isFridayOrWeekend,
   getServerTimeComponents,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
@@ -17,12 +15,10 @@ const Ordering = ({
   onOrderPlaced,
   mealType: propMealType,
   isBreakfastWindow,
-  targetWeekday: propTargetWeekday,
+  targetWeekday,
+  targetDay,
 }) => {
   const [totalPrice, setTotalPrice] = useState(0);
-  const [isFridayToday, setIsFridayToday] = useState(false);
-  const [todayWeekday, setTodayWeekday] = useState("");
-  const [targetWeekday] = useState(propTargetWeekday);
 
   // Use prop mealType if provided, otherwise calculate
   const mealType =
@@ -33,37 +29,6 @@ const Ordering = ({
         : "lunch";
 
   // Initialize on mount
-  useEffect(() => {
-    (async () => {
-      try {
-        const fridayCheck = await isFridayOrWeekend();
-        const weekday = await getTodayWeekday();
-        setIsFridayToday(fridayCheck);
-        setTodayWeekday(weekday);
-
-        // Calculate target weekday based on meal type
-        let target = weekday;
-        if (mealType === "lunch") {
-          // In lunch window - show lunch target date
-          const lunchDate = await getLunchOrderDate();
-          const lunchDateObj = new Date(lunchDate);
-          const dayIndex = lunchDateObj.getUTCDay();
-          const days = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-          ];
-          target = days[dayIndex];
-        }
-      } catch (error) {
-        console.error("Error fetching ordering data:", error);
-      }
-    })();
-  }, [mealType]);
 
   const defaultValues =
     mealType === "breakfast"
@@ -176,7 +141,7 @@ const Ordering = ({
     <div className="sm:px-6 md:px-12 lg:px-32 xl:px-44 py-4 sm:py-6 md:py-8">
       <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-primary-navy mb-4 sm:mb-6 md:mb-8 uppercase tracking-wide text-center">
         Select Your Favorite Dishes For{" "}
-        <span className="font-bold">{targetWeekday}</span>
+        {/* <span className="font-bold">{targetDay}</span> */}
       </h2>
 
       <form

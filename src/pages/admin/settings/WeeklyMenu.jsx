@@ -219,7 +219,7 @@ const WeeklyMenu = () => {
   useEffect(() => {
     (async () => {
       try {
-        const serverTime = await getServerTime();
+        const { date: serverTime } = await getServerTime();
         const monday = getMondayOfCurrentWeek(serverTime);
         const dates = getWeekDates(monday);
         setWeekData({

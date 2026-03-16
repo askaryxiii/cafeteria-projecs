@@ -47,7 +47,7 @@ const Feedback = () => {
   useEffect(() => {
     const initializeFeedbackDate = async () => {
       try {
-        const serverTime = await getServerTime();
+        const { date: serverTime } = await getServerTime();
         const formattedDate = formatServerDate(serverTime);
         setFeedbackDate(formattedDate);
         setValue("date_of_feedback", formattedDate);
@@ -75,7 +75,7 @@ const Feedback = () => {
 
       const result = await getMenuByCategoryAndDate(
         selectedCategory,
-        dateString
+        dateString,
       );
 
       if (result.error) {

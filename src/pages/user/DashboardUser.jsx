@@ -6,13 +6,11 @@ import {
   isTimeInWindow,
   getServerTimeComponents,
   getLunchCheckDate,
-  getTodayWeekday,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
 import { toast } from "react-hot-toast";
 import OrderSkeleton from "../../components/skeleton/loading/order/OrderSkeleton";
-import { is } from "date-fns/locale/is";
 
 const DashboardUser = () => {
   const [loading, setLoading] = useState(true);
@@ -20,6 +18,7 @@ const DashboardUser = () => {
   const [isBreakfastWindow, setIsBreakfastWindow] = useState(null);
   const [windowsInitialized, setWindowsInitialized] = useState(false);
   const [targetWeekday, setTargetWeekday] = useState("");
+  const [targetDay, setTargetDay] = useState("");
 
   // Initialize windows on mount - MUST complete before fetching order
   useEffect(() => {
@@ -63,30 +62,22 @@ const DashboardUser = () => {
       }
 
       const components = await getServerTimeComponents();
-      const weekday = await getTodayWeekday();
+      console.log(components);
+
+      let dateToCheck;
 
       if (isBreakfast) {
         // Breakfast shows today
-        setTargetWeekday(weekday);
+        setTargetWeekday(components.dateString);
+        setTargetDay(components.day);
       } else {
         // Lunch shows tomorrow (or Monday if weekend)
-        const lunchDate = await getLunchOrderDate();
-        // Parse the lunch date to get the weekday name
-        const lunchDateObj = new Date(lunchDate);
-        const dayIndex = lunchDateObj.getUTCDay();
-        const days = [
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ];
-        setTargetWeekday(days[dayIndex]);
+        dateToCheck = await getLunchCheckDate();
+        setTargetWeekday(dateToCheck);
+        setTargetDay(components.day);
       }
 
-      const res = await getUserOrdersByDate(targetWeekday, token);
+      const res = await getUserOrdersByDate(dateToCheck, token);
       if (res && res.error) {
         toast.error(res.error);
         setLoading(false);
@@ -145,6 +136,7 @@ const DashboardUser = () => {
       mealType={passedMealType}
       isBreakfastWindow={isBreakfastWindow}
       targetWeekday={targetWeekday}
+      targetDay={targetDay}
     />
   );
 };

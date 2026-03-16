@@ -59,7 +59,7 @@ const ImportModal = ({ isOpen, onClose, isLoading }) => {
       csvContent += headers.map((h) => `"${h}"`).join(",") + "\n";
       csvContent += csvData
         .map((row) =>
-          row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+          row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
         )
         .join("\n");
 
@@ -69,10 +69,10 @@ const ImportModal = ({ isOpen, onClose, isLoading }) => {
       const url = URL.createObjectURL(blob);
 
       link.setAttribute("href", url);
-      const serverTime = await getServerTime();
+      const { date: serverTime } = await getServerTime();
       link.setAttribute(
         "download",
-        `menu_items_${serverTime.toISOString().split("T")[0]}.csv`
+        `menu_items_${serverTime.toISOString().split("T")[0]}.csv`,
       );
       link.style.visibility = "hidden";
 

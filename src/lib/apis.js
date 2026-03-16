@@ -12,6 +12,7 @@ let serverTimeOffset = null;
 let lastServerTimeUpdate = 0;
 
 // Get server time - fetches fresh from server each time (no caching offset)
+// Returns { date: Date, dayOfWeek: number }
 export async function getServerTime() {
   try {
     const res = await fetch(`${API_URL}/stats/server-time`, {
@@ -23,16 +24,25 @@ export async function getServerTime() {
 
     if (!res.ok) {
       console.warn("Failed to fetch server time, using local time");
-      return new Date();
+      const localDate = new Date();
+      return {
+        date: localDate,
+        dayOfWeek: localDate.getUTCDay(),
+      };
     }
 
     const data = await res.json();
     const timestamp = data.serverTime;
+    const dayOfWeek = data.dayOfWeek;
 
     // Ensure we have a valid timestamp
     if (!timestamp) {
       console.warn("No timestamp in server response:", data);
-      return new Date();
+      const localDate = new Date();
+      return {
+        date: localDate,
+        dayOfWeek: localDate.getUTCDay(),
+      };
     }
 
     // Handle both milliseconds (number) and ISO strings
@@ -48,17 +58,29 @@ export async function getServerTime() {
     // Validate the parsed time
     if (isNaN(serverTimeMs)) {
       console.warn("Invalid timestamp from server:", timestamp);
-      return new Date();
+      const localDate = new Date();
+      return {
+        date: localDate,
+        dayOfWeek: localDate.getUTCDay(),
+      };
     }
 
     // Update cache with fresh server time for use in getCurrentTime()
     serverTimeOffset = serverTimeMs - Date.now();
     lastServerTimeUpdate = Date.now();
 
-    return new Date(serverTimeMs);
+    const serverDate = new Date(serverTimeMs);
+    return {
+      date: serverDate,
+      dayOfWeek: dayOfWeek !== undefined ? dayOfWeek : serverDate.getUTCDay(),
+    };
   } catch (error) {
     console.warn("Error fetching server time:", error);
-    return new Date();
+    const localDate = new Date();
+    return {
+      date: localDate,
+      dayOfWeek: localDate.getUTCDay(),
+    };
   }
 }
 
@@ -113,8 +135,7 @@ export function getNextMondayDate(serverTime) {
 
 // Get tomorrow's date or Monday if today is Fri/Sat/Sun (for cafeteria lunch display)
 export async function getCafeteriaLunchDate() {
-  const serverTime = await getServerTime();
-  const day = serverTime.getUTCDay();
+  const { date: serverTime, dayOfWeek: day } = await getServerTime();
 
   // If today is Friday (5), Saturday (6), or Sunday (0), show Monday
   if (day === 5 || day === 6 || day === 0) {
@@ -128,8 +149,7 @@ export async function getCafeteriaLunchDate() {
 // Get the lunch order date based on current day and time
 // Returns tomorrow for regular days, or Monday for Friday/Saturday/Sunday
 export async function getLunchOrderDate() {
-  const serverTime = await getServerTime();
-  const day = serverTime.getUTCDay();
+  const { date: serverTime, dayOfWeek: day } = await getServerTime();
 
   // If today is Friday (5), Saturday (6), or Sunday (0), order for Monday
   if (day === 5 || day === 6 || day === 0) {
@@ -143,8 +163,7 @@ export async function getLunchOrderDate() {
 // Get the date to check for existing lunch orders
 // Returns Monday for Friday/Saturday/Sunday, otherwise tomorrow
 export async function getLunchCheckDate() {
-  const serverTime = await getServerTime();
-  const day = serverTime.getUTCDay();
+  const { date: serverTime, dayOfWeek: day } = await getServerTime();
 
   // If today is Friday (5), Saturday (6), or Sunday (0), check for Monday
   if (day === 5 || day === 6 || day === 0) {
@@ -157,7 +176,7 @@ export async function getLunchCheckDate() {
 
 // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
-  const serverTime = await getServerTime();
+  const { date: serverTime, dayOfWeek: day } = await getServerTime();
   return {
     date: serverTime,
     hour: serverTime.getUTCHours(), // Use UTC hours, not local
@@ -165,13 +184,14 @@ export async function getServerTimeComponents() {
     dateString: formatServerDate(serverTime),
     // tomorrowString: formatServerDate(getNextOrderDate(serverTime)),
     tomorrowString: formatServerDate(getTomorrowDate(serverTime)),
+    day: day,
   };
 }
 
 // Get the current day of the week (0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday)
 export async function getCurrentDayOfWeek() {
-  const serverTime = await getServerTime();
-  return serverTime.getUTCDay();
+  const { dayOfWeek } = await getServerTime();
+  return dayOfWeek;
 }
 
 // Get the name of today's weekday
@@ -239,7 +259,7 @@ export async function getWeeklyMeals() {
     }
 
     // compute next monday
-    const serverTime = await getServerTime();
+    const { date: serverTime } = await getServerTime();
     const nextMonday = getNextMonday(serverTime);
     const dateStr = formatDateYYYYMMDD(nextMonday);
 
@@ -279,9 +299,7 @@ export async function getTodayMenuByCategory(categoryName) {
       return { error: errBody.message || "Token verification failed" };
     }
 
-    const serverTime = await getServerTime();
-    // Use getUTCDay() instead of getDay() to get the correct day in UTC
-    const day = serverTime.getUTCDay();
+    const { date: serverTime, dayOfWeek: day } = await getServerTime();
 
     // For lunch category, use special logic: Mon if Fri/Sat/Sun, else tomorrow
     let menuDate;
@@ -594,14 +612,10 @@ export async function getUserOrdersByDate(dateStr, token) {
 
 export async function getAllOrdersForToday() {
   try {
-    const serverTime = await getServerTime();
+    const { date: serverTime } = await getServerTime();
 
     // Validate that serverTime is a valid Date
-    if (
-      !serverTime ||
-      !(serverTime instanceof Date) ||
-      isNaN(serverTime.getTime())
-    ) {
+    if (!serverTime || isNaN(serverTime.getTime())) {
       console.error("Invalid server time:", serverTime);
       return { error: "Failed to get valid server time" };
     }
@@ -636,14 +650,10 @@ export async function getAllOrdersForToday() {
 
 export async function getAllOrdersForTomorrow() {
   try {
-    const serverTime = await getServerTime();
+    const { date: serverTime } = await getServerTime();
 
     // Validate that serverTime is a valid Date
-    if (
-      !serverTime ||
-      !(serverTime instanceof Date) ||
-      isNaN(serverTime.getTime())
-    ) {
+    if (!serverTime || isNaN(serverTime.getTime())) {
       console.error("Invalid server time:", serverTime);
       return { error: "Failed to get valid server time" };
     }

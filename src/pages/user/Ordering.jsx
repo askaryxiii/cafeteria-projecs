@@ -5,30 +5,36 @@ import {
   readToken,
   getVerifiedUser,
   placeOrder,
-  getOrderWindows,
-  isTimeInWindow,
-  getServerTimeComponents,
   getLunchOrderDate,
   getTodayWeekday,
   isFridayOrWeekend,
+  getServerTimeComponents,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
 
-const Ordering = ({ onOrderPlaced }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [mealType, setMealType] = useState(null);
+const Ordering = ({
+  onOrderPlaced,
+  mealType: propMealType,
+  isBreakfastWindow,
+}) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [isFridayToday, setIsFridayToday] = useState(false);
   const [todayWeekday, setTodayWeekday] = useState("");
   const [targetWeekday, setTargetWeekday] = useState("");
 
-  // Initialize windows on mount
+  // Use prop mealType if provided, otherwise calculate
+  const mealType =
+    propMealType !== undefined
+      ? propMealType
+      : isBreakfastWindow
+        ? "breakfast"
+        : "lunch";
+
+  // Initialize on mount
   useEffect(() => {
     (async () => {
       try {
-        const windows = await getOrderWindows();
-        const components = await getServerTimeComponents();
         const fridayCheck = await isFridayOrWeekend();
         const weekday = await getTodayWeekday();
         setIsFridayToday(fridayCheck);
@@ -36,14 +42,7 @@ const Ordering = ({ onOrderPlaced }) => {
 
         // Calculate target weekday based on meal type
         let target = weekday;
-        if (
-          isTimeInWindow(
-            components.hour,
-            components.minute,
-            windows?.lunch_start || "15:00",
-            windows?.lunch_end || "23:59",
-          )
-        ) {
+        if (mealType === "lunch") {
           // In lunch window - show lunch target date
           const lunchDate = await getLunchOrderDate();
           const lunchDateObj = new Date(lunchDate);
@@ -60,47 +59,11 @@ const Ordering = ({ onOrderPlaced }) => {
           target = days[dayIndex];
         }
         setTargetWeekday(target);
-
-        if (windows) {
-          // Determine meal type based on current time
-          if (
-            isTimeInWindow(
-              components.hour,
-              components.minute,
-              windows.breakfast_start,
-              windows.breakfast_end,
-            )
-          ) {
-            setMealType("breakfast");
-          } else if (
-            isTimeInWindow(
-              components.hour,
-              components.minute,
-              windows.lunch_start,
-              windows.lunch_end,
-            )
-          ) {
-            setMealType("lunch");
-          } else {
-            setMealType(null); // Outside ordering windows
-          }
-        } else {
-          // Fallback logic
-          setMealType(
-            components.hour >= 11 && components.hour < 15
-              ? "breakfast"
-              : components.hour >= 15
-                ? "lunch"
-                : null,
-          );
-        }
       } catch (error) {
-        console.error("Error fetching order windows:", error);
-      } finally {
-        setIsLoading(false);
+        console.error("Error fetching ordering data:", error);
       }
     })();
-  }, []);
+  }, [mealType]);
 
   const defaultValues =
     mealType === "breakfast"

@@ -30,7 +30,7 @@ const DashboardUser = () => {
             components.hour,
             components.minute,
             windows.breakfast_start,
-            windows.breakfast_end
+            windows.breakfast_end,
           );
 
           setIsBreakfastWindow(isBreakfast);
@@ -119,7 +119,11 @@ const DashboardUser = () => {
       isBreakfastWindow={isBreakfastWindow}
     />
   ) : (
-    <Ordering onOrderPlaced={handleOrderPlaced} />
+    <Ordering
+      onOrderPlaced={handleOrderPlaced}
+      mealType={isBreakfastWindow ? "breakfast" : "lunch"}
+      isBreakfastWindow={isBreakfastWindow}
+    />
   );
 };
 

@@ -17,11 +17,12 @@ const Ordering = ({
   onOrderPlaced,
   mealType: propMealType,
   isBreakfastWindow,
+  targetWeekday: propTargetWeekday,
 }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [isFridayToday, setIsFridayToday] = useState(false);
   const [todayWeekday, setTodayWeekday] = useState("");
-  const [targetWeekday, setTargetWeekday] = useState("");
+  const [targetWeekday] = useState(propTargetWeekday);
 
   // Use prop mealType if provided, otherwise calculate
   const mealType =
@@ -58,7 +59,6 @@ const Ordering = ({
           ];
           target = days[dayIndex];
         }
-        setTargetWeekday(target);
       } catch (error) {
         console.error("Error fetching ordering data:", error);
       }

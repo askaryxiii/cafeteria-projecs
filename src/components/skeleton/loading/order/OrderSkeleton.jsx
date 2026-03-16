@@ -1,5 +1,3 @@
-import { Skeleton, SVGSkeleton } from "../../Skeleton";
-
 const OrderSkeleton = () => {
   return (
     <div className="px-6 md:px-12 lg:px-32 xl:px-44 py-6 md:py-8 flex flex-col w-full justify-center align-middle animate-pulse">
@@ -10,7 +8,7 @@ const OrderSkeleton = () => {
 
       <div className="space-y-6 md:space-y-6">
         {/* DishDropdown Skeletons */}
-        {[...Array(4)].map((_, i) => (
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="space-y-3">
             {/* Dropdown */}
             <div className="h-12 w-full bg-gray-200 rounded-lg"></div>

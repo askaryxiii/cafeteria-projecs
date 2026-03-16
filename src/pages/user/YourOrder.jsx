@@ -144,7 +144,14 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
     if (!windowsInitialized) {
       return <OrderSkeleton />;
     }
-    return <Ordering onOrderPlaced={onOrderUpdated} />;
+    const mealType = isBreakfastWindow ? "breakfast" : "lunch";
+    return (
+      <Ordering
+        onOrderPlaced={onOrderUpdated}
+        mealType={mealType}
+        isBreakfastWindow={isBreakfastWindow}
+      />
+    );
   }
 
   return (

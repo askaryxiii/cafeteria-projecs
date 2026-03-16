@@ -6,17 +6,20 @@ import {
   isTimeInWindow,
   getServerTimeComponents,
   getLunchCheckDate,
+  getTodayWeekday,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
 import { toast } from "react-hot-toast";
 import OrderSkeleton from "../../components/skeleton/loading/order/OrderSkeleton";
+import { is } from "date-fns/locale/is";
 
 const DashboardUser = () => {
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
   const [isBreakfastWindow, setIsBreakfastWindow] = useState(null);
   const [windowsInitialized, setWindowsInitialized] = useState(false);
+  const [targetWeekday, setTargetWeekday] = useState("");
 
   // Initialize windows on mount - MUST complete before fetching order
   useEffect(() => {
@@ -25,14 +28,13 @@ const DashboardUser = () => {
         const components = await getServerTimeComponents();
         const windows = await getOrderWindows();
 
-        if (windows) {
+        if (windows && windows.breakfast_start && windows.breakfast_end) {
           const isBreakfast = isTimeInWindow(
             components.hour,
             components.minute,
             windows.breakfast_start,
             windows.breakfast_end,
           );
-
           setIsBreakfastWindow(isBreakfast);
         } else {
           // Fallback to default timing if API fails
@@ -61,18 +63,30 @@ const DashboardUser = () => {
       }
 
       const components = await getServerTimeComponents();
-      let dateToCheck;
+      const weekday = await getTodayWeekday();
 
       if (isBreakfast) {
-        // For breakfast, always check today
-        dateToCheck = components.dateString;
+        // Breakfast shows today
+        setTargetWeekday(weekday);
       } else {
-        // For lunch, use the special lunch check date function
-        // which returns Monday if today is Fri/Sat/Sun, otherwise tomorrow
-        dateToCheck = await getLunchCheckDate();
+        // Lunch shows tomorrow (or Monday if weekend)
+        const lunchDate = await getLunchOrderDate();
+        // Parse the lunch date to get the weekday name
+        const lunchDateObj = new Date(lunchDate);
+        const dayIndex = lunchDateObj.getUTCDay();
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        setTargetWeekday(days[dayIndex]);
       }
 
-      const res = await getUserOrdersByDate(dateToCheck, token);
+      const res = await getUserOrdersByDate(targetWeekday, token);
       if (res && res.error) {
         toast.error(res.error);
         setLoading(false);
@@ -112,6 +126,13 @@ const DashboardUser = () => {
 
   if (loading) return <OrderSkeleton />;
 
+  const passedMealType =
+    isBreakfastWindow === true
+      ? "breakfast"
+      : isBreakfastWindow === false
+        ? "lunch"
+        : undefined;
+
   return order ? (
     <YourOrder
       order={order}
@@ -121,14 +142,9 @@ const DashboardUser = () => {
   ) : (
     <Ordering
       onOrderPlaced={handleOrderPlaced}
-      mealType={
-        isBreakfastWindow === true
-          ? "breakfast"
-          : isBreakfastWindow === false
-            ? "lunch"
-            : undefined
-      }
+      mealType={passedMealType}
       isBreakfastWindow={isBreakfastWindow}
+      targetWeekday={targetWeekday}
     />
   );
 };

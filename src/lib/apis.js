@@ -32,12 +32,14 @@ export async function getServerTime() {
     }
 
     const data = await res.json();
-    const timestamp = data.serverTime;
+    const serverTime = data.serverTime;
+    const tmwServerTime = data.serverTmwTime;
     const dayOfWeek = data.dayOfWeek;
+    const tmwDayOfWeek = data.tmwDayOfWeek;
 
-    // Ensure we have a valid timestamp
-    if (!timestamp) {
-      console.warn("No timestamp in server response:", data);
+    // Ensure we have a valid serverTime
+    if (!serverTime) {
+      console.warn("No serverTime  in server response:", data);
       const localDate = new Date();
       return {
         date: localDate,
@@ -47,17 +49,24 @@ export async function getServerTime() {
 
     // Handle both milliseconds (number) and ISO strings
     let serverTimeMs;
-    if (typeof timestamp === "number") {
-      serverTimeMs = timestamp;
+    if (typeof serverTime === "number") {
+      serverTimeMs = serverTime;
     } else {
       // Parse ISO string or other string formats
-      const parsedDate = new Date(timestamp);
+      const parsedDate = new Date(serverTime);
       serverTimeMs = parsedDate.getTime();
+    }
+    let tmwServerTimeMs;
+    if (typeof tmwServerTime === "number") {
+      tmwServerTimeMs = tmwServerTime;
+    } else {
+      const parsedDate = new Date(tmwServerTime);
+      tmwServerTimeMs = parsedDate.getTime();
     }
 
     // Validate the parsed time
     if (isNaN(serverTimeMs)) {
-      console.warn("Invalid timestamp from server:", timestamp);
+      console.warn("Invalid serverTime  from server:", serverTime);
       const localDate = new Date();
       return {
         date: localDate,
@@ -70,9 +79,13 @@ export async function getServerTime() {
     lastServerTimeUpdate = Date.now();
 
     const serverDate = new Date(serverTimeMs);
+    const tmwServerDate = new Date(tmwServerTimeMs);
     return {
       date: serverDate,
+      tmwDate: tmwServerDate,
       dayOfWeek: dayOfWeek !== undefined ? dayOfWeek : serverDate.getUTCDay(),
+      tmwDayOfWeek:
+        tmwDayOfWeek !== undefined ? tmwDayOfWeek : tmwServerDate.getUTCDay(),
     };
   } catch (error) {
     console.warn("Error fetching server time:", error);
@@ -176,15 +189,22 @@ export async function getLunchCheckDate() {
 
 // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
-  const { date: serverTime, dayOfWeek: day } = await getServerTime();
+  const {
+    date: serverTime,
+    dayOfWeek: day,
+    tmwDate: tmwDate,
+    tmwDayOfWeek: tmwDayOfWeek,
+  } = await getServerTime();
   return {
     date: serverTime,
+    tmwDate: tmwDate,
     hour: serverTime.getUTCHours(), // Use UTC hours, not local
     minute: serverTime.getUTCMinutes(), // Use UTC minutes, not local
     dateString: formatServerDate(serverTime),
     // tomorrowString: formatServerDate(getNextOrderDate(serverTime)),
     tomorrowString: formatServerDate(getTomorrowDate(serverTime)),
     day: day,
+    tmwDayOfWeek: tmwDayOfWeek,
   };
 }
 

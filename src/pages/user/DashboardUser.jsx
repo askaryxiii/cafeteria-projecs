@@ -62,7 +62,6 @@ const DashboardUser = () => {
       }
 
       const components = await getServerTimeComponents();
-      console.log(components);
 
       let dateToCheck;
 
@@ -74,7 +73,7 @@ const DashboardUser = () => {
         // Lunch shows tomorrow (or Monday if weekend)
         dateToCheck = await getLunchCheckDate();
         setTargetWeekday(dateToCheck);
-        setTargetDay(components.day);
+        setTargetDay(components.tmwDayOfWeek);
       }
 
       const res = await getUserOrdersByDate(dateToCheck, token);
@@ -129,6 +128,7 @@ const DashboardUser = () => {
       order={order}
       onOrderUpdated={handleOrderPlaced}
       isBreakfastWindow={isBreakfastWindow}
+      targetDay={targetDay}
     />
   ) : (
     <Ordering

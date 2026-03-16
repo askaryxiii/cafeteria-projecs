@@ -13,7 +13,7 @@ import OrderSkeleton from "../../components/skeleton/loading/order/OrderSkeleton
 import { MdDeleteOutline } from "react-icons/md";
 import toast from "react-hot-toast";
 
-const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
+const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow, targetDay }) => {
   const [currentOrder, setCurrentOrder] = useState(order);
   const [windowsInitialized, setWindowsInitialized] = useState(false);
   const [localBreakfastWindow, setLocalBreakfastWindow] =
@@ -157,8 +157,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow }) => {
   return (
     <div className="flex flex-col items-center w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-3">
       <h2 className="text-2xl sm:text-3xl md:text-4xl text-center font-semibold text-primary-navy drop-shadow-[0_3px_2px_rgba(0,0,0,0.3)] mb-4 sm:mb-6 md:mb-8">
-        Your Order For
-        {/* <span className="font-bold">{targetWeekday}</span> */}
+        Your Order For <span className="font-bold">{targetDay}</span>
       </h2>
       <div className="px-3 sm:px-6 md:px-8 lg:px-32 py-4 sm:py-6 md:py-8 your-order w-full sm:w-11/12 md:w-10/12 lg:w-9/12">
         <div className="relative bg-primary-navy text-primary-navy py-6 md:py-8 px-4 sm:px-6 md:px-10 rounded-lg shadow w-full">

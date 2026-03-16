@@ -121,7 +121,13 @@ const DashboardUser = () => {
   ) : (
     <Ordering
       onOrderPlaced={handleOrderPlaced}
-      mealType={isBreakfastWindow ? "breakfast" : "lunch"}
+      mealType={
+        isBreakfastWindow === true
+          ? "breakfast"
+          : isBreakfastWindow === false
+            ? "lunch"
+            : undefined
+      }
       isBreakfastWindow={isBreakfastWindow}
     />
   );

@@ -6,6 +6,7 @@ import {
 } from "../../lib/apis";
 import { unlockAudio, playNewOrderSound } from "../../lib/sound";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
+import TableSkeleton from "../../components/skeleton/loading/tables/TableSkeleton";
 
 // Add CSS for smooth line animation
 const lineAnimationStyle = `
@@ -249,7 +250,7 @@ const DashboardCafeteria = () => {
   };
 
   if (loading) {
-    return <div className="p-4">Loading orders...</div>;
+    return <TableSkeleton />;
   }
 
   return (
@@ -288,7 +289,7 @@ const DashboardCafeteria = () => {
                 sortedOrders.map((order) => (
                   <tr
                     key={order.id}
-                    className={`hover:bg-gray-50 relative ${
+                    className={`hover:bg-gray-50 bg-[#f3f3f3] relative ${
                       checkedItems.has(order.id) ? "line-through-animated" : ""
                     }`}>
                     <td className="px-4 py-3">

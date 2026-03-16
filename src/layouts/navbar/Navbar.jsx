@@ -10,6 +10,7 @@ import { IoFastFoodSharp } from "react-icons/io5";
 import AuthContext from "../../context/AuthContext";
 import { getAvailableDrinks, updateAvailableDrinks } from "../../lib/apis";
 import { toast } from "react-hot-toast";
+import { IoClose } from "react-icons/io5";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -146,29 +147,52 @@ const Navbar = () => {
           </div>
         </div>
 
-        <button
-          className="md:hidden w-10 h-10 flex items-center justify-center"
-          onClick={() => setOpen(!open)}>
-          <GiHamburgerMenu className="text-2xl text-primary-navy" />
-        </button>
+        {!open ? (
+          <button
+            className="md:hidden w-10 h-10 flex items-center justify-center"
+            onClick={() => setOpen(!open)}>
+            <GiHamburgerMenu className="text-2xl text-primary-navy" />
+          </button>
+        ) : (
+          <button
+            className="md:hidden w-10 h-10 flex items-center justify-center"
+            onClick={() => setOpen(!open)}>
+            <IoClose className="text-3xl text-primary-navy" />
+          </button>
+        )}
       </div>
 
       {open && (
         <div
           ref={menuRef}
           className="absolute right-3 top-full bg-light-grey rounded shadow-lg p-4 z-50 flex flex-col gap-1">
-          <div className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-gray-700">
+          <div className="bg-gray-300 flex items-center justify-center px-6 py-1.5 text-primary-navy">
             <span className="font-bold">Welcome {user?.user?.name}</span>
           </div>
-          <Link
-            to="/user/drinks"
-            className="flex items-center gap-2 p-2 rounded"
-            onClick={() => setOpen(false)}>
-            <BsFillCupHotFill /> Drinks
-          </Link>
+          <div className="flex gap-3">
+            {user.user.role === "cafeteria" ? (
+              <div className="flex gap-3">
+                <button
+                  className="flex items-center gap-2 p-2 rounded text-primary-navy font-medium"
+                  onClick={() => setDrinksModalOpen(true)}>
+                  Edit Drinks
+                </button>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
+          {user.user.role !== "cafeteria" && (
+            <Link
+              to="/user/drinks"
+              className="flex items-center gap-2 p-2 rounded text-primary-navy font-medium"
+              onClick={() => setOpen(false)}>
+              <BsFillCupHotFill /> Drinks
+            </Link>
+          )}
           <Link
             to="/"
-            className="flex items-center gap-2 p-2 rounded"
+            className="flex items-center gap-2 p-2 rounded text-primary-navy font-medium"
             onClick={() => setOpen(false)}>
             <ImHome /> Home
           </Link>

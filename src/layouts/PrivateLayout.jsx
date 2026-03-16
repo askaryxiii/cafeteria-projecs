@@ -8,7 +8,7 @@ const PrivateLayout = ({ children }) => {
         <div className="absolute inset-0 bg-[url('/assets/backgrounds/orderBG.png')] bg-no-repeat bg-top-right opacity-70 md:opacity-100"></div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col gap-2">
+        <div className="relative  flex flex-col gap-2">
           <Navbar />
           <main className="grow">{children}</main>
         </div>

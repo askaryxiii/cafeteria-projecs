@@ -50,7 +50,8 @@ const DishDropdown = ({
   };
 
   // Disable breakfast dropdown on Friday
-  const isDisabled = categoryName.toLowerCase() === "breakfast";
+  const isDisabled =
+    isFridayToday && categoryName.toLowerCase() === "breakfast";
   // isFridayToday && categoryName.toLowerCase() === "breakfast";
 
   return (

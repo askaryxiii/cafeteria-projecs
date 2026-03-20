@@ -6,9 +6,11 @@ import {
   isTimeInWindow,
   getServerTimeComponents,
   getLunchCheckDate,
+  isOrderWindowActive,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
+import NoOrderWindow from "../../components/user/no-order-window";
 import { toast } from "react-hot-toast";
 import OrderSkeleton from "../../components/skeleton/loading/order/OrderSkeleton";
 
@@ -19,6 +21,7 @@ const DashboardUser = () => {
   const [windowsInitialized, setWindowsInitialized] = useState(false);
   const [targetWeekday, setTargetWeekday] = useState("");
   const [targetDay, setTargetDay] = useState("");
+  const [hasActiveWindow, setHasActiveWindow] = useState(true);
 
   // Initialize windows on mount - MUST complete before fetching order
   useEffect(() => {
@@ -26,6 +29,10 @@ const DashboardUser = () => {
       try {
         const components = await getServerTimeComponents();
         const windows = await getOrderWindows();
+
+        // Check if there's an active order window
+        const windowStatus = await isOrderWindowActive();
+        setHasActiveWindow(windowStatus.active);
 
         if (windows && windows.breakfast_start && windows.breakfast_end) {
           const isBreakfast = isTimeInWindow(
@@ -47,6 +54,7 @@ const DashboardUser = () => {
         const components = await getServerTimeComponents();
         const isBreakfast = components.hour >= 11 && components.hour < 15;
         setIsBreakfastWindow(isBreakfast);
+        setHasActiveWindow(false);
       } finally {
         setWindowsInitialized(true);
       }
@@ -67,7 +75,8 @@ const DashboardUser = () => {
 
       if (isBreakfast) {
         // Breakfast shows today
-        setTargetWeekday(components.dateString);
+        dateToCheck = components.dateString;
+        setTargetWeekday(dateToCheck);
         setTargetDay(components.day);
       } else {
         // Lunch shows tomorrow (or Monday if weekend)
@@ -115,6 +124,11 @@ const DashboardUser = () => {
   };
 
   if (loading) return <OrderSkeleton />;
+
+  // If no active order window, show the NoOrderWindow component
+  if (!hasActiveWindow) {
+    return <NoOrderWindow />;
+  }
 
   const passedMealType =
     isBreakfastWindow === true

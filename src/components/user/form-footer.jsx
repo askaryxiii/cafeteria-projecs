@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getTotalPrice } from "../../lib/apis";
 import { readToken } from "../../lib/apis";
 import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
@@ -14,30 +14,46 @@ export default function FormFooter({
   mealType,
 }) {
   const [totalPrice, setTotalPrice] = useState(0);
+  const debounceTimerRef = useRef(null);
 
   useEffect(() => {
-    const token = readToken();
-    if (!token) return;
+    // Clear previous timer if it exists
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
 
-    getTotalPrice(selectedItems, token).then((value) => {
-      setTotalPrice(value);
-      if (typeof onTotalChange === "function") onTotalChange(value);
-    });
+    // Set a new timer to fetch price after 300ms of inactivity
+    debounceTimerRef.current = setTimeout(() => {
+      const token = readToken();
+      if (!token) return;
+
+      getTotalPrice(selectedItems, token).then((value) => {
+        setTotalPrice(value);
+        if (typeof onTotalChange === "function") onTotalChange(value);
+      });
+    }, 300);
+
+    // Cleanup function to clear the timer on unmount
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, [selectedItems, onTotalChange]);
 
   return (
-    <div className="flex flex-col items-center justify-between gap-3 sm:gap-4 md:gap-6 pt-0 md:pt-6">
+    <div className="flex flex-col items-center justify-between gap-3 md:gap-1.5 pt-0 md:pt-6">
       <Divider
         spacing="md"
-        label={
-          <img
-            src="/assets/logo/ramadan-kareem.png"
-            alt="Ramadan Kareem"
-            className="h-28 w-40"
-          />
-        }
+        // label={
+        //   <img
+        //     src="/assets/logo/logo.webp"
+        //     alt="Ramadan Kareem"
+        //     className="h-16 w-16"
+        //   />
+        // }
         labelPlacement="center"
-        className="h-28 md:h-10 px-3.5 md:px-0"
+        className="h-3 md:h-3 px-3.5 md:px-0"
         color="#D1D5DB"
       />
       <div className="flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6 items-center justify-between w-11/12 md:w-full">
@@ -47,9 +63,9 @@ export default function FormFooter({
         </div>
         <button
           type="submit"
-          disabled={isSubmitting || disabled}
+          disabled={isSubmitting}
           className={`px-4 md:px-6 py-1.5 md:py-2 border-2 border-dark-grey/50 rounded font-normal text-sm sm:text-base md:text-lg ${
-            disabled
+            isSubmitting
               ? "bg-gray-300 text-gray-600 cursor-not-allowed"
               : "text-primary-navy hover:bg-mid-grey"
           } transition w-full sm:w-auto min-h-11 sm:min-h-10 md:min-h-11 flex items-center justify-center disabled:opacity-50`}>

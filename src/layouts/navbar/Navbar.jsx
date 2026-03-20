@@ -85,9 +85,9 @@ const Navbar = () => {
     <div className="relative">
       <div className="flex items-center justify-between">
         <Logo
-          src={"/assets/logo/projecs-ramadan.svg"}
+          src={"/assets/logo/projecs.webp"}
           alt="art"
-          className="w-36 md:w-52 lg:w-64 pt-1"
+          className="w-36 md:w-52 lg:w-64 pt-3"
         />
 
         <div className="flex gap-3">

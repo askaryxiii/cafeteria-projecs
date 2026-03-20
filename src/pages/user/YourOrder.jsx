@@ -150,6 +150,8 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow, targetDay }) => {
         onOrderPlaced={onOrderUpdated}
         mealType={mealType}
         isBreakfastWindow={isBreakfastWindow}
+        targetWeekday={targetWeekday}
+        targetDay={targetDay}
       />
     );
   }

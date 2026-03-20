@@ -1321,3 +1321,56 @@ export async function updateAvailableDrinks(items = []) {
     return { error: err.message || "Something went wrong" };
   }
 }
+
+// Check if there's an active order window (breakfast or lunch)
+export async function isOrderWindowActive() {
+  try {
+    const components = await getServerTimeComponents();
+    const windows = await getOrderWindows();
+
+    if (!windows) {
+      return { active: false, reason: "Failed to fetch order windows" };
+    }
+
+    const { hour, minute } = components;
+    const currentTotalMinutes = hour * 60 + minute;
+
+    // Check breakfast window
+    if (windows.breakfast_start && windows.breakfast_end) {
+      const breakfastStart =
+        parseTimeToHours(windows.breakfast_start) * 60 +
+        parseTimeToMinutes(windows.breakfast_start);
+      const breakfastEnd =
+        parseTimeToHours(windows.breakfast_end) * 60 +
+        parseTimeToMinutes(windows.breakfast_end);
+      if (
+        currentTotalMinutes >= breakfastStart &&
+        currentTotalMinutes <= breakfastEnd
+      ) {
+        return { active: true, type: "breakfast" };
+      }
+    }
+
+    // Check lunch window
+    if (windows.lunch_start && windows.lunch_end) {
+      const lunchStart =
+        parseTimeToHours(windows.lunch_start) * 60 +
+        parseTimeToMinutes(windows.lunch_start);
+      const lunchEnd =
+        parseTimeToHours(windows.lunch_end) * 60 +
+        parseTimeToMinutes(windows.lunch_end);
+      if (
+        currentTotalMinutes >= lunchStart &&
+        currentTotalMinutes <= lunchEnd
+      ) {
+        return { active: true, type: "lunch" };
+      }
+    }
+
+    // No active window
+    return { active: false, reason: "No active order window" };
+  } catch (error) {
+    console.error("Error checking order window:", error);
+    return { active: false, reason: "Error checking order window" };
+  }
+}

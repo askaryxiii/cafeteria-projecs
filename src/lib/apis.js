@@ -34,8 +34,37 @@ export async function getServerTime() {
     const data = await res.json();
     const serverTime = data.serverTime;
     const tmwServerTime = data.serverTmwTime;
-    const dayOfWeek = data.dayOfWeek;
-    const tmwDayOfWeek = data.tmwDayOfWeek;
+    // Server may return dayOfWeek as a number (0-6), a numeric string, or a weekday name
+    // Normalize to a numeric index (0=Sunday ... 6=Saturday) so callers can reliably compare
+    const rawDayOfWeek = data.dayOfWeek;
+    const rawTmwDayOfWeek = data.tmwDayOfWeek;
+
+    const dayNameMap = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+
+    function toDayIndex(d) {
+      if (d === undefined || d === null) return undefined;
+      // already a number
+      if (typeof d === "number") return d;
+      // numeric string like "5"
+      const n = parseInt(d, 10);
+      if (!isNaN(n)) return n;
+      if (typeof d === "string") {
+        const key = d.trim().toLowerCase();
+        if (dayNameMap.hasOwnProperty(key)) return dayNameMap[key];
+      }
+      return undefined;
+    }
+
+    const dayOfWeek = toDayIndex(rawDayOfWeek);
+    const tmwDayOfWeek = toDayIndex(rawTmwDayOfWeek);
 
     // Ensure we have a valid serverTime
     if (!serverTime) {
@@ -306,7 +335,7 @@ export async function getWeeklyMeals() {
   }
 }
 
-export async function getTodayMenuByCategory(categoryName) {
+export async function getTodayMenuByCategory(categoryName, targetDate = null) {
   try {
     const token = readToken();
     if (!token) return { error: "No auth token found" };
@@ -319,25 +348,31 @@ export async function getTodayMenuByCategory(categoryName) {
       return { error: errBody.message || "Token verification failed" };
     }
 
-    const { date: serverTime, dayOfWeek: day } = await getServerTime();
-
-    // For lunch category, use special logic: Mon if Fri/Sat/Sun, else tomorrow
+    // If target date is provided and not empty, use it directly
+    // Otherwise, calculate based on category and current day
     let menuDate;
-    if (
-      categoryName.toLowerCase() === "salad" ||
-      categoryName.toLowerCase() === "carbs" ||
-      categoryName.toLowerCase() === "protein" ||
-      categoryName.toLowerCase() === "side"
-    ) {
-      // These are lunch categories - use getLunchOrderDate logic
-      if (day === 5 || day === 6 || day === 0) {
-        menuDate = formatServerDate(getNextMondayDate(serverTime));
+    if (targetDate && targetDate.trim()) {
+      menuDate = targetDate;
+    } else {
+      const { date: serverTime, dayOfWeek: day } = await getServerTime();
+
+      // For lunch category, use special logic: Mon if Fri/Sat/Sun, else tomorrow
+      if (
+        categoryName.toLowerCase() === "salad" ||
+        categoryName.toLowerCase() === "carbs" ||
+        categoryName.toLowerCase() === "protein" ||
+        categoryName.toLowerCase() === "side"
+      ) {
+        // These are lunch categories - use getLunchOrderDate logic
+        if (day === 5 || day === 6 || day === 0) {
+          menuDate = formatServerDate(getNextMondayDate(serverTime));
+        } else {
+          menuDate = formatServerDate(getTomorrowDate(serverTime));
+        }
       } else {
+        // Breakfast or other categories - use regular tomorrow
         menuDate = formatServerDate(getTomorrowDate(serverTime));
       }
-    } else {
-      // Breakfast or other categories - use regular tomorrow
-      menuDate = formatServerDate(getTomorrowDate(serverTime));
     }
 
     const res = await fetch(`${API_URL}/daily-menu/${menuDate}`, {

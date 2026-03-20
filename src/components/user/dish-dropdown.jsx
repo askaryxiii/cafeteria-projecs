@@ -15,6 +15,7 @@ const DishDropdown = ({
   control,
   selectionMode = "multiple",
   maxSelections = null,
+  targetDate = null,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState([]);
@@ -30,10 +31,10 @@ const DishDropdown = ({
   }, []);
 
   useEffect(() => {
-    if (isOpen && items.length === 0) {
+    if (isOpen && items.length === 0 && (categoryName.toLowerCase() === "breakfast" || (targetDate && targetDate.trim()))) {
       fetchItems();
     }
-  }, [isOpen, items.length]);
+  }, [isOpen, items.length, categoryName, targetDate]);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -42,7 +43,7 @@ const DishDropdown = ({
       const breakfastFetch = await getBreakfast();
       setItems(breakfastFetch);
     } else {
-      const fetchedItems = await getTodayMenuByCategory(categoryName);
+      const fetchedItems = await getTodayMenuByCategory(categoryName, targetDate);
 
       setItems(fetchedItems);
     }

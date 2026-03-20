@@ -10,6 +10,10 @@ import {
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
+import { IoCheckmarkCircle } from "react-icons/io5";
+import { MdClose } from "react-icons/md";
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
 
 const Ordering = ({
   onOrderPlaced,
@@ -19,6 +23,7 @@ const Ordering = ({
   targetDay,
 }) => {
   const [totalPrice, setTotalPrice] = useState(0);
+  const [open, setOpen] = useState(false);
 
   // Use prop mealType if provided, otherwise calculate
   const mealType =
@@ -39,6 +44,7 @@ const Ordering = ({
     control,
     watch,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
   } = useForm({
     defaultValues,
@@ -85,10 +91,17 @@ const Ordering = ({
         toast.error(res.error);
         return;
       }
-      toast.success("Order placed successfully");
 
-      if (typeof onOrderPlaced === "function") {
-        onOrderPlaced(res);
+      // For breakfast, show success modal instead of calling callback immediately
+      if (mealType === "breakfast") {
+        setOpen(true);
+        reset();
+      } else {
+        // For lunch, call callback immediately
+        toast.success("Order placed successfully");
+        if (typeof onOrderPlaced === "function") {
+          onOrderPlaced(res);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -146,7 +159,8 @@ const Ordering = ({
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6 sm:space-y-8 md:space-y-10">
+        className="space-y-6 sm:space-y-8 md:space-y-10"
+      >
         {mealType === "breakfast"
           ? breakfastCategories.map((category) => (
               <DishDropdown
@@ -157,6 +171,7 @@ const Ordering = ({
                 control={control}
                 selectionMode={category.selectionMode}
                 maxSelections={category.maxSelections}
+                targetDate={targetWeekday}
               />
             ))
           : categories.map((category) => (
@@ -168,6 +183,7 @@ const Ordering = ({
                 control={control}
                 selectionMode={category.selectionMode}
                 maxSelections={category.maxSelections}
+                targetDate={targetWeekday}
               />
             ))}
 
@@ -179,6 +195,28 @@ const Ordering = ({
           mealType={mealType}
         />
       </form>
+
+      {mealType === "breakfast" && (
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          center
+          classNames={{
+            modal: "rounded-lg",
+          }}
+        >
+          <div className="flex flex-col items-center gap-4 sm:gap-6 py-6 sm:py-8 px-4 sm:px-8">
+            <IoCheckmarkCircle className="w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24 text-green-500" />
+            <h3 className="text-2xl sm:text-3xl font-bold text-primary-navy text-center">
+              Order Placed Successfully!
+            </h3>
+            <p className="text-base sm:text-lg text-dark-grey text-center">
+              Your breakfast order has been placed. You can order more or close
+              this modal.
+            </p>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

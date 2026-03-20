@@ -23,6 +23,8 @@ const DashboardUser = () => {
   const [targetDay, setTargetDay] = useState("");
   const [hasActiveWindow, setHasActiveWindow] = useState(true);
 
+   console.log({ hasActiveWindow, isBreakfastWindow, targetWeekday, targetDay });
+
   // Initialize windows on mount - MUST complete before fetching order
   useEffect(() => {
     (async () => {
@@ -72,17 +74,32 @@ const DashboardUser = () => {
       const components = await getServerTimeComponents();
 
       let dateToCheck;
+      let dayName;
+      const dayNames = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
 
       if (isBreakfast) {
         // Breakfast shows today
         dateToCheck = components.dateString;
         setTargetWeekday(dateToCheck);
-        setTargetDay(components.day);
+        dayName = dayNames[components.day];
+        setTargetDay(dayName);
       } else {
         // Lunch shows tomorrow (or Monday if weekend)
         dateToCheck = await getLunchCheckDate();
         setTargetWeekday(dateToCheck);
-        setTargetDay(components.tmwDayOfWeek);
+        // Parse the lunch date to get the correct day of week
+        const lunchDateObj = new Date(dateToCheck);
+        const lunchDayOfWeek = lunchDateObj.getUTCDay();
+        dayName = dayNames[lunchDayOfWeek];
+        setTargetDay(dayName);
       }
 
       const res = await getUserOrdersByDate(dateToCheck, token);
@@ -92,8 +109,9 @@ const DashboardUser = () => {
         return;
       }
       if (Array.isArray(res) && res.length > 0) {
-        // Filter out drinks orders, only show breakfast/lunch orders
-        const foodOrder = res.find((order) => order.meal_type !== "drinks");
+        // Filter out drinks and breakfast orders, only show lunch orders
+        // Breakfast orders should not block the ordering form (they show success modal instead)
+        const foodOrder = res.find((order) => order.meal_type === "lunch");
         setOrder(foodOrder || null);
       } else {
         setOrder(null);

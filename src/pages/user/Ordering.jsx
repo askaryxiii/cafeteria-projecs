@@ -212,7 +212,7 @@ const Ordering = ({
             </h3>
             <p className="text-base sm:text-lg text-dark-grey text-center">
               Your breakfast order has been placed. You can order more or close
-              this modal.
+              this.
             </p>
           </div>
         </Modal>

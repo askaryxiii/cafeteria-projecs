@@ -7,11 +7,11 @@ const NoOrderWindow = () => {
         <img
           src="/assets/logo/closed.gif"
           alt="Closed"
-          className="w-28 md:w-full h-28 md:h-64 object-contain"
+          className="w-4/5 md:w-full h-64 md:h-64 object-contain"
         />
 
         <div className="space-y-5">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-navy">
+          <h2 className="text-2xl md:text-4xl font-bold text-primary-navy">
             Lunch Order is not available for this week.
           </h2>
           <p className="text-lg md:text-xl text-dark-grey font-normal">

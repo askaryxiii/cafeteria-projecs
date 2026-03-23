@@ -95,8 +95,8 @@ const DashboardCafeteria = () => {
       const { hour, minute } = timeComponents;
 
       // Determine current meal window
-      const inBreakfast = isTimeInWindow(hour, minute, "11:00", "15:00");
-      const inLunch = isTimeInWindow(hour, minute, "15:00", "23:59");
+      const inBreakfast = isTimeInWindow(hour, minute, "11:00", "19:00");
+      const inLunch = isTimeInWindow(hour, minute, "6:02", "6:03");
       // drinks are always available
 
       const orderData = await getAllOrdersForToday();
@@ -269,7 +269,8 @@ const DashboardCafeteria = () => {
                 <th className="px-4 py-3 text-left font-semibold"> </th>
                 <th
                   className="px-4 py-3 text-left font-semibold cursor-pointer align-middle"
-                  onClick={() => handleSort("arabic_name")}>
+                  onClick={() => handleSort("arabic_name")}
+                >
                   <div className="flex items-center gap-2">
                     Full Name
                     {sortConfig.key === "arabic_name" &&
@@ -291,7 +292,8 @@ const DashboardCafeteria = () => {
                     key={order.id}
                     className={`hover:bg-gray-50 bg-[#f3f3f3] relative ${
                       checkedItems.has(order.id) ? "line-through-animated" : ""
-                    }`}>
+                    }`}
+                  >
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
@@ -315,7 +317,8 @@ const DashboardCafeteria = () => {
                             : order.meal_type === "lunch"
                               ? "bg-blue-100 text-blue-800"
                               : "bg-purple-100 text-purple-800"
-                        }`}>
+                        }`}
+                      >
                         {order.meal_type.charAt(0).toUpperCase() +
                           order.meal_type.slice(1)}
                       </span>
@@ -343,9 +346,8 @@ const DashboardCafeteria = () => {
                   checkedItems.has(order.id)
                     ? "bg-gray-100 border-gray-300"
                     : "bg-white border-gray-200"
-                } ${
-                  checkedItems.has(order.id) ? "line-through-animated" : ""
-                }`}>
+                } ${checkedItems.has(order.id) ? "line-through-animated" : ""}`}
+              >
                 <div>
                   <div className="flex items-start gap-3 mb-2">
                     <input
@@ -378,7 +380,8 @@ const DashboardCafeteria = () => {
                           : order.meal_type === "lunch"
                             ? "bg-blue-100 text-blue-800"
                             : "bg-purple-100 text-purple-800"
-                      }`}>
+                      }`}
+                    >
                       {order.meal_type.charAt(0).toUpperCase() +
                         order.meal_type.slice(1)}
                     </span>

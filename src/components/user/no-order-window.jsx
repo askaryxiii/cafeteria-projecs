@@ -12,10 +12,10 @@ const NoOrderWindow = () => {
 
         <div className="space-y-5">
           <h2 className="text-2xl md:text-4xl font-bold text-primary-navy">
-            Lunch Order is not available for this week.
+            There's Nothing To Order Now.
           </h2>
           <p className="text-lg md:text-xl text-dark-grey font-normal">
-            We will be back soon.
+            Please check back later.
           </p>
         </div>
       </div>

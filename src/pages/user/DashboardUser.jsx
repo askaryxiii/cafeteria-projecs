@@ -23,8 +23,6 @@ const DashboardUser = () => {
   const [targetDay, setTargetDay] = useState("");
   const [hasActiveWindow, setHasActiveWindow] = useState(true);
 
-   console.log({ hasActiveWindow, isBreakfastWindow, targetWeekday, targetDay });
-
   // Initialize windows on mount - MUST complete before fetching order
   useEffect(() => {
     (async () => {

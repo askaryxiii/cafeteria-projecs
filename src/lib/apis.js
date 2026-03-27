@@ -1224,14 +1224,24 @@ export function parseTimeToMinutes(timeString) {
 
 export function isTimeInWindow(hour, minute, startTime, endTime) {
   // Check if current time is within the window
+  // Handles windows that span midnight (e.g., start 15:00, end 00:00)
   const startHour = parseTimeToHours(startTime);
   const startMinute = parseTimeToMinutes(startTime);
   const endHour = parseTimeToHours(endTime);
   const endMinute = parseTimeToMinutes(endTime);
 
-  const currentTotalMinutes = hour * 60 + minute;
+  let currentTotalMinutes = hour * 60 + minute;
   const startTotalMinutes = startHour * 60 + startMinute;
-  const endTotalMinutes = endHour * 60 + endMinute;
+  let endTotalMinutes = endHour * 60 + endMinute;
+
+  // If the window wraps past midnight, treat end as next day
+  if (endTotalMinutes < startTotalMinutes) {
+    // If current time is before start, assume it's on the next day
+    if (currentTotalMinutes < startTotalMinutes) {
+      currentTotalMinutes += 24 * 60;
+    }
+    endTotalMinutes += 24 * 60;
+  }
 
   return (
     currentTotalMinutes >= startTotalMinutes &&
@@ -1370,33 +1380,23 @@ export async function isOrderWindowActive() {
     const { hour, minute } = components;
     const currentTotalMinutes = hour * 60 + minute;
 
-    // Check breakfast window
+    // Use isTimeInWindow which handles wrap-around midnight windows
     if (windows.breakfast_start && windows.breakfast_end) {
-      const breakfastStart =
-        parseTimeToHours(windows.breakfast_start) * 60 +
-        parseTimeToMinutes(windows.breakfast_start);
-      const breakfastEnd =
-        parseTimeToHours(windows.breakfast_end) * 60 +
-        parseTimeToMinutes(windows.breakfast_end);
       if (
-        currentTotalMinutes >= breakfastStart &&
-        currentTotalMinutes <= breakfastEnd
+        isTimeInWindow(
+          hour,
+          minute,
+          windows.breakfast_start,
+          windows.breakfast_end,
+        )
       ) {
         return { active: true, type: "breakfast" };
       }
     }
 
-    // Check lunch window
     if (windows.lunch_start && windows.lunch_end) {
-      const lunchStart =
-        parseTimeToHours(windows.lunch_start) * 60 +
-        parseTimeToMinutes(windows.lunch_start);
-      const lunchEnd =
-        parseTimeToHours(windows.lunch_end) * 60 +
-        parseTimeToMinutes(windows.lunch_end);
       if (
-        currentTotalMinutes >= lunchStart &&
-        currentTotalMinutes <= lunchEnd
+        isTimeInWindow(hour, minute, windows.lunch_start, windows.lunch_end)
       ) {
         return { active: true, type: "lunch" };
       }

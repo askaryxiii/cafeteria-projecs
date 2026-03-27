@@ -95,8 +95,8 @@ const DashboardCafeteria = () => {
       const { hour, minute } = timeComponents;
 
       // Determine current meal window
-      const inBreakfast = isTimeInWindow(hour, minute, "11:00", "19:00");
-      const inLunch = isTimeInWindow(hour, minute, "6:02", "6:03");
+      const inBreakfast = isTimeInWindow(hour, minute, "11:00", "15:00");
+      const inLunch = isTimeInWindow(hour, minute, "15:00", "00:00");
       // drinks are always available
 
       const orderData = await getAllOrdersForToday();

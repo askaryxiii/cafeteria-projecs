@@ -7,6 +7,7 @@ import {
   placeOrder,
   getLunchOrderDate,
   getServerTimeComponents,
+  getUserOrdersByDate,
 } from "../../lib/apis";
 import FormFooter from "../../components/user/form-footer";
 import DishDropdown from "../../components/user/dish-dropdown";
@@ -73,6 +74,20 @@ const Ordering = ({
         // For lunch, use the special lunch order date function
         // which returns Monday if today is Fri/Sat/Sun, otherwise tomorrow
         selectedDate = await getLunchOrderDate();
+
+        // PREVENT DUPLICATE LUNCH ORDERS: Check if user already has a lunch order for this date
+        const existingOrders = await getUserOrdersByDate(selectedDate, token);
+        if (Array.isArray(existingOrders) && existingOrders.length > 0) {
+          const existingLunchOrder = existingOrders.find(
+            (order) => order.meal_type === "lunch",
+          );
+          if (existingLunchOrder) {
+            toast.error(
+              "You already have a lunch order for this date. Please delete the existing order first if you want to place a new one.",
+            );
+            return;
+          }
+        }
       }
 
       const codes = Object.values(selectedItems).flat();
@@ -159,8 +174,7 @@ const Ordering = ({
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6 sm:space-y-8 md:space-y-10"
-      >
+        className="space-y-6 sm:space-y-8 md:space-y-10">
         {mealType === "breakfast"
           ? breakfastCategories.map((category) => (
               <DishDropdown
@@ -203,8 +217,7 @@ const Ordering = ({
           center
           classNames={{
             modal: "rounded-lg",
-          }}
-        >
+          }}>
           <div className="flex flex-col items-center gap-4 sm:gap-6 py-6 sm:py-8 px-4 sm:px-8">
             <IoCheckmarkCircle className="w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24 text-green-500" />
             <h3 className="text-2xl sm:text-3xl font-bold text-primary-navy text-center">

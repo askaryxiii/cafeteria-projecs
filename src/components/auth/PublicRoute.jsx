@@ -15,7 +15,7 @@ const PublicRoute = ({ children }) => {
     case "chef":
       return <Navigate to="/chef" replace />;
     case "accountant":
-      return <Navigate to="/accountant" replace />;
+      return <Navigate to="/admin" replace />;
     case "cafeteria":
       return <Navigate to="/cafeteria" replace />;
     case "admin":

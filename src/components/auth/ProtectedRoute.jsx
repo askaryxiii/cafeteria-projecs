@@ -22,10 +22,14 @@ const ProtectedRoute = ({
   if (allowedRoles.includes(role)) return children;
   // authenticated but not authorized -> redirect to their dashboard
   switch (role) {
+    case "accountant":
+      // Check if accessing admin with restricted access
+      if (allowedRoles.includes("accountant")) {
+        return children; // Already checked above, shouldn't reach here
+      }
+      return <Navigate to="/admin/dashboard" replace />;
     case "chef":
       return <Navigate to="/chef" replace />;
-    case "accountant":
-      return <Navigate to="/accountant" replace />;
     case "cafeteria":
       return <Navigate to="/cafeteria" replace />;
     case "employee":

@@ -164,6 +164,7 @@ export default function DrinksTable({ drinks, onUpdate, onDelete, onCreate }) {
           onClose={() => setEditingItem(null)}
           onSave={handleEdit}
           isLoading={isLoading}
+          drinks={true}
         />
       )}
 

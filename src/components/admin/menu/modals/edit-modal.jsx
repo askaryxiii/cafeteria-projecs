@@ -9,6 +9,7 @@ export default function EditModal({
   onClose,
   onSave,
   isLoading,
+  drinks = false,
 }) {
   const [formData, setFormData] = useState(item);
   const [isFetchingItem, setIsFetchingItem] = useState(false);
@@ -49,8 +50,8 @@ export default function EditModal({
         propertyName === "price" || propertyName === "weight_grams"
           ? value === ""
             ? ""
-            : value
-          : value,
+            : parseFloat(value)
+          : value.toLowerCase(), // Convert to lowercase
     }));
   };
 
@@ -81,15 +82,29 @@ export default function EditModal({
             <label className="block text-sm font-medium text-[#072A57] mb-1">
               Category
             </label>
-            <input
-              type="text"
+            <select
               name="category"
               value={formData.category || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
-              disabled={isFetchingItem || isLoading}
-            />
+              disabled={isFetchingItem || isLoading}>
+              <option value="">Select a category</option>
+              {formData.meal_type === "drinks" ? (
+                <>
+                  <option value="drinks">Drinks</option>
+                  <option value="drinks can">Drinks Can</option>
+                </>
+              ) : (
+                <>
+                  <option value="breakfast">Breakfast</option>
+                  <option value="carbs">Carbs</option>
+                  <option value="protein">Protein</option>
+                  <option value="salad">Salad</option>
+                  <option value="side">Side</option>
+                </>
+              )}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-[#072A57] mb-1">
@@ -106,32 +121,37 @@ export default function EditModal({
               disabled={isFetchingItem || isLoading}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-[#072A57] mb-1">
-              Weight (grams)
-            </label>
-            <input
-              type="number"
-              name="weightGrams"
-              value={formData.weight_grams || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              disabled={isFetchingItem || isLoading}
-            />
-          </div>
+          {!drinks && (
+            <div>
+              <label className="block text-sm font-medium text-[#072A57] mb-1">
+                Weight (grams)
+              </label>
+              <input
+                type="number"
+                name="weightGrams"
+                value={formData.weight_grams || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
+                disabled={isFetchingItem || isLoading}
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-[#072A57] mb-1">
               Meal Type
             </label>
-            <input
-              type="text"
+            <select
               name="mealType"
               value={formData.meal_type || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
-              disabled={isFetchingItem || isLoading}
-            />
+              disabled={isFetchingItem || isLoading}>
+              <option value="">Select a meal type</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="drinks">Drinks</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-[#072A57] mb-1">
@@ -147,19 +167,23 @@ export default function EditModal({
               disabled={isFetchingItem || isLoading}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-[#072A57] mb-1">
-              Protein Type
-            </label>
-            <input
-              type="text"
-              name="proteinType"
-              value={formData.protein_type || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              disabled={isFetchingItem || isLoading}
-            />
-          </div>
+          {!drinks && (
+            <div>
+              <label className="block text-sm font-medium text-[#072A57] mb-1">
+                Protein Type
+              </label>
+              <select
+                name="proteinType"
+                value={formData.protein_type || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
+                disabled={isFetchingItem || isLoading}>
+                <option value="">Select a protein type</option>
+                <option value="meat">Meat</option>
+                <option value="chicken">Chicken</option>
+              </select>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 justify-center pt-4">

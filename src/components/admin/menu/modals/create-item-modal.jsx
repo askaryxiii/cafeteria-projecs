@@ -24,9 +24,9 @@ export default function CreateItemModal({
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name.includes("price") || name.includes("Weight")
+        name.includes("price") || name.includes("weight")
           ? parseFloat(value)
-          : value,
+          : value.toLowerCase(), // Convert to lowercase
     }));
   };
 
@@ -50,7 +50,7 @@ export default function CreateItemModal({
               placeholder="Enter item name"
               value={formData.item_name}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
+              className="w-full px-3 h-10 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
             />
           </div>
@@ -58,15 +58,28 @@ export default function CreateItemModal({
             <label className="block text-sm font-medium text-[#072A57] mb-1">
               Category
             </label>
-            <input
-              type="text"
+            <select
               name="category"
-              placeholder="Enter category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              required
-            />
+              className="w-full px-2 h-10 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none"
+              required>
+              <option value="">Select Category</option>
+              {drinks ? (
+                <>
+                  <option value="drinks">Drinks</option>
+                  <option value="drinks can">Drinks Can</option>
+                </>
+              ) : (
+                <>
+                  <option value="breakfast">Breakfast</option>
+                  <option value="carbs">Carbs</option>
+                  <option value="protein">Protein</option>
+                  <option value="salad">Salad</option>
+                  <option value="side">Side</option>
+                </>
+              )}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-[#072A57] mb-1">
@@ -79,50 +92,66 @@ export default function CreateItemModal({
               value={formData.price}
               onChange={handleChange}
               step="0.01"
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
+              min="0"
+              className="w-full px-3 h-10 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-[#072A57] mb-1">
-              Weight (grams)
-            </label>
-            <input
-              type="number"
-              name="weight_grams"
-              placeholder="Enter weight in grams"
-              value={formData.weight_grams}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-            />
-          </div>
-          <div>
+          {!drinks && (
+            <div>
+              <label className="block text-sm font-medium text-[#072A57] mb-1">
+                Weight (grams)
+              </label>
+              <input
+                type="number"
+                name="weight_grams"
+                placeholder="Enter weight in grams"
+                value={formData.weight_grams}
+                onChange={handleChange}
+                min="0"
+                className="w-full  px-3 h-10 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
+              />
+            </div>
+          )}
+
+          <div className={`${drinks && "col-span-2"}`}>
             <label className="block text-sm font-medium text-[#072A57] mb-1">
               Meal Type
             </label>
-            <input
-              type="text"
+            <select
               name="meal_type"
-              placeholder="Enter meal type"
               value={formData.meal_type}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              required
-            />
+              className={`w-full  px-3 h-10 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none`}
+              required>
+              {drinks ? (
+                <>
+                  <option value="">Select a type</option>
+                  <option value="drinks">Drinks</option>
+                </>
+              ) : (
+                <>
+                  <option value="">Select a type</option>
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                </>
+              )}
+            </select>
           </div>
           {!drinks && (
             <div className="col-span-2">
               <label className="block text-sm font-medium text-[#072A57] mb-1">
                 Protein Type
               </label>
-              <input
-                type="text"
+              <select
                 name="protein_type"
-                placeholder="Enter protein type"
                 value={formData.protein_type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none "
-              />
+                className="w-full px-3 h-10 text-white bg-[#072A57] border border-gray-300 rounded-sm focus:outline-none">
+                <option value="">Select a protein type</option>
+                <option value="meat">Meat</option>
+                <option value="chicken">Chicken</option>
+              </select>
             </div>
           )}
         </div>
@@ -131,7 +160,7 @@ export default function CreateItemModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-[#D9D9D9] text-[#072A57] border border-[#072A57] rounded-sm hover:bg-[#b3b3b3] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+            className="px-4 h-10 bg-[#D9D9D9] text-[#072A57] border border-[#072A57] rounded-sm hover:bg-[#b3b3b3] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
             {isLoading ? "Creating..." : "Save"}
           </button>
         </div>

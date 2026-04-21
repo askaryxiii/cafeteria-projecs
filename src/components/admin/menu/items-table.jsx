@@ -27,7 +27,7 @@ export default function ItemsTable({ items, onUpdate, onDelete, onCreate }) {
       (item) =>
         item.meal_type &&
         (item.meal_type.toLowerCase() === "lunch" ||
-          item.meal_type.toLowerCase() === "breakfast")
+          item.meal_type.toLowerCase() === "breakfast"),
     );
 
     // Apply search filter
@@ -35,8 +35,8 @@ export default function ItemsTable({ items, onUpdate, onDelete, onCreate }) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((item) =>
         Object.values(item).some((value) =>
-          value?.toString().toLowerCase().includes(term)
-        )
+          value?.toString().toLowerCase().includes(term),
+        ),
       );
     }
 

@@ -6,6 +6,7 @@ import {
   getTodayWeekday,
   deleteOrder,
   getLunchOrderDate,
+  getLunchDateWithDayOfWeek,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import DeleteConfirmModal from "../../components/admin/users/delete-confirm-modal";
@@ -72,10 +73,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow, targetDay }) => {
           setTargetWeekday(weekday);
         } else if (mealType === "lunch") {
           // Lunch shows tomorrow (or Monday if weekend)
-          const lunchDate = await getLunchOrderDate();
-          // Parse the lunch date to get the weekday name
-          const lunchDateObj = new Date(lunchDate);
-          const dayIndex = lunchDateObj.getUTCDay();
+          const lunchInfo = await getLunchDateWithDayOfWeek();
           const days = [
             "Sunday",
             "Monday",
@@ -85,7 +83,7 @@ const YourOrder = ({ order, onOrderUpdated, isBreakfastWindow, targetDay }) => {
             "Friday",
             "Saturday",
           ];
-          setTargetWeekday(days[dayIndex]);
+          setTargetWeekday(days[lunchInfo.dayOfWeek]);
         }
       }
     })();

@@ -216,6 +216,30 @@ export async function getLunchCheckDate() {
   return formatServerDate(getTomorrowDate(serverTime));
 }
 
+// Get lunch date and its day of week
+// Returns { dateString, dayOfWeek } where dayOfWeek is 0-6
+export async function getLunchDateWithDayOfWeek() {
+  const { date: serverTime, dayOfWeek: day } = await getServerTime();
+  
+  let lunchDate;
+  let lunchDayOfWeek;
+  
+  // If today is Friday (5), Saturday (6), or Sunday (0), order for Monday
+  if (day === 5 || day === 6 || day === 0) {
+    lunchDate = getNextMondayDate(serverTime);
+    lunchDayOfWeek = 1; // Monday is day 1
+  } else {
+    // Otherwise, order for tomorrow
+    lunchDate = getTomorrowDate(serverTime);
+    lunchDayOfWeek = (day + 1) % 7; // Get tomorrow's day of week
+  }
+  
+  return {
+    dateString: formatServerDate(lunchDate),
+    dayOfWeek: lunchDayOfWeek,
+  };
+}
+
 // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
   const {

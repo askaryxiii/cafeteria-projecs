@@ -7,6 +7,7 @@ import {
   getServerTimeComponents,
   getLunchCheckDate,
   isOrderWindowActive,
+  getLunchDateWithDayOfWeek,
 } from "../../lib/apis";
 import Ordering from "./Ordering";
 import YourOrder from "./YourOrder";
@@ -91,12 +92,10 @@ const DashboardUser = () => {
         setTargetDay(dayName);
       } else {
         // Lunch shows tomorrow (or Monday if weekend)
-        dateToCheck = await getLunchCheckDate();
+        const lunchInfo = await getLunchDateWithDayOfWeek();
+        dateToCheck = lunchInfo.dateString;
         setTargetWeekday(dateToCheck);
-        // Parse the lunch date to get the correct day of week
-        const lunchDateObj = new Date(dateToCheck);
-        const lunchDayOfWeek = lunchDateObj.getUTCDay();
-        dayName = dayNames[lunchDayOfWeek];
+        dayName = dayNames[lunchInfo.dayOfWeek];
         setTargetDay(dayName);
       }
 

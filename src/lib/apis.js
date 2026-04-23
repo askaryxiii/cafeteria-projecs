@@ -39,6 +39,8 @@ export async function getServerTime() {
     const rawDayOfWeek = data.dayOfWeek;
     const rawTmwDayOfWeek = data.tmwDayOfWeek;
 
+    console.log("🐛 getServerTime API response:", { serverTime, rawDayOfWeek, tmwServerTime, rawTmwDayOfWeek });
+
     const dayNameMap = {
       sunday: 0,
       monday: 1,
@@ -109,13 +111,20 @@ export async function getServerTime() {
 
     const serverDate = new Date(serverTimeMs);
     const tmwServerDate = new Date(tmwServerTimeMs);
-    return {
+    const result = {
       date: serverDate,
       tmwDate: tmwServerDate,
       dayOfWeek: dayOfWeek !== undefined ? dayOfWeek : serverDate.getUTCDay(),
       tmwDayOfWeek:
         tmwDayOfWeek !== undefined ? tmwDayOfWeek : tmwServerDate.getUTCDay(),
     };
+    console.log("🐛 getServerTime result:", { 
+      date: serverDate.toISOString(), 
+      dayOfWeek: result.dayOfWeek,
+      tmwDate: tmwServerDate.toISOString(),
+      tmwDayOfWeek: result.tmwDayOfWeek
+    });
+    return result;
   } catch (error) {
     console.warn("Error fetching server time:", error);
     const localDate = new Date();
@@ -221,6 +230,8 @@ export async function getLunchCheckDate() {
 export async function getLunchDateWithDayOfWeek() {
   const { date: serverTime, dayOfWeek: day } = await getServerTime();
   
+  console.log("🐛 getLunchDateWithDayOfWeek START - day:", day, "serverTime:", serverTime.toISOString());
+  
   let lunchDate;
   let lunchDayOfWeek;
   
@@ -228,16 +239,20 @@ export async function getLunchDateWithDayOfWeek() {
   if (day === 5 || day === 6 || day === 0) {
     lunchDate = getNextMondayDate(serverTime);
     lunchDayOfWeek = 1; // Monday is day 1
+    console.log("🐛 getLunchDateWithDayOfWeek - Weekend detected, using Monday");
   } else {
     // Otherwise, order for tomorrow
     lunchDate = getTomorrowDate(serverTime);
     lunchDayOfWeek = (day + 1) % 7; // Get tomorrow's day of week
+    console.log("🐛 getLunchDateWithDayOfWeek - Weekday, using tomorrow");
   }
   
-  return {
+  const result = {
     dateString: formatServerDate(lunchDate),
     dayOfWeek: lunchDayOfWeek,
   };
+  console.log("🐛 getLunchDateWithDayOfWeek RESULT:", result, "lunchDate object:", lunchDate.toISOString());
+  return result;
 }
 
 // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
@@ -398,6 +413,8 @@ export async function getTodayMenuByCategory(categoryName, targetDate = null) {
         menuDate = formatServerDate(getTomorrowDate(serverTime));
       }
     }
+
+    console.log("🐛 getTodayMenuByCategory - category:", categoryName, "menuDate:", menuDate, "targetDate provided:", !!targetDate);
 
     const res = await fetch(`${API_URL}/daily-menu/${menuDate}`, {
       headers: getHeaders({

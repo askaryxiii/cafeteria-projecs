@@ -191,7 +191,7 @@ const WeeklyMenu = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      week_start_date: "",
+      week_start_date: getMondayOfCurrentWeek(),
       items: WEEKDAYS.map((day, index) => ({
         day,
         date: "",
@@ -381,16 +381,34 @@ const WeeklyMenu = () => {
     }
   };
 
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate) {
+      const date = parseLocalDate(selectedDate);
+      const weekday = date.weekday; // 1 = Monday, 7 = Sunday
+      if (weekday !== 1) {
+        // If not Monday, adjust to the Monday of that week
+        const daysToMonday = weekday === 7 ? -6 : 1 - weekday;
+        const monday = date.plus({ days: daysToMonday });
+        setValue("week_start_date", monday.toISODate());
+      } else {
+        setValue("week_start_date", selectedDate);
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-5 pb-5">
       <div className="mb-6 w-full flex flex-col justify-center items-center">
         <label className="block text-sm font-medium text-primary-navy mb-2">
-          Week Start Date
+          Week Start Date (Mondays Only)
         </label>
         <input
           type="date"
           {...control.register("week_start_date")}
-          className="w-11/12 pl-4 pr-4 py-1.5 text-prim rounded-sm border border-primary-navy bg-light-grey focus:outline-none "
+          onChange={handleDateChange}
+          onClick={(e) => e.target.showPicker()}
+          className="w-11/12 pl-4 pr-4 py-1.5 text-prim rounded-sm border border-primary-navy bg-light-grey focus:outline-none"
         />
       </div>
 

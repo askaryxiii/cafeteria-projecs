@@ -5,6 +5,7 @@ import {
   isTimeInWindow,
 } from "../../lib/apis";
 import { unlockAudio, playNewOrderSound } from "../../lib/sound";
+import time from "@/utils/timeClient";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import TableSkeleton from "../../components/skeleton/loading/tables/TableSkeleton";
 
@@ -131,7 +132,8 @@ const DashboardCafeteria = () => {
       // Sort by created_at descending (newest first)
       filteredOrders.sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          time.parseISO(b.created_at).toMillis() -
+          time.parseISO(a.created_at).toMillis(),
       );
 
       const newIds = new Set(filteredOrders.map((o) => o.id));
@@ -208,8 +210,8 @@ const DashboardCafeteria = () => {
     // Within same meal type, apply sorting
     // Drinks and Breakfast: sort by creation date (newest first)
     if (a.meal_type === "drinks" || a.meal_type === "breakfast") {
-      const aTime = new Date(a.created_at).getTime();
-      const bTime = new Date(b.created_at).getTime();
+      const aTime = time.parseISO(a.created_at).toMillis();
+      const bTime = time.parseISO(b.created_at).toMillis();
       return bTime - aTime; // Newest first
     }
 
@@ -269,8 +271,7 @@ const DashboardCafeteria = () => {
                 <th className="px-4 py-3 text-left font-semibold"> </th>
                 <th
                   className="px-4 py-3 text-left font-semibold cursor-pointer align-middle"
-                  onClick={() => handleSort("arabic_name")}
-                >
+                  onClick={() => handleSort("arabic_name")}>
                   <div className="flex items-center gap-2">
                     Full Name
                     {sortConfig.key === "arabic_name" &&
@@ -292,8 +293,7 @@ const DashboardCafeteria = () => {
                     key={order.id}
                     className={`hover:bg-gray-50 bg-[#f3f3f3] relative ${
                       checkedItems.has(order.id) ? "line-through-animated" : ""
-                    }`}
-                  >
+                    }`}>
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
@@ -317,8 +317,7 @@ const DashboardCafeteria = () => {
                             : order.meal_type === "lunch"
                               ? "bg-blue-100 text-blue-800"
                               : "bg-purple-100 text-purple-800"
-                        }`}
-                      >
+                        }`}>
                         {order.meal_type.charAt(0).toUpperCase() +
                           order.meal_type.slice(1)}
                       </span>
@@ -346,8 +345,7 @@ const DashboardCafeteria = () => {
                   checkedItems.has(order.id)
                     ? "bg-gray-100 border-gray-300"
                     : "bg-white border-gray-200"
-                } ${checkedItems.has(order.id) ? "line-through-animated" : ""}`}
-              >
+                } ${checkedItems.has(order.id) ? "line-through-animated" : ""}`}>
                 <div>
                   <div className="flex items-start gap-3 mb-2">
                     <input
@@ -380,8 +378,7 @@ const DashboardCafeteria = () => {
                           : order.meal_type === "lunch"
                             ? "bg-blue-100 text-blue-800"
                             : "bg-purple-100 text-purple-800"
-                      }`}
-                    >
+                      }`}>
                       {order.meal_type.charAt(0).toUpperCase() +
                         order.meal_type.slice(1)}
                     </span>

@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import time from "@/utils/timeClient";
 
 export default function RevenueChart({ timePeriod = "24hours", data = null }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
@@ -100,8 +101,7 @@ export default function RevenueChart({ timePeriod = "24hours", data = null }) {
 
           // If no day property, try to extract from date
           if (dayNum === undefined && dayData.date) {
-            const date = new Date(dayData.date);
-            dayNum = date.getDate();
+            dayNum = time.parseISO(dayData.date).day;
           }
 
           if (dayNum !== undefined) {

@@ -4,6 +4,7 @@ import DateRangeHeader from "../../components/user/orders/date-range-header";
 import CalendarPicker from "../../components/user/orders/calendar-picker";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import time from "@/utils/timeClient";
 
 const DashboardAccountant = () => {
   const { user, logout } = useContext(AuthContext);
@@ -25,7 +26,7 @@ const DashboardAccountant = () => {
     if (action === "users") {
       if (fromDate && toDate) {
         const dates = `${formatDateToDDMMYYYY(fromDate)}_${formatDateToDDMMYYYY(
-          toDate
+          toDate,
         )}`;
 
         // encode the dates segment to be safe in the URL
@@ -35,7 +36,7 @@ const DashboardAccountant = () => {
     if (action === "ordersSummary") {
       if (fromDate && toDate) {
         const dates = `${formatDateToDDMMYYYY(fromDate)}_${formatDateToDDMMYYYY(
-          toDate
+          toDate,
         )}`;
 
         // encode the dates segment to be safe in the URL
@@ -57,13 +58,7 @@ const DashboardAccountant = () => {
   };
 
   const formatDateToDDMMYYYY = (dateInput) => {
-    const date = new Date(dateInput);
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
-    const year = date.getFullYear();
-
-    return `${day}-${month}-${year}`;
+    return time.parseISO(dateInput).toFormat("dd-MM-yyyy");
   };
 
   return (

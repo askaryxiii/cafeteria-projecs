@@ -6,11 +6,8 @@ import TableBody from "../../components/user/orders-list/table-body";
 import TableRow from "../../components/user/orders-list/table-row";
 import TableHeader from "../../components/user/orders-list/table-header";
 import TableCell from "../../components/user/orders-list/table-cell";
-import {
-  getUserOrderFromTo,
-  getVerifiedUser,
-  readToken,
-} from "../../lib/apis";
+import { getUserOrderFromTo, getVerifiedUser, readToken } from "../../lib/apis";
+import time from "@/utils/timeClient";
 import { toast } from "react-hot-toast";
 
 const OrdersList = () => {
@@ -71,11 +68,7 @@ const OrdersList = () => {
         // Transform API response to table format
         const transformed = (Array.isArray(res) ? res : []).map((order) => ({
           date: order.date
-            ? new Date(order.date).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "2-digit",
-              })
+            ? time.parseISO(order.date).toFormat("dd/MM/yy")
             : "N/A",
           orders:
             order.items && Array.isArray(order.items)

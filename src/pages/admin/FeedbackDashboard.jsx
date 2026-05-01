@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { getAllFeedbacks, deleteFeedback } from "../../lib/apis";
 import FeedbackDetailModal from "../../components/admin/feedback/feedback-detail-modal";
 import DeleteConfirmModal from "../../components/admin/users/delete-confirm-modal";
+import time from "@/utils/timeClient";
 
 const FeedbackDashboard = () => {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -47,7 +48,7 @@ const FeedbackDashboard = () => {
       (feedback) =>
         feedback.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         feedback.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        feedback.category.toLowerCase().includes(searchTerm.toLowerCase())
+        feedback.category.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     // Sort feedbacks
@@ -76,10 +77,10 @@ const FeedbackDashboard = () => {
   // Count new and read feedbacks
   const feedbackCounts = useMemo(() => {
     const newCount = filteredFeedbacks.filter(
-      (f) => f.status.toLowerCase() === "new"
+      (f) => f.status.toLowerCase() === "new",
     ).length;
     const readCount = filteredFeedbacks.filter(
-      (f) => f.status.toLowerCase() === "read"
+      (f) => f.status.toLowerCase() === "read",
     ).length;
     return { newCount, readCount };
   }, [filteredFeedbacks]);
@@ -250,9 +251,9 @@ const FeedbackDashboard = () => {
                     </td>
                     <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center">
                       <span className="text-primary-navy text-xs sm:text-sm">
-                        {new Date(feedback.created_at).toLocaleDateString(
-                          "en-US"
-                        )}
+                        {time
+                          .parseISO(feedback.created_at)
+                          .toFormat("MM/dd/yyyy")}
                       </span>
                     </td>
                     <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center">
@@ -264,7 +265,7 @@ const FeedbackDashboard = () => {
                     <td className="px-2 sm:px-3 md:px-6 py-2 sm:py-3 md:py-4 text-center">
                       <span
                         className={`inline-block px-2 py-0.5 rounded-full text-xs sm:text-sm font-medium capitalize ${getStatusColor(
-                          feedback.status
+                          feedback.status,
                         )}`}>
                         {feedback.status}
                       </span>
@@ -306,7 +307,7 @@ const FeedbackDashboard = () => {
                   </div>
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
-                      feedback.status
+                      feedback.status,
                     )}`}>
                     {feedback.status}
                   </span>
@@ -317,9 +318,9 @@ const FeedbackDashboard = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600 font-medium">Created:</span>
                     <span className="text-primary-navy text-right">
-                      {new Date(feedback.created_at).toLocaleDateString(
-                        "en-US"
-                      )}
+                      {time
+                        .parseISO(feedback.created_at)
+                        .toFormat("MM/dd/yyyy")}
                     </span>
                   </div>
                   <div className="flex justify-between">

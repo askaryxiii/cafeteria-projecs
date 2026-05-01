@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import time from "@/utils/timeClient";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Login from "./pages/Login";
@@ -22,6 +24,12 @@ import OrderSummary from "./pages/accountant/OrderSummary";
 import Feedback from "./pages/user/Feedback";
 
 const App = () => {
+  useEffect(() => {
+    time.initTimeSync().catch((error) => {
+      console.warn("[App] Failed to initialize time sync", error);
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <AuthProvider>

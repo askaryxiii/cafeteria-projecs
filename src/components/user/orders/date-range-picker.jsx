@@ -1,10 +1,9 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
 import DateRangeHeader from "./date-range-header";
 import CalendarPicker from "./calendar-picker";
 import { useNavigate } from "react-router-dom";
-import { getServerTimeComponents } from "../../../lib/apis";
+import time from "@/utils/timeClient";
 
 export default function DateRangePicker() {
   const [showFromCalendar, setShowFromCalendar] = useState(false);
@@ -14,10 +13,15 @@ export default function DateRangePicker() {
 
   // Initialize server time on mount
   useEffect(() => {
-    (async () => {
-      const components = await getServerTimeComponents();
-      setServerNow(components.date);
-    })();
+    const initialize = async () => {
+      try {
+        await time.initTimeSync();
+      } catch (error) {
+        console.warn("[DateRangePicker] time sync failed", error);
+      }
+      setServerNow(time.now().toJSDate());
+    };
+    initialize();
   }, []);
 
   const { watch, setValue } = useForm({
@@ -42,19 +46,14 @@ export default function DateRangePicker() {
   };
 
   const formatDateToDDMMYYYY = (dateInput) => {
-    const date = new Date(dateInput);
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
-    const year = date.getFullYear();
-
-    return `${day}-${month}-${year}`;
+    const date = time.parseISO(dateInput);
+    return date.toFormat("dd-MM-yyyy");
   };
 
   useEffect(() => {
     if (fromDate && toDate && fromDate <= toDate) {
       const dates = `${formatDateToDDMMYYYY(fromDate)}_${formatDateToDDMMYYYY(
-        toDate
+        toDate,
       )}`;
 
       // encode the dates segment to be safe in the URL

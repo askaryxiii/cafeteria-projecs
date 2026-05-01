@@ -5,15 +5,9 @@ import { AuthContext } from "../../context/AuthContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PulseLoader } from "react-spinners";
-import {
-  getServerTime,
-  formatServerDate,
-  getMenuByCategoryAndDate,
-  readToken,
-  submitFeedback,
-} from "../../lib/apis";
+import { getMenuByCategoryAndDate, submitFeedback } from "../../lib/apis";
+import time from "@/utils/timeClient";
 import { MdOutlineInfo } from "react-icons/md";
-import { Tooltip } from "recharts";
 import ToolTip from "../../components/ui/tooltip";
 
 const Feedback = () => {
@@ -31,7 +25,7 @@ const Feedback = () => {
       name: user?.user?.name || "",
       email: user?.user?.email || "",
       category: "",
-      date_of_meal: new Date(),
+      date_of_meal: time.now().toJSDate(),
       feedback_paragraph: "",
     },
   });
@@ -47,15 +41,14 @@ const Feedback = () => {
   useEffect(() => {
     const initializeFeedbackDate = async () => {
       try {
-        const { date: serverTime } = await getServerTime();
-        const formattedDate = formatServerDate(serverTime);
-        setFeedbackDate(formattedDate);
-        setValue("date_of_feedback", formattedDate);
+        await time.initTimeSync();
+        const serverDate = time.nowDate();
+        setFeedbackDate(serverDate);
+        setValue("date_of_feedback", serverDate);
       } catch {
-        // Fall back to local time if server time fails
-        const localDate = new Date().toISOString().split("T")[0];
-        setFeedbackDate(localDate);
-        setValue("date_of_feedback", localDate);
+        const fallbackDate = time.nowDate();
+        setFeedbackDate(fallbackDate);
+        setValue("date_of_feedback", fallbackDate);
       }
     };
     initializeFeedbackDate();
@@ -69,16 +62,18 @@ const Feedback = () => {
 
   const loadMenuItems = async () => {
     setLoadingMenu(true);
+
     try {
-      // Convert the selected date to YYYY-MM-DD format
-      const dateString = selectedDate.toISOString().split("T")[0];
+      const dateString = selectedDate
+        ? time.toISODate(selectedDate)
+        : time.nowDate();
 
       const result = await getMenuByCategoryAndDate(
         selectedCategory,
         dateString,
       );
 
-      if (result.error) {
+      if (result?.error) {
         toast.error(result.error);
         setMenuItems([]);
         return;
@@ -99,7 +94,7 @@ const Feedback = () => {
       const submissionData = {
         name: data.name,
         email: data.email,
-        date_of_meal: data.date_of_meal.toISOString().split("T")[0],
+        date_of_meal: time.toISODate(data.date_of_meal),
         date_of_feedback: data.date_of_feedback,
         category: data.category,
         menu_item_id: Number(data.menu_item_id),
@@ -121,7 +116,7 @@ const Feedback = () => {
         name: user.user.name,
         email: user.user.email,
         category: "",
-        date_of_meal: new Date(),
+        date_of_meal: time.now().toJSDate(),
         menu_item_id: "",
         feedback_paragraph: "",
         date_of_feedback: feedbackDate,
@@ -214,7 +209,7 @@ const Feedback = () => {
                   wrapperClassName="w-full"
                   selected={getValues("date_of_meal")}
                   onChange={(date) =>
-                    setValue("date_of_meal", date || new Date())
+                    setValue("date_of_meal", date || time.now().toJSDate())
                   }
                   dateFormat="yyyy-MM-dd"
                   className="w-full px-4 py-2 border border-gray-300 bg-gray-100 rounded-lg focus:outline-none"

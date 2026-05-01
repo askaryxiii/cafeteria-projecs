@@ -8,6 +8,7 @@ import {
   readToken,
   getServerTime,
 } from "../../../../lib/apis";
+import time from "@/utils/timeClient";
 
 const ImportModal = ({ isOpen, onClose, isLoading }) => {
   const [isExporting, setIsExporting] = useState(false);
@@ -72,7 +73,7 @@ const ImportModal = ({ isOpen, onClose, isLoading }) => {
       const { date: serverTime } = await getServerTime();
       link.setAttribute(
         "download",
-        `menu_items_${serverTime.toISOString().split("T")[0]}.csv`,
+        `menu_items_${time.toISODate(serverTime)}.csv`,
       );
       link.style.visibility = "hidden";
 

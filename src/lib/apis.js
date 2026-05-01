@@ -1,4 +1,6 @@
+import { DateTime } from "luxon";
 const API_URL = import.meta.env.VITE_API_BASE;
+import time from "@/utils/timeClient";
 
 // Helper to add ngrok-skip-browser-warning to all headers
 function getHeaders(baseHeaders = {}) {
@@ -8,278 +10,185 @@ function getHeaders(baseHeaders = {}) {
   };
 }
 
-let serverTimeOffset = null;
-let lastServerTimeUpdate = 0;
-
-// Get server time - fetches fresh from server each time (no caching offset)
-// Returns { date: Date, dayOfWeek: number }
+// Get server time - now uses timeClient
 export async function getServerTime() {
   try {
-    const res = await fetch(`${API_URL}/stats/server-time`, {
-      headers: getHeaders({
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
-      }),
-    });
-
-    if (!res.ok) {
-      console.warn("Failed to fetch server time, using local time");
-      const localDate = new Date();
-      return {
-        date: localDate,
-        dayOfWeek: localDate.getUTCDay(),
-      };
-    }
-
-    const data = await res.json();
-    const serverTime = data.serverTime;
-    const tmwServerTime = data.serverTmwTime;
-    // Server may return dayOfWeek as a number (0-6), a numeric string, or a weekday name
-    // Normalize to a numeric index (0=Sunday ... 6=Saturday) so callers can reliably compare
-    const rawDayOfWeek = data.dayOfWeek;
-    const rawTmwDayOfWeek = data.tmwDayOfWeek;
-
-    console.log("🐛 getServerTime API response:", { serverTime, rawDayOfWeek, tmwServerTime, rawTmwDayOfWeek });
-
-    const dayNameMap = {
-      sunday: 0,
-      monday: 1,
-      tuesday: 2,
-      wednesday: 3,
-      thursday: 4,
-      friday: 5,
-      saturday: 6,
+    const syncResult = await time.initTimeSync();
+    const now = time.now();
+    // Convert Luxon weekday to JS weekday (0=Sun, 1=Mon, ..., 6=Sat)
+    const dayOfWeek = time.getWeekday() % 7;
+    return {
+      date: now.toJSDate(),
+      dayOfWeek,
+      tmwDate: time.addDays(1).toJSDate(),
+      tmwDayOfWeek: (time.getWeekday() + 1) % 7,
     };
-
-    function toDayIndex(d) {
-      if (d === undefined || d === null) return undefined;
-      // already a number
-      if (typeof d === "number") return d;
-      // numeric string like "5"
-      const n = parseInt(d, 10);
-      if (!isNaN(n)) return n;
-      if (typeof d === "string") {
-        const key = d.trim().toLowerCase();
-        if (dayNameMap.hasOwnProperty(key)) return dayNameMap[key];
-      }
-      return undefined;
-    }
-
-    const dayOfWeek = toDayIndex(rawDayOfWeek);
-    const tmwDayOfWeek = toDayIndex(rawTmwDayOfWeek);
-
-    // Ensure we have a valid serverTime
-    if (!serverTime) {
-      console.warn("No serverTime  in server response:", data);
-      const localDate = new Date();
-      return {
-        date: localDate,
-        dayOfWeek: localDate.getUTCDay(),
-      };
-    }
-
-    // Handle both milliseconds (number) and ISO strings
-    let serverTimeMs;
-    if (typeof serverTime === "number") {
-      serverTimeMs = serverTime;
-    } else {
-      // Parse ISO string or other string formats
-      const parsedDate = new Date(serverTime);
-      serverTimeMs = parsedDate.getTime();
-    }
-    let tmwServerTimeMs;
-    if (typeof tmwServerTime === "number") {
-      tmwServerTimeMs = tmwServerTime;
-    } else {
-      const parsedDate = new Date(tmwServerTime);
-      tmwServerTimeMs = parsedDate.getTime();
-    }
-
-    // Validate the parsed time
-    if (isNaN(serverTimeMs)) {
-      console.warn("Invalid serverTime  from server:", serverTime);
-      const localDate = new Date();
-      return {
-        date: localDate,
-        dayOfWeek: localDate.getUTCDay(),
-      };
-    }
-
-    // Update cache with fresh server time for use in getCurrentTime()
-    serverTimeOffset = serverTimeMs - Date.now();
-    lastServerTimeUpdate = Date.now();
-
-    const serverDate = new Date(serverTimeMs);
-    const tmwServerDate = new Date(tmwServerTimeMs);
-    const result = {
-      date: serverDate,
-      tmwDate: tmwServerDate,
-      dayOfWeek: dayOfWeek !== undefined ? dayOfWeek : serverDate.getUTCDay(),
-      tmwDayOfWeek:
-        tmwDayOfWeek !== undefined ? tmwDayOfWeek : tmwServerDate.getUTCDay(),
-    };
-    console.log("🐛 getServerTime result:", { 
-      date: serverDate.toISOString(), 
-      dayOfWeek: result.dayOfWeek,
-      tmwDate: tmwServerDate.toISOString(),
-      tmwDayOfWeek: result.tmwDayOfWeek
-    });
-    return result;
   } catch (error) {
-    console.warn("Error fetching server time:", error);
-    const localDate = new Date();
+    console.warn("Failed to sync server time, using local time", error);
+    const localDate = DateTime.now().setZone(TIMEZONE).toJSDate();
     return {
       date: localDate,
-      dayOfWeek: localDate.getUTCDay(),
+      dayOfWeek: DateTime.fromJSDate(localDate, { zone: TIMEZONE }).weekday % 7,
     };
   }
 }
 
-// Synchronous version - uses cached offset (won't be perfect on first call)
+// Synchronous version - uses cached offset
 export function getCurrentTime() {
-  if (serverTimeOffset !== null) {
-    return new Date(Date.now() + serverTimeOffset);
-  }
-  return new Date();
+  return time.now().toJSDate();
 }
 
-// Helper function to format date as YYYY-MM-DD using server time (UTC timezone)
+// Helper function to format date as YYYY-MM-DD using server time
 export function formatServerDate(date) {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return time.toISODate(date);
 }
 
-// Helper function to get tomorrow's date based on server time (UTC)
+// Helper function to get tomorrow's date based on server time
 export function getTomorrowDate(serverTime) {
-  const tomorrow = new Date(serverTime);
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  return tomorrow;
+  return time.addDays(1).toJSDate();
 }
 
 // Helper function to get next Monday based on server time
 // If today is Monday, returns today; if Friday/Saturday/Sunday, returns next Monday
 export function getNextMondayDate(serverTime) {
-  const date = new Date(serverTime);
-  // Use getUTCDay() to get the day in UTC, not local timezone
-  const day = date.getUTCDay(); // 0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday
+  const now = time.now();
+  const weekday = time.getWeekday(); // Luxon: 1=Mon, 7=Sun
+  const jsWeekday = weekday % 7; // 0=Sun, 1=Mon, ..., 6=Sat
 
   let daysToAdd = 0;
-  if (day === 0) {
+  if (jsWeekday === 0) {
     // Sunday -> Monday (1 day)
     daysToAdd = 1;
-  } else if (day === 5) {
+  } else if (jsWeekday === 5) {
     // Friday -> Monday (3 days)
     daysToAdd = 3;
-  } else if (day === 6) {
+  } else if (jsWeekday === 6) {
     // Saturday -> Monday (2 days)
     daysToAdd = 2;
-  } else if (day === 1) {
+  } else if (jsWeekday === 1) {
     // Monday -> Monday (0 days, today)
     daysToAdd = 0;
   }
 
-  date.setUTCDate(date.getUTCDate() + daysToAdd);
-  return date;
+  return now.plus({ days: daysToAdd }).toJSDate();
 }
 
 // Get tomorrow's date or Monday if today is Fri/Sat/Sun (for cafeteria lunch display)
 export async function getCafeteriaLunchDate() {
-  const { date: serverTime, dayOfWeek: day } = await getServerTime();
+  await time.initTimeSync();
+  const weekday = time.getWeekday(); // Luxon: 1=Mon, 7=Sun
+  const jsWeekday = weekday % 7; // 0=Sun, 1=Mon, ..., 6=Sat
 
   // If today is Friday (5), Saturday (6), or Sunday (0), show Monday
-  if (day === 5 || day === 6 || day === 0) {
-    return formatServerDate(getNextMondayDate(serverTime));
+  if (jsWeekday === 5 || jsWeekday === 6 || jsWeekday === 0) {
+    return time.toISODate(getNextMondayDate(time.now().toJSDate()));
   }
 
   // Otherwise, show tomorrow
-  return formatServerDate(getTomorrowDate(serverTime));
+  return time.toISODate(time.addDays(1));
 }
 
 // Get the lunch order date based on current day and time
 // Returns tomorrow for regular days, or Monday for Friday/Saturday/Sunday
 export async function getLunchOrderDate() {
-  const { date: serverTime, dayOfWeek: day } = await getServerTime();
+  await time.initTimeSync();
+  const weekday = time.getWeekday(); // Luxon: 1=Mon, 7=Sun
+  const jsWeekday = weekday % 7; // 0=Sun, 1=Mon, ..., 6=Sat
 
   // If today is Friday (5), Saturday (6), or Sunday (0), order for Monday
-  if (day === 5 || day === 6 || day === 0) {
-    return formatServerDate(getNextMondayDate(serverTime));
+  if (jsWeekday === 5 || jsWeekday === 6 || jsWeekday === 0) {
+    return time.toISODate(getNextMondayDate(time.now().toJSDate()));
   }
 
   // Otherwise, order for tomorrow
-  return formatServerDate(getTomorrowDate(serverTime));
+  return time.toISODate(time.addDays(1));
 }
 
 // Get the date to check for existing lunch orders
 // Returns Monday for Friday/Saturday/Sunday, otherwise tomorrow
 export async function getLunchCheckDate() {
-  const { date: serverTime, dayOfWeek: day } = await getServerTime();
+  await time.initTimeSync();
+  const weekday = time.getWeekday();
+  const jsWeekday = weekday % 7;
 
   // If today is Friday (5), Saturday (6), or Sunday (0), check for Monday
-  if (day === 5 || day === 6 || day === 0) {
-    return formatServerDate(getNextMondayDate(serverTime));
+  if (jsWeekday === 5 || jsWeekday === 6 || jsWeekday === 0) {
+    return time.toISODate(getNextMondayDate(time.now().toJSDate()));
   }
 
   // Otherwise, check for tomorrow
-  return formatServerDate(getTomorrowDate(serverTime));
+  return time.toISODate(time.addDays(1));
 }
 
 // Get lunch date and its day of week
 // Returns { dateString, dayOfWeek } where dayOfWeek is 0-6
 export async function getLunchDateWithDayOfWeek() {
-  const { date: serverTime, dayOfWeek: day } = await getServerTime();
-  
-  console.log("🐛 getLunchDateWithDayOfWeek START - day:", day, "serverTime:", serverTime.toISOString());
-  
+  await time.initTimeSync();
+  const weekday = time.getWeekday();
+  const jsWeekday = weekday % 7;
+
+  console.log(
+    "🐛 getLunchDateWithDayOfWeek START - day:",
+    jsWeekday,
+    "serverTime:",
+    time.now().toISO(),
+  );
+
   let lunchDate;
   let lunchDayOfWeek;
-  
+
   // If today is Friday (5), Saturday (6), or Sunday (0), order for Monday
-  if (day === 5 || day === 6 || day === 0) {
-    lunchDate = getNextMondayDate(serverTime);
+  if (jsWeekday === 5 || jsWeekday === 6 || jsWeekday === 0) {
+    lunchDate = getNextMondayDate(time.now().toJSDate());
     lunchDayOfWeek = 1; // Monday is day 1
-    console.log("🐛 getLunchDateWithDayOfWeek - Weekend detected, using Monday");
+    console.log(
+      "🐛 getLunchDateWithDayOfWeek - Weekend detected, using Monday",
+    );
   } else {
     // Otherwise, order for tomorrow
-    lunchDate = getTomorrowDate(serverTime);
-    lunchDayOfWeek = (day + 1) % 7; // Get tomorrow's day of week
+    lunchDate = time.addDays(1).toJSDate();
+    lunchDayOfWeek = (jsWeekday + 1) % 7; // Get tomorrow's day of week
     console.log("🐛 getLunchDateWithDayOfWeek - Weekday, using tomorrow");
   }
-  
+
   const result = {
-    dateString: formatServerDate(lunchDate),
+    dateString: time.toISODate(lunchDate),
     dayOfWeek: lunchDayOfWeek,
   };
-  console.log("🐛 getLunchDateWithDayOfWeek RESULT:", result, "lunchDate object:", lunchDate.toISOString());
+  console.log(
+    "🐛 getLunchDateWithDayOfWeek RESULT:",
+    result,
+    "lunchDate object:",
+    time.toISODate(lunchDate),
+  );
   return result;
 }
 
 // Get server time and extract hour/minute for time window checks (ALWAYS USE UTC)
 export async function getServerTimeComponents() {
-  const {
-    date: serverTime,
-    dayOfWeek: day,
-    tmwDate: tmwDate,
-    tmwDayOfWeek: tmwDayOfWeek,
-  } = await getServerTime();
+  await time.initTimeSync();
+  const now = time.now();
+  const tomorrow = time.addDays(1);
+  const weekday = time.getWeekday();
+  const jsWeekday = weekday % 7;
+  const tmwWeekday = (weekday + 1) % 7;
+
   return {
-    date: serverTime,
-    tmwDate: tmwDate,
-    hour: serverTime.getUTCHours(), // Use UTC hours, not local
-    minute: serverTime.getUTCMinutes(), // Use UTC minutes, not local
-    dateString: formatServerDate(serverTime),
-    // tomorrowString: formatServerDate(getNextOrderDate(serverTime)),
-    tomorrowString: formatServerDate(getTomorrowDate(serverTime)),
-    day: day,
-    tmwDayOfWeek: tmwDayOfWeek,
+    date: now.toJSDate(),
+    tmwDate: tomorrow.toJSDate(),
+    hour: now.hour,
+    minute: now.minute,
+    dateString: time.nowDate(),
+    tomorrowString: time.toISODate(tomorrow),
+    day: jsWeekday,
+    tmwDayOfWeek: tmwWeekday,
   };
 }
 
 // Get the current day of the week (0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday)
 export async function getCurrentDayOfWeek() {
-  const { dayOfWeek } = await getServerTime();
-  return dayOfWeek;
+  await time.initTimeSync();
+  return time.getWeekday() % 7;
 }
 
 // Get the name of today's weekday
@@ -316,20 +225,14 @@ export function readToken() {
 }
 
 function formatDateYYYYMMDD(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  return time.toISODate(date);
 }
 
 // returns next Monday date (if today is Monday returns today)
 function getNextMonday(from = getCurrentTime()) {
-  const day = from.getDay(); // 0 (Sun) - 6 (Sat)
-  const daysToAdd = (8 - day) % 7; // 0 when Monday
-  const next = new Date(from);
-  next.setDate(from.getDate() + daysToAdd);
-  next.setHours(0, 0, 0, 0);
-  return next;
+  const fromDateTime = time.parseISO(from).startOf("day");
+  const daysToAdd = (8 - fromDateTime.weekday) % 7; // 0 when Monday
+  return fromDateTime.plus({ days: daysToAdd }).startOf("day").toJSDate();
 }
 
 export async function getWeeklyMeals() {
@@ -347,9 +250,9 @@ export async function getWeeklyMeals() {
     }
 
     // compute next monday
-    const { date: serverTime } = await getServerTime();
-    const nextMonday = getNextMonday(serverTime);
-    const dateStr = formatDateYYYYMMDD(nextMonday);
+    await time.initTimeSync();
+    const nextMonday = getNextMonday(time.now().toJSDate());
+    const dateStr = time.toISODate(nextMonday);
 
     const res = await fetch(`${API_URL}/weekly-menu/${dateStr}`, {
       headers: getHeaders({
@@ -393,7 +296,9 @@ export async function getTodayMenuByCategory(categoryName, targetDate = null) {
     if (targetDate && targetDate.trim()) {
       menuDate = targetDate;
     } else {
-      const { date: serverTime, dayOfWeek: day } = await getServerTime();
+      await time.initTimeSync();
+      const weekday = time.getWeekday();
+      const jsWeekday = weekday % 7;
 
       // For lunch category, use special logic: Mon if Fri/Sat/Sun, else tomorrow
       if (
@@ -403,18 +308,25 @@ export async function getTodayMenuByCategory(categoryName, targetDate = null) {
         categoryName.toLowerCase() === "side"
       ) {
         // These are lunch categories - use getLunchOrderDate logic
-        if (day === 5 || day === 6 || day === 0) {
-          menuDate = formatServerDate(getNextMondayDate(serverTime));
+        if (jsWeekday === 5 || jsWeekday === 6 || jsWeekday === 0) {
+          menuDate = time.toISODate(getNextMondayDate(time.now().toJSDate()));
         } else {
-          menuDate = formatServerDate(getTomorrowDate(serverTime));
+          menuDate = time.toISODate(time.addDays(1));
         }
       } else {
         // Breakfast or other categories - use regular tomorrow
-        menuDate = formatServerDate(getTomorrowDate(serverTime));
+        menuDate = time.toISODate(time.addDays(1));
       }
     }
 
-    console.log("🐛 getTodayMenuByCategory - category:", categoryName, "menuDate:", menuDate, "targetDate provided:", !!targetDate);
+    console.log(
+      "🐛 getTodayMenuByCategory - category:",
+      categoryName,
+      "menuDate:",
+      menuDate,
+      "targetDate provided:",
+      !!targetDate,
+    );
 
     const res = await fetch(`${API_URL}/daily-menu/${menuDate}`, {
       headers: getHeaders({
@@ -688,8 +600,9 @@ export async function getUserOrdersByDate(dateStr, token) {
     const uid = u?.id;
     if (!uid) return { error: "No user id in token" };
 
-    const month = new Date(dateStr).getMonth() + 1; // 1-based
-    const year = new Date(dateStr).getFullYear();
+    const dateObj = time.parseISO(dateStr);
+    const month = dateObj.month; // 1-based
+    const year = dateObj.year;
 
     const monthly = await getUserOrdersForMonth(uid, month, year, t);
     if (monthly && monthly.error) return monthly;

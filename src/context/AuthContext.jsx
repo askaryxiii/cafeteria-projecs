@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
-import { clearVerifiedUserCache, getCurrentTime } from "../lib/apis";
+import { clearVerifiedUserCache } from "../lib/apis";
+import time from "@/utils/timeClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-    const ms = expiresAt - Date.now();
+    const ms = expiresAt - time.now().toMillis();
     if (ms <= 0) {
       logout();
       return;
@@ -71,8 +72,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error(
           `Token verification failed: ${res.status} - ${responseText.substring(
             0,
-            100
-          )}`
+            100,
+          )}`,
         );
       }
 
@@ -83,8 +84,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error(
           `Expected JSON response but got ${contentType}. Is the API endpoint correct? Response: ${responseText.substring(
             0,
-            100
-          )}`
+            100,
+          )}`,
         );
       }
 
@@ -99,8 +100,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error(
           `Server response is not valid JSON. Response: ${responseText.substring(
             0,
-            100
-          )}`
+            100,
+          )}`,
         );
       }
     } catch (fetchError) {
@@ -132,7 +133,7 @@ export const AuthProvider = ({ children }) => {
     // backend may optionally include expiry info; try common locations
     const expiresAt =
       (verifyRes && (verifyRes.expiresAt || verifyRes.user?.exp)) ||
-      getCurrentTime().getTime() + 7 * 24 * 3600 * 1000;
+      time.now().toMillis() + 7 * 24 * 3600 * 1000;
 
     // persist token depending on remember flag
     const storage = remember ? localStorage : sessionStorage;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
 import { getServerTime } from "../../../lib/apis";
-
+import time from "@/utils/timeClient";
 const API_URL = import.meta.env.VITE_API_BASE;
 
 function readToken() {
@@ -20,39 +20,28 @@ function readToken() {
 const WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
 const CATEGORIES = ["protein", "carbs", "salad", "side"];
 
-// Helper function to parse ISO date string and create a local date (not UTC)
+// Helper function to parse ISO date values with the server timezone
 function parseLocalDate(dateString) {
-  const [year, month, day] = dateString.split("-").map(Number);
-  const date = new Date(year, month - 1, day, 0, 0, 0, 0);
-  return date;
+  return time.parseISO(dateString);
 }
 
-// Helper function to format date as YYYY-MM-DD in local time (not UTC)
+// Helper function to format date as YYYY-MM-DD in the server timezone
 function formatLocalDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return time.toISODate(date);
 }
 
 // Get Monday of the current week
-function getMondayOfCurrentWeek(now = new Date()) {
-  const day = now.getDay(); // 0 (Sunday) - 6 (Saturday)
-  // Calculate days since Monday (Monday = 1, Sunday = 0)
-  const daysToMonday = day === 0 ? -6 : 1 - day; // If Sunday, go back 6 days; otherwise go back (day - 1) days
-  const monday = new Date(now);
-  monday.setDate(now.getDate() + daysToMonday);
-  return formatLocalDate(monday);
+function getMondayOfCurrentWeek(now = time.now()) {
+  const weekday = now.weekday; // 1 = Monday, 7 = Sunday
+  const daysToMonday = weekday === 7 ? -6 : 1 - weekday;
+  const monday = now.plus({ days: daysToMonday });
+  return monday.toISODate();
 }
 
 // Calculate dates for the week starting from a given date
 function getWeekDates(startDate) {
   const start = parseLocalDate(startDate);
-  return WEEKDAYS.map((day, index) => {
-    const date = new Date(start);
-    date.setDate(start.getDate() + index);
-    return formatLocalDate(date);
-  });
+  return WEEKDAYS.map((_, index) => start.plus({ days: index }).toISODate());
 }
 
 const WeeklyMenuItems = ({ control, watch, menuItems, errors }) => {
